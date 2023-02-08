@@ -1,0 +1,178 @@
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 52 - Transferência de valor alto para terceiros |' ||    
+'Objetivo: C) Movimentação de recursos de alto valor, de forma contumaz, em benefício de terceiros. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Cliente movimentou recursos de alto valor, de forma contumaz, em benefício de terceiros |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||   
+'Período de consolidação: de ' || TO_CHAR((T1.DT_FIM - 30),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_FIM),'DD/MM/YYYY') ||  '|' ||    
+'Valor total transferido para terceiros: ' || LTRIM(TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99')) || '|'  ||    
+'Quantidade de transações: ' || TO_CHAR(QT_TRANS) || '|'  ||   
+'Análise: Detalhe das transações de transferência' || '|'  ||   
+TRANS  
+ || '|' ||    
+'Parâmetro de comparação com a quantidade de ocorrências tratadas pela regra, para Pessoas Física (pm_QtdeContumazPF): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeContumazPF, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de comparação para valores considerados altos, para Pessoas Física (pm_AltoValorPF): ' || COALESCE((SELECT TO_CHAR(:pm_AltoValorPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE    
+FROM (  
+SELECT C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,  C.CD_LOTE, MAX(C.DT_FIM) DT_FIM, COUNT(*) QT_TRANS, SUM(VL_OPER) VL_TOTAL,  
+xmlcast(  xmlagg(xmlelement(outros,   
+CASE T1.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'CPF-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_DESTORIG   
+END   
+|| ': Data-' || to_char(T1.DT_TRANS,'DD/MM/YY') || ', Valor-' || LTRIM(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  
+|| '|')    
+order by T1.CD_DOC_IDENTF_CLIE) as clob) TRANS  
+FROM TB_TRANS T1    
+INNER JOIN VM_CLIE C ON T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE  
+WHERE T1.CD_TP_PESSOA = 'F'    
+  AND T1.CD_NATUR_OPER = 2    
+  AND T1.FL_ANALISADO = 1   
+  AND T1.CD_TP_OPER IN (5, 8, 9)      
+  AND T1.VL_OPER IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_DESTORIG IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_CLIE <> T1.CD_DOC_IDENTF_DESTORIG    
+  AND T1.DT_TRANS >= (C.DT_FIM - 30)    
+  AND T1.DT_TRANS <= C.DT_FIM     
+GROUP BY C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, C.CD_LOTE    
+HAVING SUM(T1.VL_OPER) > (:pm_AltoValorPF)    
+AND COUNT(*) > (:pm_QtdeContumazPF)    
+) T1  
+  
+UNION ALL  
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 52 - Transferência de valor alto para terceiros |' ||    
+'Objetivo: C) Movimentação de recursos de alto valor, de forma contumaz, em benefício de terceiros. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Cliente movimentou recursos de alto valor, de forma contumaz, em benefício de terceiros |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||   
+'Período de consolidação: de ' || TO_CHAR((T1.DT_FIM - 30),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_FIM),'DD/MM/YYYY') ||  '|' ||    
+'Valor total recebido de terceiros: ' || LTRIM(TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99')) || '|'  ||    
+'Quantidade de transações: ' || TO_CHAR(QT_TRANS) || '|'  ||   
+'Análise: Detalhe dos créditos' || '|'  ||   
+TRANS  
+ || '|' ||    
+'Parâmetro de comparação com a quantidade de ocorrências tratadas pela regra, para Pessoas Física (pm_QtdeContumazPF): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeContumazPF, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de comparação para valores considerados altos, para Pessoas Física (pm_AltoValorPF): ' || COALESCE((SELECT TO_CHAR(:pm_AltoValorPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE    
+FROM (  
+SELECT C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,  C.CD_LOTE, MAX(C.DT_FIM) DT_FIM, COUNT(*) QT_TRANS, SUM(VL_OPER) VL_TOTAL,  
+xmlcast(  xmlagg(xmlelement(outros,   
+CASE T1.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'CPF-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_DESTORIG   
+END   
+|| ': Data-' || to_char(T1.DT_TRANS,'DD/MM/YY') || ', Valor-' || LTRIM(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  
+|| '|')    
+order by T1.CD_DOC_IDENTF_CLIE) as clob) TRANS  
+FROM TB_TRANS T1    
+INNER JOIN VM_CLIE C ON T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE  
+WHERE T1.CD_TP_PESSOA = 'F'    
+  AND T1.CD_NATUR_OPER = 1    
+  AND T1.FL_ANALISADO = 1   
+  AND T1.CD_TP_OPER IN (5, 8, 9)      
+  AND T1.VL_OPER IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_DESTORIG IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_CLIE <> T1.CD_DOC_IDENTF_DESTORIG    
+  AND T1.DT_TRANS >= (C.DT_FIM - 30)    
+  AND T1.DT_TRANS <= C.DT_FIM     
+GROUP BY C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, C.CD_LOTE    
+HAVING SUM(VL_OPER) > (:pm_AltoValorPF)    
+AND COUNT(*) > (:pm_QtdeContumazPF)    
+) T1  
+UNION ALL  
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 52 - Transferência de valor alto para terceiros |' ||    
+'Objetivo: C) Movimentação de recursos de alto valor, de forma contumaz, em benefício de terceiros. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Cliente movimentou recursos de alto valor, de forma contumaz, em benefício de terceiros |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||   
+'Período de consolidação: de ' || TO_CHAR((T1.DT_FIM - 30),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_FIM),'DD/MM/YYYY') ||  '|' ||    
+'Valor total transferido para terceiros: ' || LTRIM(TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99')) || '|'  ||    
+'Quantidade de transações: ' || TO_CHAR(QT_TRANS) || '|'  ||   
+'Análise: Detalhe das transações de transferência' || '|'  ||   
+TRANS  
+ || '|' ||    
+'Parâmetro de comparação com a quantidade de ocorrências tratadas pela regra, para Pessoa Jurídica (pm_QtdeContumazPJ): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeContumazPJ, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de comparação para valores considerados altos, para Pessoa Jurídica (pm_AltoValorPJ): ' || COALESCE((SELECT TO_CHAR(:pm_AltoValorPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE    
+FROM (  
+SELECT C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, C.CD_LOTE, MAX(C.DT_FIM) DT_FIM, COUNT(*) QT_TRANS, SUM(VL_OPER) VL_TOTAL,  
+xmlcast(  xmlagg(xmlelement(outros,   
+CASE T1.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'CPF-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_DESTORIG   
+END   
+|| ': Data-' || to_char(T1.DT_TRANS,'DD/MM/YY') || ', Valor-' || LTRIM(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  
+|| '|')    
+order by T1.CD_DOC_IDENTF_CLIE) as clob) TRANS  
+FROM TB_TRANS T1    
+INNER JOIN VM_CLIE C ON T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE  
+WHERE T1.CD_TP_PESSOA = 'J'    
+  AND T1.CD_NATUR_OPER = 2    
+  AND T1.FL_ANALISADO = 1   
+  AND T1.CD_TP_OPER IN (5, 8, 9)      
+  AND T1.VL_OPER IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_DESTORIG IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_CLIE <> T1.CD_DOC_IDENTF_DESTORIG    
+  AND T1.DT_TRANS >= (C.DT_FIM - 30)    
+  AND T1.DT_TRANS <= C.DT_FIM     
+GROUP BY C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, C.CD_LOTE     
+HAVING SUM(VL_OPER) > (:pm_AltoValorPJ)    
+AND    COUNT(*) > (:pm_QtdeContumazPJ)    
+) T1  
+  
+UNION ALL  
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 52 - Transferência de valor alto para terceiros |' ||    
+'Objetivo: C) Movimentação de recursos de alto valor, de forma contumaz, em benefício de terceiros. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Cliente movimentou recursos de alto valor, de forma contumaz, em benefício de terceiros |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||   
+'Período de consolidação: de ' || TO_CHAR((T1.DT_FIM - 30),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_FIM),'DD/MM/YYYY') ||  '|' ||    
+'Valor total recebido de terceiros: ' || LTRIM(TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99')) || '|'  ||    
+'Quantidade de transações: ' || TO_CHAR(QT_TRANS) || '|'  ||   
+'Análise: Detalhe dos créditos' || '|'  ||   
+TRANS  
+ || '|' ||    
+'Parâmetro de comparação com a quantidade de ocorrências tratadas pela regra, para Pessoa Jurídica (pm_QtdeContumazPJ): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeContumazPJ, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de comparação para valores considerados altos, para Pessoa Jurídica (pm_AltoValorPJ): ' || COALESCE((SELECT TO_CHAR(:pm_AltoValorPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE    
+FROM (  
+SELECT C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, C.CD_LOTE, MAX(C.DT_FIM) DT_FIM, COUNT(*) QT_TRANS, SUM(VL_OPER) VL_TOTAL,  
+xmlcast(  xmlagg(xmlelement(outros,   
+CASE T1.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'CPF-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_DESTORIG   
+END   
+|| ': Data-' || to_char(T1.DT_TRANS,'DD/MM/YY') || ', Valor-' || LTRIM(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  
+|| '|')    
+order by T1.CD_DOC_IDENTF_CLIE) as clob) TRANS  
+FROM TB_TRANS T1    
+INNER JOIN VM_CLIE C ON T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE  
+WHERE T1.CD_TP_PESSOA = 'J'    
+  AND T1.CD_NATUR_OPER = 1    
+  AND T1.FL_ANALISADO = 1   
+  AND T1.CD_TP_OPER IN (5, 8, 9)      
+  AND T1.VL_OPER IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_DESTORIG IS NOT NULL    
+  AND T1.CD_DOC_IDENTF_CLIE <> T1.CD_DOC_IDENTF_DESTORIG    
+  AND T1.DT_TRANS >= (C.DT_FIM - 30)    
+  AND T1.DT_TRANS <= C.DT_FIM     
+GROUP BY C.DT_APONTAMENTO, T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, C.CD_LOTE    
+HAVING SUM(VL_OPER) > (:pm_AltoValorPJ)    
+AND    COUNT(*) > (:pm_QtdeContumazPJ)    
+) T1  
+

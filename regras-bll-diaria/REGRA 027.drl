@@ -1,0 +1,132 @@
+SELECT SAQUE.DT_APONTAMENTO, SAQUE.CD_DOC_IDENTF_CLIE,SAQUE.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 27 - Saques em Espécie |' ||  
+'Objetivo: h) Realização de saques em espécie de conta que receba diversos depósitos por transferência eletrônica de várias origens em curto período de tempo. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||  
+'Conclusão: O cliente realizou saques em espécie, sendo que sua conta recebeu diversos depósitos por transferência eletrônica, de várias origens, em curto período de tempo |' ||  
+'Cliente: ' ||  SAQUE.NM_CLIE || '|' || 
+CASE SAQUE.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE SAQUE.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||   
+'Saque-Lote referente: ' || TO_CHAR(SAQUE.CD_LOTE)  || '|' || 
+'Saque-Valor da Total: ' || TO_CHAR(VL_SAQUE, 'L999G999G999G990D99') || '|' ||    
+'Saque-Quantidade: ' || TO_CHAR(Q_SAQUE) || '|' || 
+'Saque-lista de saques: ' || SAQUES || '|' ||   
+ 
+'Crédito-Período de consolidação: de ' || TO_CHAR((CREDITO.DT_FIM  - (:pm_QDiasRecuo)),'DD/MM/YYYY') ||    
+' até ' || TO_CHAR(CREDITO.DT_FIM, 'DD/MM/YYYY') || '|' ||  
+ 
+'Crédito-Valor da Total: ' || TO_CHAR(VL_CREDITO, 'L999G999G999G990D99') || '|' ||    
+'Crédito-Quantidade: ' || TO_CHAR(Q_CREDITO) || '|' || 
+'Crédito-Quantidade de origens diferentes: ' || TO_CHAR(QORIGENS_diferentes) || '|' || 
+'Crédito-Documento de identificação das origens: ' || Origens || '|' || 
+ 
+'Parâmetro de quantidade de dias de recuo para consolidação e calculo de QtdeOrigemDistintas (pm_QDiasRecuo): ' || COALESCE((SELECT TO_CHAR(:pm_QDiasRecuo, '999999990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|' ||  
+'Parâmetro de quantidade mínima de origens distintas de saque. Somente Pessoa Física (pm_QtdeOrigemDistintasPF): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeOrigemDistintasPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|' || 
+'Parâmetro de valor mínimo para operação de Saque. Somente Pessoa Física (pm_ValorMinimo_PF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|'  
+AS DS_INF_ANLSE  
+FROM ( 
+SELECT CD_LOTE, LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) VL_SAQUE, 
+xmlcast(  xmlagg(xmlelement(outros,  LTRIM(TO_CHAR(VL_OPER, 'L999G999G999G990D99'))  || '/ ')  order by VL_OPER) as clob) SAQUES,   
+COUNT(*) Q_SAQUE   
+FROM TB_TRANS_ANLSE  
+WHERE CD_LOTE = :cd_lote  
+  AND CD_SUBLOTE = :cd_sublote
+  AND CD_NATUR_OPER = 2 /*debito*/  
+  AND CD_TP_OPER    = 7 /*saque*/  
+  AND CD_FORMA_OPER = 7 /*especie*/  
+  AND CD_TP_PESSOA  = 'F'  
+  AND VL_OPER IS NOT NULL  
+GROUP BY CD_LOTE, LAST_DAY(TRUNC(DT_TRANS)), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE  
+HAVING SUM(VL_OPER) > (:pm_ValorMinimo_PF)  
+) SAQUE  
+INNER JOIN  
+(SELECT T2.DT_APONTAMENTO,T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, LISTAGG(TO_CHAR(T2.CD_DOC_IDENTF_DESTORIG), '/ ') WITHIN GROUP (ORDER BY T2.CD_DOC_IDENTF_CLIE desc) ORIGENS, COUNT(*) QORIGENS_diferentes, SUM(VL_CREDITO) VL_CREDITO, SUM(Q_CREDITO) Q_CREDITO, MAX(T2.DT_INIC) DT_INIC, MAX(T2.DT_FIM) DT_FIM 
+ FROM ( 
+  
+ SELECT C.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG, SUM(VL_OPER) VL_CREDITO, COUNT(*) Q_CREDITO, MAX(C.DT_INIC) DT_INIC, MAX(C.DT_FIM) DT_FIM 
+ FROM TB_TRANS T  
+ INNER JOIN VM_CLIE C ON T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE AND C.CD_TP_PESSOA = 'F'     
+ WHERE T.FL_ANALISADO = 1  
+   AND T.CD_DOC_IDENTF_DESTORIG IS NOT NULL 
+   AND T.CD_DOC_IDENTF_CLIE <> T.CD_DOC_IDENTF_DESTORIG  
+   AND T.CD_NATUR_OPER = 1  
+   AND T.FL_ANALISADO = 1 
+   AND T.CD_TP_OPER IN (5, 8, 9)  
+   AND (T.DT_TRANS >= (C.DT_FIM - (:pm_QDiasRecuo)))     
+   AND T.DT_TRANS <= C.DT_FIM 
+ GROUP BY C.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG   
+ ) T2 
+ GROUP BY T2.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE 
+ HAVING COUNT(*) > (:pm_QtdeOrigemDistintasPF)    
+ ) CREDITO 
+ ON SAQUE.CD_DOC_IDENTF_CLIE = CREDITO.CD_DOC_IDENTF_CLIE AND SAQUE.CD_TP_IDENTF_CLIE = CREDITO.CD_TP_IDENTF_CLIE AND SAQUE.DT_APONTAMENTO = CREDITO.DT_APONTAMENTO
+ 
+UNION ALL 
+ 
+SELECT SAQUE.DT_APONTAMENTO, SAQUE.CD_DOC_IDENTF_CLIE,SAQUE.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 27 - Saques em Espécie |' ||  
+'Objetivo: h) Realização de saques em espécie de conta que receba diversos depósitos por transferência eletrônica de várias origens em curto período de tempo. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||  
+'Conclusão: O cliente realizou saques em espécie, sendo que sua conta recebeu diversos depósitos por transferência eletrônica, de várias origens, em curto período de tempo |' ||  
+'Cliente: ' ||  SAQUE.NM_CLIE || '|' || 
+CASE SAQUE.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(SAQUE.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE SAQUE.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||   
+'Saque-Lote referente: ' || TO_CHAR(SAQUE.CD_LOTE)  || '|' || 
+'Saque-Valor da Total: ' || TO_CHAR(VL_SAQUE, 'L999G999G999G990D99') || '|' ||    
+'Saque-Quantidade: ' || TO_CHAR(Q_SAQUE) || '|' || 
+'Saque-lista de saques: ' || SAQUES || '|' ||   
+ 
+'Crédito-Período de consolidação: de ' || TO_CHAR((CREDITO.DT_FIM  - (:pm_QDiasRecuo)),'DD/MM/YYYY') ||    
+' até ' || TO_CHAR(CREDITO.DT_FIM, 'DD/MM/YYYY') || '|' ||  
+ 
+'Crédito-Valor da Total: ' || TO_CHAR(VL_CREDITO, 'L999G999G999G990D99') || '|' ||    
+'Crédito-Quantidade: ' || TO_CHAR(Q_CREDITO) || '|' || 
+'Crédito-Quantidade de origens diferentes: ' || TO_CHAR(QORIGENS_diferentes) || '|' || 
+'Crédito-Documento de identificação das origens: ' || Origens || '|' || 
+ 
+'Parâmetro de quantidade de dias de recuo para consolidação e calculo de QtdeOrigemDistintas (pm_QDiasRecuo): ' || COALESCE((SELECT TO_CHAR(:pm_QDiasRecuo, '999999990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|' || 
+'Parâmetro de quantidade mínima de origens distintas de saque. Somente Pessoa Jurídica (pm_QtdeOrigemDistintasPJ): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeOrigemDistintasPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|' ||  
+'Parâmetro de valor mínimo para operação de Saque. Somente Pessoa Jurídica (pm_ValorMinimo_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|'  
+AS DS_INF_ANLSE  
+FROM ( 
+SELECT CD_LOTE, LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) VL_SAQUE, 
+xmlcast(  xmlagg(xmlelement(outros,  LTRIM(TO_CHAR(VL_OPER, 'L999G999G999G990D99'))  || '/ ')  order by VL_OPER) as clob) SAQUES,   
+COUNT(*) Q_SAQUE   
+FROM TB_TRANS_ANLSE  
+WHERE CD_LOTE = :cd_lote  
+  AND CD_SUBLOTE = :cd_sublote
+  AND CD_NATUR_OPER = 2 /*debito*/  
+  AND CD_TP_OPER    = 7 /*saque*/  
+  AND CD_FORMA_OPER = 7 /*especie*/  
+  AND CD_TP_PESSOA  = 'J'  
+  AND VL_OPER IS NOT NULL  
+GROUP BY CD_LOTE, LAST_DAY(TRUNC(DT_TRANS)), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE  
+HAVING SUM(VL_OPER) > (:pm_ValorMinimo_PJ)  
+) SAQUE  
+INNER JOIN  
+(SELECT T2.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, LISTAGG(TO_CHAR(T2.CD_DOC_IDENTF_DESTORIG), '/ ') WITHIN GROUP (ORDER BY T2.CD_DOC_IDENTF_CLIE desc) ORIGENS, COUNT(*) QORIGENS_diferentes, SUM(VL_CREDITO) VL_CREDITO, SUM(Q_CREDITO) Q_CREDITO, MAX(T2.DT_INIC) DT_INIC, MAX(T2.DT_FIM) DT_FIM 
+ FROM ( 
+  
+ SELECT C.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG, SUM(VL_OPER) VL_CREDITO, COUNT(*) Q_CREDITO, MAX(C.DT_INIC) DT_INIC, MAX(C.DT_FIM) DT_FIM 
+ FROM TB_TRANS T  
+ INNER JOIN VM_CLIE C ON T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE AND C.CD_TP_PESSOA = 'J'     
+ WHERE T.FL_ANALISADO = 1  
+   AND T.CD_DOC_IDENTF_DESTORIG IS NOT NULL 
+   AND T.CD_DOC_IDENTF_CLIE <> T.CD_DOC_IDENTF_DESTORIG  
+   AND T.CD_NATUR_OPER = 1  
+   AND T.FL_ANALISADO  = 1 
+   AND T.CD_TP_OPER IN (5, 8, 9)  
+   AND (T.DT_TRANS >= (C.DT_FIM - (:pm_QDiasRecuo)))     
+   AND T.DT_TRANS <= C.DT_FIM 
+ GROUP BY C.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG   
+ ) T2 
+ GROUP BY T2.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE 
+ HAVING COUNT(*) > (:pm_QtdeOrigemDistintasPJ)    
+ ) CREDITO 
+ ON SAQUE.CD_DOC_IDENTF_CLIE = CREDITO.CD_DOC_IDENTF_CLIE AND SAQUE.CD_TP_IDENTF_CLIE = CREDITO.CD_TP_IDENTF_CLIE AND SAQUE.DT_APONTAMENTO = CREDITO.DT_APONTAMENTO
+ 

@@ -1,0 +1,1 @@
+select vl_apontamento, vl_ponto_corte, fl_carencia, fl_ponto_corte, fl_susp_ld from tb_apontamento where cd_doc_identf_clie = '10426500000000';

@@ -1,0 +1,182 @@
+/* 4065 - MENSAL*/     
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4065 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' || T.NM_CLIE || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+     ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+ || '|' ||    
+'Mês calendário: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||   
+'Renda/Faturamento: ' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não informado') || '|' ||   
+'Quantidade de ORPAGs no caixa: ' || COALESCE(TO_CHAR(QT_TOTAL),'Quantidade não informada') || '|' ||   
+'Valor total de ORPAGs no caixa: ' || COALESCE(TO_CHAR(VL_TOTAL, 'L999G999G999G990D99'),'Valor não informado') || '|'  ||   
+CASE CD_TP_PESSOA WHEN 'F' THEN  
+COALESCE((':DS-pm_ValorMinimoPF' || ' (' || ':NM-pm_ValorMinimoPF' || '):' || TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercRendaDebito' || ' (' || ':NM-pm_PercRendaDebito' || '):' || TO_CHAR(:pm_PercRendaDebito) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_QtdeOcorrenciasPF' || ' (' || ':NM-pm_QtdeOcorrenciasPF' || '):' || TO_CHAR(:pm_QtdeOcorrenciasPF, '999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_ValorOcorrenciasPF' || ' (' || ':NM-pm_ValorOcorrenciasPF' || '):' || TO_CHAR(:pm_ValorOcorrenciasPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'     
+WHEN 'J' THEN  
+COALESCE((':DS-pm_ValorMinimoPJ' || ' (' || ':NM-pm_ValorMinimoPJ' || '):' || TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercFaturamentoDebito' || ' (' || ':NM-pm_PercFaturamentoDebito' || '):' || TO_CHAR(:pm_PercFaturamentoDebito) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_QtdeOcorrenciasPJ' || ' (' || ':NM-pm_QtdeOcorrenciasPJ' || '):' || TO_CHAR(:pm_QtdeOcorrenciasPJ, '999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_ValorOcorrenciasPJ' || ' (' || ':NM-pm_ValorOcorrenciasPJ' || '):' || TO_CHAR(:pm_ValorOcorrenciasPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'     
+END  
+AS DS_INF_ANLSE     
+FROM (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT, QT_TOTAL, VL_TOTAL   
+      FROM (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT, COUNT(*) QT_TOTAL, SUM(VL_OPER) VL_TOTAL   
+            FROM TB_TRANS    
+            WHERE DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+            AND DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))    
+            AND CD_NATUR_OPER = 2  
+            AND FL_ANALISADO  = 1    
+            AND CD_VIA_OPER   = 2 /*Caixa*/  
+            AND CD_FORMA_OPER = 9 /*ORPAG*/   
+            AND ((CD_TP_PESSOA = 'F' AND VL_OPER > (:pm_ValorMinimoPF))  
+                  OR  
+                 (CD_TP_PESSOA = 'J' AND VL_OPER > (:pm_ValorMinimoPJ))  
+                )  
+            GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE) T  
+      WHERE (CD_TP_PESSOA = 'F'    
+             AND QT_TOTAL > (:pm_QtdeOcorrenciasPF)    
+             AND VL_TOTAL > (:pm_ValorOcorrenciasPF)   
+             AND ((VL_RENDA_FAT IS NOT NULL AND (VL_TOTAL > (VL_RENDA_FAT * (:pm_PercRendaDebito/100))))  
+                  OR VL_RENDA_FAT IS NULL)  
+            )  
+            OR  
+            (CD_TP_PESSOA = 'J'     
+             AND QT_TOTAL > (:pm_QtdeOcorrenciasPJ)    
+             AND VL_TOTAL > (:pm_ValorOcorrenciasPJ)   
+             AND ((VL_RENDA_FAT IS NOT NULL AND (VL_TOTAL > (VL_RENDA_FAT * (:pm_PercFaturamentoDebito/100))))  
+                  OR VL_RENDA_FAT IS NULL)  
+            )  
+     ) T  
+UNION ALL   
+ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4065 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' || T.NM_CLIE || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE   
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+     ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Lote:' || TO_CHAR(T.CD_MES_ANO) ||  '|' ||   
+'Agência: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||  
+'Conta: ' || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Natureza: débito ' || '|' ||   
+'Via: Caixa ' || '|' ||   
+'Forma: ORPAG ' || '|' ||   
+'Data: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||   
+'Valor do saldo inicial da conta: ' || COALESCE(TO_CHAR(T.VL_SLD_INIC, 'L999G999G999G990D99'),'Valor não informado') || '|' || 
+'Valor consolidado dos débitos ORPAG, via caixa, na data: ' || TO_CHAR(COALESCE(T.TOTAL_DEBITO,0), 'L999G999G999G990D99') || '|' ||     
+'Valor consolidado dos créditos na data: ' || TO_CHAR(COALESCE(T.TOTAL_CREDITO,0), 'L999G999G999G990D99') || '|' ||  
+COALESCE((':DS-pm_ValorChequeOP' || ' (' || ':NM-pm_ValorChequeOP' || '):' || TO_CHAR(:pm_ValorChequeOP, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercSaldoContaInferior' || ' (' || ':NM-pm_PercSaldoContaInferior' || '):' || TO_CHAR(:pm_PercSaldoContaInferior) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercSaldoContaSuperior' || ' (' || ':NM-pm_PercSaldoContaSuperior' || '):' || TO_CHAR(:pm_PercSaldoContaSuperior) || '%'),'Parâmetro não cadastrado' ) || '|'     
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_LOTE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_MES_ANO, T.DT_TRANS, T.VL_SLD_INIC, T.CD_AG, T.CD_CTA, 
+      SUM(T.TOTAL_CREDITO) TOTAL_CREDITO, SUM(T.TOTAL_DEBITO) TOTAL_DEBITO 
+      FROM (SELECT T.CD_LOTE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_MES_ANO, TRUNC(T.DT_TRANS) DT_TRANS,   
+            T.VL_SLD_INIC, T.CD_AG, T.CD_CTA, 
+            CASE T.CD_NATUR_OPER WHEN 1 THEN SUM(T.VL_OPER) END TOTAL_CREDITO,   
+            CASE WHEN T.CD_NATUR_OPER = 2 AND T.CD_VIA_OPER = 2 AND T.CD_FORMA_OPER = 9 THEN SUM(T.VL_OPER) END TOTAL_DEBITO     
+            FROM TB_TRANS  T  
+            WHERE T.DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+            AND T.DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD')) 
+            AND T.CD_NATUR_OPER IN (1, 2)    
+            AND T.FL_ANALISADO = 1     
+            AND T.VL_SLD_INIC IS NOT NULL  
+            GROUP BY T.CD_LOTE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_MES_ANO, TRUNC(T.DT_TRANS),   
+            T.VL_SLD_INIC, T.CD_AG, T.CD_CTA, T.CD_NATUR_OPER, T.CD_VIA_OPER, T.CD_FORMA_OPER   
+           ) T  
+      GROUP BY T.CD_LOTE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_MES_ANO, T.DT_TRANS, T.VL_SLD_INIC, T.CD_AG, T.CD_CTA   
+     ) T  
+WHERE T.TOTAL_DEBITO >= (:pm_ValorChequeOP)  
+AND T.TOTAL_DEBITO >= ((T.VL_SLD_INIC + COALESCE(T.TOTAL_CREDITO,0)) * (:pm_PercSaldoContaInferior/100))  
+AND T.TOTAL_DEBITO <= ((T.VL_SLD_INIC + COALESCE(T.TOTAL_CREDITO,0)) * (:pm_PercSaldoContaSuperior/100))    
+ 
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4065 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' || T.NM_CLIE || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE   
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+     ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote:' || TO_CHAR(T.CD_MES_ANO) ||  '|' ||   
+'Dia da análise: ' || TO_CHAR(DT_DIA,'DD/MM/YYYY') || '|' ||   
+'Renda/Faturamento: ' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não informado') || '|' ||   
+'Valor total de crédito no mês calendário ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) || ':' || TO_CHAR(VL_CREDITO_MES, 'L999G999G999G990D99') || '|' ||   
+'Quantidade de crédito no dia: ' || COALESCE(TO_CHAR(QT_CREDITO_DIA),'Quantidade não informada') || '|' ||   
+'Valor total de crédito no dia: ' || COALESCE(TO_CHAR(VL_CREDITO_DIA, 'L999G999G999G990D99'),'Valor não informado') || '|' ||   
+'Quantidade de débito (DOC, TED, TEV, ORPAG) no dia: ' || COALESCE(TO_CHAR(QT_DEBITO_DIA),'Valor não informado')  || '|' ||   
+'Valor total de débito (DOC, TED, TEV, ORPAG) no dia: ' || COALESCE(TO_CHAR(VL_DEBITO_DIA, 'L999G999G999G990D99'),'Valor não informado') || '|' ||   
+CASE CD_TP_PESSOA WHEN 'F' THEN  
+COALESCE((':DS-pm_ValorMinimoCreditoPF' || ' (' || ':NM-pm_ValorMinimoCreditoPF' || '):' || TO_CHAR(:pm_ValorMinimoCreditoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercRendaCredito' || ' (' || ':NM-pm_PercRendaCredito' || '):' || TO_CHAR(:pm_PercRendaCredito) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercInferiorPF' || ' (' || ':NM-pm_PercInferiorPF' || '):' || TO_CHAR(:pm_PercInferiorPF) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercSuperiorPF' || ' (' || ':NM-pm_PercSuperiorPF' || '):' || TO_CHAR(:pm_PercSuperiorPF) || '%'),'Parâmetro não cadastrado' ) || '|' ||      
+COALESCE((':DS-pm_ValorMinimoCreditoDiaPF' || ' (' || ':NM-pm_ValorMinimoCreditoDiaPF' || '):' || TO_CHAR(:pm_ValorMinimoCreditoDiaPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'    
+WHEN 'J' THEN  
+COALESCE((':DS-pm_ValorMinimoCreditoPJ' || ' (' || ':NM-pm_ValorMinimoCreditoPJ' || '):' || TO_CHAR(:pm_ValorMinimoCreditoPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercFaturamentoCredito' || ' (' || ':NM-pm_PercFaturamentoCredito' || '):' || TO_CHAR(:pm_PercFaturamentoCredito) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercInferiorPJ' || ' (' || ':NM-pm_PercInferiorPJ' || '):' || TO_CHAR(:pm_PercInferiorPJ) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_PercSuperiorPJ' || ' (' || ':NM-pm_PercSuperiorPJ' || '):' || TO_CHAR(:pm_PercSuperiorPJ) || '%'),'Parâmetro não cadastrado' ) || '|'  ||    
+COALESCE((':DS-pm_ValorMinimoCreditoDiaPJ' || ' (' || ':NM-pm_ValorMinimoCreditoDiaPJ' || '):' || TO_CHAR(:pm_ValorMinimoCreditoDiaPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'    
+END 
+AS DS_INF_ANLSE     
+FROM (SELECT CD_MES_ANO, DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT,   
+      VL_CREDITO_DIA, QT_CREDITO_DIA, VL_DEBITO_DIA, QT_DEBITO_DIA, P.VL_TOTAL VL_CREDITO_MES, P.QT_TOTAL QT_CREDITO_MES  
+      FROM (SELECT CD_MES_ANO, DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT,   
+            SUM(VL_CREDITO_DIA) VL_CREDITO_DIA, SUM(QT_CREDITO_DIA) QT_CREDITO_DIA, SUM(VL_DEBITO_DIA) VL_DEBITO_DIA, SUM(QT_DEBITO_DIA) QT_DEBITO_DIA    
+            FROM (SELECT CD_MES_ANO, TRUNC(DT_TRANS) DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, CD_NATUR_OPER, MAX(VL_RENDA_FAT) VL_RENDA_FAT,   
+                  CASE CD_NATUR_OPER WHEN 1 THEN SUM(VL_OPER) END VL_CREDITO_DIA,  
+                  CASE CD_NATUR_OPER WHEN 1 THEN COUNT(*)     END QT_CREDITO_DIA,  
+                  CASE WHEN (CD_TP_OPER in (8, 9, 5) OR CD_FORMA_OPER = 9) AND CD_NATUR_OPER = 2 THEN SUM(VL_OPER) END VL_DEBITO_DIA,  
+                  CASE WHEN (CD_TP_OPER in (8, 9, 5) OR CD_FORMA_OPER = 9) AND CD_NATUR_OPER = 2 THEN COUNT(*) END QT_DEBITO_DIA  
+                  FROM TB_TRANS    
+                  WHERE DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+                  AND DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))    
+                  AND FL_ANALISADO = 1   
+                  AND CD_NATUR_OPER IN (1,2)  
+                  GROUP BY CD_MES_ANO,  TRUNC(DT_TRANS), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, CD_NATUR_OPER, CD_TP_OPER, CD_FORMA_OPER  
+                 ) T  
+            GROUP BY CD_MES_ANO, DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT  
+           ) A  
+      INNER JOIN TB_PERFIL_MES_CALENDARIO P     
+      ON P.CD_IDENTF_PERFIL = 105     
+      AND P.CD_VARIAVEL_PRIMEIRA = A.CD_DOC_IDENTF_CLIE  
+      AND P.CD_VARIAVEL_SEGUNDA = A.CD_TP_IDENTF_CLIE  
+      AND P.CD_VARIAVEL_TERCEIRA = '1' /*credito*/  
+      AND P.CD_ANO_MES = A.CD_MES_ANO   
+      GROUP BY CD_MES_ANO, DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT,   
+      VL_CREDITO_DIA, QT_CREDITO_DIA, VL_DEBITO_DIA, QT_DEBITO_DIA, P.VL_TOTAL, P.QT_TOTAL    
+     ) T   
+WHERE T.VL_CREDITO_MES IS NOT NULL  
+AND T.VL_CREDITO_DIA IS NOT NULL  
+AND T.VL_DEBITO_DIA IS NOT NULL  
+AND ((T.CD_TP_PESSOA = 'F'  
+      AND T.VL_CREDITO_MES >= (:pm_ValorMinimoCreditoPF) 
+      AND T.VL_CREDITO_DIA >= (:pm_ValorMinimoCreditoDiaPF) 
+      AND T.VL_DEBITO_DIA >= (VL_CREDITO_DIA * (:pm_PercInferiorPF/100))  
+      AND T.VL_DEBITO_DIA <= (VL_CREDITO_DIA * (:pm_PercSuperiorPF/100))  
+      AND ((T.VL_RENDA_FAT IS NOT NULL AND (T.VL_CREDITO_MES > (T.VL_RENDA_FAT * (:pm_PercRendaCredito/100))))  
+           OR T.VL_RENDA_FAT IS NULL)  
+     )  
+     OR  (T.CD_TP_PESSOA = 'J'   
+          AND T.VL_CREDITO_MES >= (:pm_ValorMinimoCreditoPJ) 
+          AND T.VL_CREDITO_DIA >= (:pm_ValorMinimoCreditoDiaPJ) 
+          AND T.VL_DEBITO_DIA >= (T.VL_CREDITO_DIA * (:pm_PercInferiorPJ/100))  
+          AND T.VL_DEBITO_DIA <= (T.VL_CREDITO_DIA * (:pm_PercSuperiorPJ/100))  
+          AND ((T.VL_RENDA_FAT IS NOT NULL AND (T.VL_CREDITO_MES > (T.VL_RENDA_FAT * (:pm_PercFaturamentoCredito/100))))  
+               OR T.VL_RENDA_FAT IS NULL)  
+         )
+    )
+   
+   
+ 

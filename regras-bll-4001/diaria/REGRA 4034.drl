@@ -1,0 +1,47 @@
+select LAST_DAY(T.DT_TRANS) DT_APONTAMENTO,
+T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || ' |Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4034 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' || 
+'Data da transação : '  ||  TO_CHAR(T.DT_TRANS) || '|' ||  
+'IP da Transação Cliente: ' || COALESCE(T.NU_IP_OPER, 'Não cadastrado') || '|' || 
+'Email do Cliente: ' || COALESCE(T.DS_EMAIL_CLIE, 'Não cadastrado') || '|' || 
+CASE WHEN LISTA_IP IS NOT NULL THEN 'Clientes que usaram o mesmo IP: ' || LISTA_IP END || '|' || 
+CASE WHEN LISTA_EMAIL IS NOT NULL THEN 'Clientes que informaram o mesmo e-mail: ' || LISTA_EMAIL END || '|' || 
+COALESCE((':DS-pm_QtdeDias' || ' (' || ':NM-pm_QtdeDias' || '):' || :pm_QtdeDias),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE 
+FROM
+
+(SELECT T2.NM_CLIE, T2.CD_LOTE, T2.DT_TRANS, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, T2.DS_EMAIL_CLIE, T2.NU_IP_OPER,
+CASE WHEN MAX(T.DS_EMAIL_CLIE) IS NOT NULL THEN LISTAGG(T.CD_DOC_IDENTF_CLIE, ', ') WITHIN GROUP (ORDER BY T.CD_DOC_IDENTF_CLIE desc) END LISTA_EMAIL,
+CASE WHEN MAX(T.NU_IP_OPER) IS NOT NULL THEN LISTAGG(T.CD_DOC_IDENTF_CLIE, ', ') WITHIN GROUP (ORDER BY T.CD_DOC_IDENTF_CLIE desc) END LISTA_IP
+FROM 
+(select NM_CLIE, CD_LOTE, trunc(DT_TRANS) DT_TRANS, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, DS_EMAIL_CLIE, NU_IP_OPER 
+from tb_trans_anlse 
+	where CD_TP_PESSOA = 'J' 
+	  and CD_LOTE = :cd_lote         
+	  and CD_SUBLOTE = :cd_sublote 
+	  and CD_TP_OPER in (25,61,62,74,78)
+      and (DS_EMAIL_CLIE is not null or NU_IP_OPER is not null)
+ group by NM_CLIE, CD_LOTE, trunc(DT_TRANS), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, DS_EMAIL_CLIE, NU_IP_OPER 
+) T2 
+INNER JOIN TB_TRANS T ON CD_TP_PESSOA = 'J'   
+  and TRUNC(T.DT_TRANS) >= (T2.DT_TRANS - (:pm_QtdeDias)) 
+  and TRUNC(T.DT_TRANS) <= T2.DT_TRANS 
+WHERE T.CD_DOC_IDENTF_CLIE <> T2.CD_DOC_IDENTF_CLIE 
+  and ((T.DS_EMAIL_CLIE is not null and 
+        T2.DS_EMAIL_CLIE is not null and 
+        T.DS_EMAIL_CLIE = T2.DS_EMAIL_CLIE) 
+        or 
+        (T.NU_IP_OPER is not null and T2.NU_IP_OPER is not null and T.NU_IP_OPER = T2.NU_IP_OPER)) 
+GROUP BY T2.NM_CLIE, T2.CD_LOTE, T2.DT_TRANS, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, T2.DS_EMAIL_CLIE, T2.NU_IP_OPER 
+) T
+
+
+

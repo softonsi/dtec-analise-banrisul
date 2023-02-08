@@ -1,0 +1,42 @@
+SELECT LAST_DAY(T.DT_DIA) DT_APONTAMENTO,  T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4012 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE)  || '|' || 
+'Data de análise: ' || TO_CHAR(DT_DIA)  || '|' ||
+'Valor consolidado: ' || TO_CHAR(VL_TOTAL, 'L999G999G999G990D99') || '|' ||
+'Quantidade de formas distintas: ' || TO_CHAR(QT_DISTINTAS_FORMAS) || '|' ||
+'Formas distintas: ' || formas || '|' ||
+COALESCE((':DS-pm_QtdeDistintaForma' || ' (' || ':NM-pm_QtdeDistintaForma' || '):' || :pm_QtdeDistintaForma),'Parâmetro não cadastrado') || '|'
+AS DS_INF_ANLSE  
+FROM 
+(SELECT DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, sum(vl_total) vl_total, COUNT(*) QT_DISTINTAS_FORMAS,
+xmlcast(  xmlagg(xmlelement(FORMAS,  COALESCE(F.NM_FORMA_OPER,TO_CHAR(T.CD_FORMA_OPER)) || ', ' )  order by T.CD_FORMA_OPER) as clob) formas
+FROM
+(SELECT TRUNC(DT_TRANS) DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, CD_FORMA_OPER, sum(vl_oper) vl_total
+ FROM TB_TRANS_ANLSE A 
+ WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote 
+   AND CD_TP_OPER = 7 /* Saque */
+   AND CD_VIA_OPER = 2 /* CAIXA */
+   AND CD_FORMA_OPER IN (
+                           7    /*Espécie*/
+                          ,1    /*Cartão de Débito*/
+                          ,2    /*Cheque*/
+                          ,3    /*Cheque administrativo*/
+                          ,13   /*Cartão de Crédito*/
+                          ,11 )  /*Cartão pré-pago*/   
+ GROUP BY TRUNC(DT_TRANS), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, CD_FORMA_OPER
+ ) T
+LEFT JOIN TB_FORMA_OPER F ON T.CD_FORMA_OPER = F.CD_FORMA_OPER
+GROUP BY DT_DIA, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE
+) T
+WHERE 
+QT_DISTINTAS_FORMAS >= (:pm_QtdeDistintaForma) 
+
+
+  

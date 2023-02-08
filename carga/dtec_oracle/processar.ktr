@@ -1,0 +1,2430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>PROCESSAR</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>&#x2f;</directory>
+    <parameters>
+    </parameters>
+    <log>
+<trans-log-table><connection/>
+<schema/>
+<table/>
+<size_limit_lines/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name></field><field><id>EXECUTING_SERVER</id><enabled>N</enabled><name>EXECUTING_SERVER</name></field><field><id>EXECUTING_USER</id><enabled>N</enabled><name>EXECUTING_USER</name></field><field><id>CLIENT</id><enabled>N</enabled><name>CLIENT</name></field></trans-log-table>
+<perf-log-table><connection/>
+<schema/>
+<table/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>SEQ_NR</id><enabled>Y</enabled><name>SEQ_NR</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>INPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>INPUT_BUFFER_ROWS</name></field><field><id>OUTPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>OUTPUT_BUFFER_ROWS</name></field></perf-log-table>
+<channel-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>LOGGING_OBJECT_TYPE</id><enabled>Y</enabled><name>LOGGING_OBJECT_TYPE</name></field><field><id>OBJECT_NAME</id><enabled>Y</enabled><name>OBJECT_NAME</name></field><field><id>OBJECT_COPY</id><enabled>Y</enabled><name>OBJECT_COPY</name></field><field><id>REPOSITORY_DIRECTORY</id><enabled>Y</enabled><name>REPOSITORY_DIRECTORY</name></field><field><id>FILENAME</id><enabled>Y</enabled><name>FILENAME</name></field><field><id>OBJECT_ID</id><enabled>Y</enabled><name>OBJECT_ID</name></field><field><id>OBJECT_REVISION</id><enabled>Y</enabled><name>OBJECT_REVISION</name></field><field><id>PARENT_CHANNEL_ID</id><enabled>Y</enabled><name>PARENT_CHANNEL_ID</name></field><field><id>ROOT_CHANNEL_ID</id><enabled>Y</enabled><name>ROOT_CHANNEL_ID</name></field></channel-log-table>
+<step-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field></step-log-table>
+<metrics-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>METRICS_DATE</id><enabled>Y</enabled><name>METRICS_DATE</name></field><field><id>METRICS_CODE</id><enabled>Y</enabled><name>METRICS_CODE</name></field><field><id>METRICS_DESCRIPTION</id><enabled>Y</enabled><name>METRICS_DESCRIPTION</name></field><field><id>METRICS_SUBJECT</id><enabled>Y</enabled><name>METRICS_SUBJECT</name></field><field><id>METRICS_TYPE</id><enabled>Y</enabled><name>METRICS_TYPE</name></field><field><id>METRICS_VALUE</id><enabled>Y</enabled><name>METRICS_VALUE</name></field></metrics-log-table>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>5000000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <created_user>-</created_user>
+  <created_date>2013&#x2f;01&#x2f;31 12&#x3a;25&#x3a;33.639</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2013&#x2f;01&#x2f;31 12&#x3a;25&#x3a;33.639</modified_date>
+  </info>
+  <notepads>
+  </notepads>
+  <connection>
+    <name>BLLS01</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>blls01</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>BLLS03</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>blls03</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ld_rc_oracle</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>dtec_ld_rc_oracle</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ld_rc_oracle_encrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle</name>
+    <server>databases</server>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>dtec_v3_oracle</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle_ecrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_sqlserver</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>dtec_v3_sqlserver</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>DELETE TB_NOTICIA_CLIE</from><to>Wait DELETE TB_NOTICIA_CLIE</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add sequence 2</from><to>Formatar QUERY</to><enabled>Y</enabled> </hop>
+  <hop> <from>Apenas CPF - N&#xe3;o</from><to>HTTP client - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>BUSCAR CLIENTES &#x28;TB_TRANS&#x29;</from><to>Get Variables 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filtrar NOMES - SOLR DOC</from><to>Match OK - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filtrar NOMES - SOLR NOME</from><to>Match OK - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>Fork - SOLR DOC</from><to>Get data from XML - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>Fork - SOLR NOME</from><to>Get data from XML - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>Formatar QUERY</from><to>SPLIT</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get Variables 2</from><to>Add sequence 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get data from XML - SOLR DOC</from><to>Filtrar NOMES - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get data from XML - SOLR NOME</from><to>Filtrar NOMES - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>HTTP client - SOLR DOC</from><to>Fork - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>HTTP client - SOLR NOME</from><to>Fork - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>Match OK - SOLR DOC</from><to>Fork 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>Match OK - SOLR DOC</from><to>Select values - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>Match OK - SOLR NOME</from><to>Fork 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>Match OK - SOLR NOME</from><to>Select values - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>SPLIT</from><to>Apenas CPF - N&#xe3;o</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values - SOLR DOC</from><to>Sort rows - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values - SOLR NOME</from><to>Sort rows - SOLR NOME</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows - SOLR DOC</from><to>Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows - SOLR NOME</from><to>Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>Group by</from><to>Strings cut 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>SPLIT</from><to>HTTP client - SOLR DOC</to><enabled>Y</enabled> </hop>
+  <hop> <from>Strings cut 2</from><to>Ajuste Campos</to><enabled>Y</enabled> </hop>
+  <hop> <from>Ajuste Campos</from><to>Insert - TB_NOTICIA_CLIE</to><enabled>Y</enabled> </hop>
+  <hop> <from>Wait DELETE TB_NOTICIA_CLIE</from><to>BUSCAR CLIENTES &#x28;TB_TRANS&#x29;</to><enabled>Y</enabled> </hop>
+  </order>
+  <step>
+    <name>Add sequence 2</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <valuename>ordem</valuename>
+      <use_database>N</use_database>
+      <connection/>
+      <schema/>
+      <seqname>SEQ_</seqname>
+      <use_counter>Y</use_counter>
+      <counter_name/>
+      <start_at>1</start_at>
+      <increment_by>1</increment_by>
+      <max_value>999999999</max_value>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>448</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Ajuste Campos</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;var DT_NOTICIA &#x3d; null&#xd;&#xa;if &#x28; dtec_DATA_NOTICIA &#x21;&#x3d; &#x22;&#x22; &#x29; &#x7b;&#xd;&#xa;	DT_NOTICIA &#x3d; str2date&#x28;substr&#x28;dtec_DATA_NOTICIA, 0, 10&#x29;, &#x27;yyyy-MM-dd&#x27;&#x29;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#x2f;&#x2a;&#x2a;&#x2a; Ajusta DATA_NOTICIA de yyyy-MM-dd para dd&#x2f;MM&#x2f;yyyy&#x29; &#x2a;&#x2a;&#x2a;&#x2f;&#xd;&#xa;&#x2f;&#x2f;if &#x28; dtec_DATA_NOTICIA &#x21;&#x3d; &#x22;&#x22; &#x29; &#x7b;&#xd;&#xa;&#x2f;&#x2f;	var DT_NOTICIA &#x3d; date2str&#x28;str2date&#x28;dtec_DATA_NOTICIA.substr&#x28;0,10&#x29;, &#x22;yyyy-MM-dd&#x22;&#x29;, &#x22;dd&#x2f;MM&#x2f;yyyy&#x22;&#x29; &#xd;&#xa;&#x2f;&#x2f;&#x7d; else DT_NOTICIA &#x3d; null&#x3b;&#xa;&#xd;&#xa;&#xd;&#xa;var dt &#x3d; null&#xd;&#xa;if &#x28; dtec_DATA_NOTICIA &#x21;&#x3d; null   &#x29; &#x7b;&#xd;&#xa;	s &#x3d; substr&#x28;dtec_DATA_NOTICIA, 0, 10&#x29;&#xd;&#xa;&#x2f;&#x2f;	Alert&#x28;s&#x29;&#xd;&#xa;	dateParts &#x3d; s.split&#x28;&#x27;-&#x27;&#x29;&#xd;&#xa;&#x2f;&#x2f;	Alert&#x28;dateParts&#x29;&#xd;&#xa; 	dt &#x3d; new Date&#x28;dateParts&#x5b;0&#x5d;, &#x28;dateParts&#x5b;1&#x5d;-1&#x29; , dateParts&#x5b;2&#x5d;&#x29;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var dtec_DATA_NOTICIA &#x3d; date2str&#x28;dt, &#x27;yyyy-MM-dd&#x27;&#x29; &#x2b; &#x27; 00&#x3a;00&#x3a;00.000&#x27;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var dtec_FONTE &#x3d; substr&#x28;dtec_FONTE, 0, 199&#x29;&#xa;&#xa;var TX_LINK_NOTICIA &#x3d; null&#xa;if &#x28;   indexOf&#x28;upper&#x28;dtec_FONTE&#x29;, &#x27;LISTA PARIS&#x27;&#x29; &#x3c; 0 &#xa;	&#x26;&#x26; indexOf&#x28;dtec_FONTE, &#x27;COAF&#x27;&#x29; &#x3c; 0  &#xa;	&#x29; &#x7b;&#xa;&#xa;	TX_LINK_NOTICIA &#x3d; buildLink&#x28;dtec_TIPO_SUSPEITA, dtec_REGISTRO_NOTICIA&#x29;&#xa;&#xa;&#x7d;&#xa;</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Item_0</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;function buildLink&#x28;tipoSuspeita, registroNoticia&#x29;&#x7b;&#xa;&#xa;	baseURL&#x3d;&#x27;http&#x3a;&#x2f;&#x2f;www.dtec-flex.com.br&#x2f;dtecflex&#x27;&#xa;&#xa;	if 	&#x28; &#x27;G&#x27;.equals&#x28;substr&#x28;dtec_REGISTRO_NOTICIA,0,1&#x29;&#x29; &#x7c;&#x7c; &#x27;L&#x27;.equals&#x28;substr&#x28;dtec_REGISTRO_NOTICIA,0,1&#x29;&#x29; &#x29; &#x7b;&#xa;		return null&#xa;	&#x7d;&#xa;&#xa;	if &#x28;baseURL &#x3d;&#x3d; null &#x7c;&#x7c; &#x22;&#x22;.equals&#x28;baseURL&#x29; &#x29; &#x7b;&#xa;		baseURL&#x3d;&#x27;http&#x3a;&#x2f;&#x2f;www.dtec-flex.com.br&#x2f;dtecflex&#x27;&#xa;	&#x7d;&#xa;&#xa;	xTipoSuspeita &#x3d; upper&#x28;substr&#x28;tipoSuspeita, 0, 2&#x29;&#x29;&#xa;	xRegistroTipo &#x3d; substr&#x28;registroNoticia, 0, 1&#x29;&#xa;	xRegistroData &#x3d; substr&#x28;registroNoticia, 0, 9&#x29;&#xa;&#xa;	xDIR &#x3d; &#x27;&#x27;&#xa;	switch &#x28;xRegistroTipo&#x29; &#x7b;&#xa;&#xa;		case &#x27;N&#x27;&#x3a;&#xa;			if &#x28; &#x27;LA&#x27;.equals&#x28;xTipoSuspeita&#x29;&#x29; &#x7b;&#xa;	 			xDIR &#x3d; &#x27;LD&#x27;&#xa;			&#x7d; else if &#x28; &#x27;FR&#x27;.equals&#x28;xTipoSuspeita&#x29;&#x29; &#x7b;&#xa;			 	xDIR &#x3d; &#x27;FF&#x27;&#xa;			&#x7d;&#xa;			break&#x3b;&#xa;	&#xa;		case &#x27;A&#x27;&#x3a;&#xa;			xDIR &#x3d; &#x27;SA&#x27;&#xa;			break&#x3b;&#xa;&#xa;		case &#x27;C&#x27;&#x3a;&#xa;			xDIR &#x3d; &#x27;CR&#x27;&#xa;		break&#x3b;&#xa;&#xa;		case &#x27;E&#x27;&#x3a;&#xa;			xDIR &#x3d; &#x27;SE&#x27;&#xa;		break&#x3b;&#xa;&#xa;		case &#x27;G&#x27;&#x3a;&#xa;			xDIR &#x3d; &#x27;&#x27;&#xa;		break&#x3b;&#xa;	&#x7d;&#xa;&#xa;	r &#x3d; baseURL &#x2b; &#x27;&#x2f;&#x27; &#x2b; xDIR &#x2b; &#x27;&#x2f;&#x27; &#x2b; xRegistroData &#x2b; &#x27;&#x2f;&#x27; &#x2b; registroNoticia &#x2b; &#x27;.htm&#x27;&#xa;	return  r&#xa;&#xa;&#x7d;&#xa;&#xa;&#xa;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>dtec_FONTE</name>
+        <rename>dtec_FONTE</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>TX_LINK_NOTICIA</name>
+        <rename>TX_LINK_NOTICIA</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>dt</name>
+        <rename>dt</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2114</xloc>
+      <yloc>165</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Apenas CPF - N&#xe3;o</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>HTTP client - SOLR NOME</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>apenas_cpf</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>NAO</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>725</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>BUSCAR CLIENTES &#x28;TB_TRANS&#x29;</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <sql>SELECT DISTINCT&#xd;&#xa; NM_CLIE,&#xd;&#xa; CD_DOC_IDENTF_CLIE,&#xd;&#xa; CD_TP_IDENTF_CLIE,&#xd;&#xa; CD_MES_ANO,&#xd;&#xa; 1000 as &#x22;solr_max_results&#x22;&#xd;&#xa;FROM TB_TRANS&#xd;&#xa;WHERE FL_ANALISADO &#x3d; 1 AND CD_MES_ANO &#x3d; TO_CHAR&#x28;ADD_MONTHS&#x28;SYSDATE,-1&#x29;, &#x27;YYYYMM&#x27;&#x29;&#xd;&#xa;ORDER BY NM_CLIE</sql>
+    <limit/>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>219</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>DELETE TB_NOTICIA_CLIE</name>
+    <type>ExecSQL</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <execute_each_row>N</execute_each_row>
+    <single_statement>Y</single_statement>
+    <replace_variables>N</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>DELETE FROM TB_NOTICIA_CLIE D&#xd;&#xa;WHERE EXISTS &#x28;&#xd;&#xa;SELECT 1 FROM TB_TRANS C&#xd;&#xa;WHERE C.CD_MES_ANO &#x3d; TO_CHAR&#x28;ADD_MONTHS&#x28;SYSDATE,-1&#x29;, &#x27;YYYYMM&#x27;&#x29;&#xd;&#xa;  AND C.CD_DOC_IDENTF_CLIE &#x3d; D.CD_DOC_IDENTF_CLIE &#xd;&#xa;  AND C.CD_TP_IDENTF_CLIE &#x3d; D.CD_TP_IDENTF_CLIE&#xd;&#xa;&#x29;</sql>
+    <set_params>N</set_params>
+    <insert_field/>
+    <update_field/>
+    <delete_field/>
+    <read_field/>
+    <arguments>
+    </arguments>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>80</xloc>
+      <yloc>339</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtrar NOMES - SOLR DOC</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2a; &#xa;	S&#xf3; considera MATCH se o primeiro_nome do &#x22;nome&#x22; ou &#x22;nome_cpf&#x22; &#xa;	forem iguais ao primeiro nome do registro encontrado &#xa;	E o ultimo_nome do &#x22;nome&#x22; ou &#x22;nome_cpf&#x22; forem iguais ao ultimo_nome nome do registro encontrado&#xa;&#x2a;&#x2f;&#xa;&#xa;var match_OK &#x3d; &#x27;S&#x27;&#xa;&#xa;&#x2f;&#x2a;&#xa;var primeiro_nome_search &#x3d; &#x27;&#x27;&#xa;var sobrenome_search     &#x3d; &#x27;&#x27;&#xa;&#xa;var primeiro_nome_found &#x3d; &#x27;&#x27;&#xa;var sobrenome_found &#x3d; &#x27;&#x27;&#xa;&#xa;var primeiro_nome_cpf_found &#x3d; &#x27;&#x27;&#xa;var sobrenome_cpf_found &#x3d; &#x27;&#x27;&#xa;&#x2a;&#x2f;&#xa;&#xa;&#x2f;&#x2a;&#xa;arr_xnome         &#x3d; xnome.split&#x28;&#x27;-&#x27;&#x29;&#xa;arr_dtec_nome     &#x3d; dtec_NOME.split&#x28;&#x27; &#x27;&#x29;&#xa;arr_dtec_nome_cpf &#x3d; dtec_NOME.split&#x28;&#x27; &#x27;&#x29;&#xa;&#xa;if &#x28; arr_xnome &#x21;&#x3d; null &#x26;&#x26; arr_xnome.length &#x3e;&#x3d;2 &#x29; &#x7b;&#xa;	primeiro_nome_search &#x3d; arr_xnome&#x5b;0&#x5d;&#xa;	sobrenome_search &#x3d; arr_xnome&#x5b;arr_xnome.length - 1&#x5d;&#xa;&#x7d; &#xa;&#xa;if &#x28; arr_dtec_nome &#x21;&#x3d; null &#x26;&#x26; arr_dtec_nome.length &#x3e;&#x3d;2 &#x29; &#x7b;&#xa;	primeiro_nome_found &#x3d; arr_dtec_nome&#x5b;0&#x5d;&#xa;	sobrenome_found &#x3d; arr_dtec_nome&#x5b;arr_dtec_nome.length - 1&#x5d;&#xa;&#x7d; &#xa;&#xa;if &#x28; arr_dtec_nome_cpf &#x21;&#x3d; null &#x26;&#x26; arr_dtec_nome_cpf.length &#x3e;&#x3d;2 &#x29; &#x7b;&#xa;	primeiro_nome_cpf_found &#x3d; arr_dtec_nome_cpf&#x5b;0&#x5d;&#xa;	sobrenome_cpf_found &#x3d; arr_dtec_nome_cpf&#x5b;arr_dtec_nome_cpf.length - 1&#x5d;&#xa;&#x7d; &#xa;&#x2a;&#x2f;&#xa;&#xa;&#x2f;&#x2a;&#xa;Alert&#x28;&#x22; primeiro_nome_found&#x3a;&#x22; &#x2b; primeiro_nome_found&#xa;&#x2b;    &#x22;&#x5c;n sobrenome_found&#x3a;&#x22; &#x2b; sobrenome_found&#xa;&#x2b;    &#x22;&#x5c;n primeiro_nome_search&#x3a;&#x22; &#x2b; primeiro_nome_search&#xa;&#x2b;    &#x22;&#x5c;n sobrenome_search&#x3a;&#x22; &#x2b; sobrenome_search&#xa;&#x29;&#xa;&#x2a;&#x2f;&#xa;&#xa;&#x2f;&#x2a;&#xa;if &#x28; &#x21;isEmpty&#x28;primeiro_nome_found&#x29; &#xa;	&#x26;&#x26; &#x21;isEmpty&#x28;sobrenome_found&#x29; &#xa;	&#x26;&#x26; primeiro_nome_search.equals&#x28;primeiro_nome_found&#x29;&#xa;	&#x26;&#x26; sobrenome_search.equals&#x28;sobrenome_found&#x29;&#xa;	&#x29; &#x7b;&#xa;		match_OK &#x3d; &#x27;S&#x27;&#xa;&#x7d; else if &#x28; &#x21;isEmpty&#x28;primeiro_nome_cpf_found&#x29; &#xa;	&#x26;&#x26; &#x21;isEmpty&#x28;sobrenome_cpf_found&#x29; &#xa;	&#x26;&#x26; primeiro_nome_search.equals&#x28;primeiro_nome_cpf_found&#x29;&#xa;	&#x26;&#x26; sobrenome_search.equals&#x28;sobrenome_cpf_found&#x29;&#xa;	&#x29; &#x7b;&#xa;		match_OK &#x3d; &#x27;S&#x27;&#xa;&#x7d;&#xa;&#x2a;&#x2f;&#xa;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>match_OK</name>
+        <rename>match_OK</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1333</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filtrar NOMES - SOLR NOME</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var match_OK &#x3d; &#x27;N&#x27;&#xa;&#xa;var solr_result_fields &#x3d; &#x27;&#x27;&#xa;var resultado &#x3d; &#x27;&#x27;&#xa;&#xa;var dtec_NOME_o &#x3d; dtec_NOME&#xa;&#xa;var dtec_NOME   &#x3d; removerPalavra&#x28;dtec_NOME&#x29;&#xa;&#xa;var arr_xnome   &#x3d; xnome.split&#x28;&#x27; &#x27;&#x29;&#xa;&#xa;dtec_NOME     &#x3d; dtec_NOME.replace&#x28;&#x2f;&#x5b;&#x5e;a-zA-Z0-9&#x5c;u002D-&#x5c;u002D&#x5d;&#x2b;&#x2f;g, &#x22; &#x22;&#x29;&#xa;var arr_dtec_NOME &#x3d; dtec_NOME.split&#x28;&#x27; &#x27;&#x29;&#xa;&#x2f;&#x2f;var dtec_primeiro_nome &#x3d; arr_dtec_NOME&#x5b;0&#x5d;&#xa;&#xa;&#x2f;&#x2f; Alert&#x28;dtec_NOME &#x2b; &#x27;&#x5c;n&#x27; &#x2b; arr_dtec_NOME.join&#x28;&#x22; &#x22;&#x29;&#x29;&#xa;&#xa;var tam_nome_bal  &#x3d; arr_xnome.length&#xa;var tam_dtec_NOME &#x3d; arr_dtec_NOME.length&#xa;&#xa;var partes_iguais &#x3d; contarPartesIguais&#x28;arr_xnome, arr_dtec_NOME&#x29;&#xa;&#xa;var descarte_obs &#x3d; &#x27;&#x27;&#xa;var dif_tamanho &#x3d; abs&#x28;tam_dtec_NOME-tam_nome_bal&#x29;&#xa;&#x2f;&#x2f; var dif_tamanho &#x3d; tam_dtec_NOME-tam_nome_bal&#xa;&#xa;if &#x28; arr_xnome &#x21;&#x3d; null &#x26;&#x26; arr_dtec_NOME &#x21;&#x3d; null &#x29; &#x7b;&#xa;&#xa;	if &#x28; dif_tamanho &#x3e;&#x3d; 2&#x29; &#x7b;&#xa;&#xa;		match_OK &#x3d; &#x27;N&#x27; &#xa;		descarte_obs &#x3d; &#x27;diferenca de tamanho &#x3e;&#x3d;2&#x27; &#xa;&#xa;	&#x7d; else &#x7b;&#xa;&#xa;		if &#x28; tam_nome_bal &#x3d;&#x3d; 1  &#x29; &#x7b;&#xa;			if &#x28; tam_nome_bal &#x3d;&#x3d; tam_dtec_NOME &#x29; &#x7b;&#xa;				match_OK &#x3d; &#x27;S&#x27;&#xa;			&#x7d; else &#x7b;&#xa;				descarte_obs &#x3d; &#x27;Regra0&#x3a; BAL&#x28;1&#x29;, mas NOME ENCONTRADO tamanho&#x3a; &#x27; &#x2b; tam_dtec_NOME&#xa;			&#x7d;&#xa;		&#x7d;&#xa;&#xa;		if &#x28; tam_nome_bal &#x3e;&#x3d; 2 &#x26;&#x26; tam_nome_bal &#x3c;&#x3d; 3 &#x29; &#x7b;&#xa;			if &#x28; tam_nome_bal &#x3d;&#x3d; partes_iguais &#x29; &#x7b;&#xa;				match_OK &#x3d; &#x27;S&#x27; &#xa;				descarte_obs &#x3d; &#x22;Regra1&#x3a; BAL&#x28;2-3&#x29; tam_nome_bal &#x3d;&#x3d; partes_iguais&#x22;&#xa;&#x2f;&#x2a;					&#x2b;  &#x22;&#x40; arr_xnome&#x3a; &#x22; &#x2b; arr_xnome &#xa;					&#x2b;  &#x22;&#x40; arr_dtec_NOME&#x3a; &#x22; &#x2b; arr_dtec_NOME&#xa;					&#x2b;  &#x22;&#x40; tam_nome_bal&#x3a; &#x22; &#x2b; tam_nome_bal&#xa;					&#x2b;  &#x22;&#x40; tam_dtec_NOME&#x3a; &#x22; &#x2b; tam_dtec_NOME&#xa;					&#x2b;  &#x22;&#x40; partes_iguais&#x3a; &#x22; &#x2b; partes_iguais&#xa;					&#x2b;  &#x22;&#x40; dif_tamanho&#x3a; &#x22; &#x2b; dif_tamanho&#xa;&#x2a;&#x2f;			&#x7d; else &#x7b;&#xa;				descarte_obs &#x3d; &#x27;TAMANHO nome_bal&#x3a; &#x27; &#x2b; tam_nome_bal &#x2b; &#x27;, partes iguais&#x3a; &#x27; &#x2b; partes_iguais &#x2b; &#x27;, deveriam ser iguais&#x27;&#xa;			&#x7d;&#xa;		&#x7d;&#xa;&#xa;		if &#x28; tam_nome_bal &#x3e;&#x3d; 4 &#x29; &#x7b;&#xa;			if &#x28; tam_nome_bal &#x3d;&#x3d;&#x3d; partes_iguais &#x7c;&#x7c; &#x28;tam_nome_bal-1&#x29; &#x3d;&#x3d;&#x3d; partes_iguais&#x29; &#x7b; &#xa;				match_OK &#x3d; &#x27;S&#x27; &#xa;				descarte_obs &#x3d; &#x22;Regra2&#x3a; BAL&#x28;&#x3e;3&#x29;  &#x28;tam_nome_bal &#x3d;&#x3d; partes_iguais OU tam_nome_bal-1 &#x3d;&#x3d; partes_iguais&#x29;&#x22;&#xa;&#x2f;&#x2a;					&#x2b; &#x22;&#x40; arr_xnome&#x3a; &#x22; &#x2b; arr_xnome &#xa;					&#x2b; &#x22;&#x40; arr_dtec_NOME&#x3a; &#x22; &#x2b; arr_dtec_NOME&#xa;					&#x2b; &#x22;&#x40; tam_nome_bal&#x3a; &#x22; &#x2b; tam_nome_bal&#xa;					&#x2b; &#x22;&#x40; tam_dtec_NOME&#x3a; &#x22; &#x2b; tam_dtec_NOME&#xa;					&#x2b; &#x22;&#x40; partes_iguais&#x3a; &#x22; &#x2b; partes_iguais&#xa;					&#x2b; &#x22;&#x40; dif_tamanho&#x3a; &#x22; &#x2b; dif_tamanho&#xa;&#x2a;&#x2f;			&#x7d; else &#x7b;&#xa;				descarte_obs &#x3d; &#x27;TAMANHO nome_bal&#x3a; &#x27; &#x2b; tam_nome_bal &#x2b; &#x27; OU &#x27; &#x2b; &#x28;tam_nome_bal-1&#x29; &#x2b; &#x27; teria que ser igual a partes iguais&#x3a; &#x27; &#x2b; partes_iguais &#xa;			&#x7d;&#xa;		&#x7d;&#xa;&#xa;		&#x2f;&#x2f;if &#x28; &#x21; dtec_primeiro_nome.equals&#x28; primeiro_nome &#x29; &#x29; &#x7b;&#xa;			&#x2f;&#x2f;match_OK &#x3d; &#x27;N&#x27; &#xa;			&#x2f;&#x2f;descarte_obs &#x3d; &#x27;Regra geral&#x3a; Primeiro nome nao &#xe9; igual&#x27;&#xa;		&#x2f;&#x2f;&#x7d;&#xa;&#xa;	&#x7d;&#xa;&#x7d;	&#xa;&#x2f;&#x2f; restaura nome original para ser gravado na saida&#xd;&#xa;dtec_NOME &#x3d; dtec_NOME_o&#xa;</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Item_0</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#xa;&#xa;function contarPartesIguais&#x28;arr_bal, arr_dtec&#x29;&#x7b;&#xa;count &#x3d; 0&#x3b;&#xa;&#xa;arr_dtec_cpy &#x3d; arr_dtec.slice&#x28;&#x29;&#xa;&#xa;for &#x28; i&#x3d;0 &#x3b; i &#x3c; arr_bal.length &#x3b; i&#x2b;&#x2b; &#x29; &#x7b;&#xa;&#xa;	pos &#x3d; arr_dtec_cpy.indexOf&#x28;arr_bal&#x5b;i&#x5d;&#x29;&#xa;&#xa;	if &#x28; pos &#x3e; -1 &#x29;&#x7b;&#xa;		arr_dtec_cpy.splice&#x28;pos,1&#x29;&#xa;		count&#x2b;&#x2b;&#xa;	&#x7d;&#xa;&#xa;&#x7d;&#xa;return count&#xa;&#x7d;&#xa;&#xa;&#xa;&#x2f;&#x2a;&#x2a;&#x2a;&#xa;  Retorna string sem as palavras reservadas &#xa;  &#x28;que causam erro no SOLR ou palavras que n&#xe3;o &#xa;  auxiliam na determina&#xe7;&#xe3;o do nome do cliente.&#xa;&#x2a;&#x2a;&#x2a;&#x2f;&#xa;function removerPalavra&#x28;str&#x29; &#x7b;&#xa;var palavras &#x3d; removeAcento&#x28;str&#x29;.split&#x28;&#x22; &#x22;&#x29;.filter&#x28;Boolean&#x29;&#x3b;&#xa;var aStr &#x3d; &#x5b;&#x5d;&#x3b;&#xa;var xStr &#x3d; &#x22;&#x22;&#x3b;&#xa;	for &#x28; i&#x3d;0 &#x3b; i &#x3c; palavras.length &#x3b; i&#x2b;&#x2b; &#x29; &#x7b;&#xa;		w &#x3d; palavras&#x5b;i&#x5d;&#x3b;&#xa;		if &#x28;w.length &#x3e; 0&#x29; &#x7b;&#xa;			if &#x28; validarPalavra&#x28;w&#x29; &#x29; &#x7b;&#xa;				aStr.push&#x28;w&#x29;&#x3b;&#xa;			&#x7d;&#xa;		&#x7d;&#xa;	&#x7d;&#xa;	xStr &#x3d; aStr.join&#x28;&#x22; &#x22;&#x29;&#xa;	return xStr&#xa;&#x7d;&#xa;&#xa;&#x2f;&#x2a;&#x2a;&#x2a;&#xa;  Retorna true se a palavra passada N&#xc3;O consta da lista&#xa;&#x2a;&#x2a;&#x2a;&#x2f;&#xa;function validarPalavra&#x28;strPalavra&#x29; &#x7b;&#xa;	x&#x3d;upper&#x28;strPalavra&#x29;&#xa;	palavraRemover &#x3d; &#x5b;&#x22;DA&#x22;, &#x22;DAS&#x22;, &#x22;DO&#x22;, &#x22;DOS&#x22;, &#x22;DE&#x22;, &#x22;E&#x22;, &#x22;S&#x2f;A&#x22;, &#x22;S.A&#x22;, &#x22;ME&#x22;, &#x22;LTDA&#x22;, &#x22;LTD&#x22;, &#x22;LT&#x22;, &#x22;INC&#x22;, &#x22;EL&#x22;, &#x22;AL&#x22;, &#x22;CIA&#x22;, &#x22;LA&#x22;, &#x22;DEL&#x22;, &#x22;EPP&#x22;, &#x22;EIRELI&#x22;&#x5d;&#xa;	return &#x28; palavraRemover.indexOf&#x28;x&#x29; &#x3d;&#x3d; -1 &#x29;&#xa;&#x7d;&#xa;&#xa;function limparTexto&#x28;str&#x29;&#x7b;&#xa;	&#x2f;&#x2a; regexp que identifica caracteres em outros idiomas &#x2a;&#x2f;&#xa;	reg1 &#x3d; &#x2f;&#x5b;&#x5e;&#x5c;u0000-&#x5c;u024F&#x5c;u1E00-&#x5c;u1EFF&#x5c;u2C60-&#x5c;u2C7F&#x5c;uA720-&#x5c;uA7FF&#x5d;&#x2f;g&#x3b;&#xa;&#xa;	&#x2f;&#x2a; troca caracteres por &#x27;&#xa7;&#x27; &#x2a;&#x2f;&#xa;	var nomeLimpo &#x3d; trim&#x28;replace&#x28;str.replace&#x28; reg1, &#x27;&#xa7;&#x27;&#x29;, &#x27;&#xa7;&#x27;, &#x27; &#x27;&#x29;&#x29;&#xa;&#xa;	return nomeLimpo&#xa;&#x7d;&#xa;&#xa;function removeAcento&#x28;strToReplace&#x29; &#x7b;&#xa;&#xa;if &#x28;strToReplace &#x3d;&#x3d; null&#x29; return &#x22;&#x22;&#x3b;&#xa;&#xa;&#x2f;&#x2f; &#x27;&#x2014;&#x27; , &#x27;&#x2013;&#x27;, &#x27;&#x2019;&#x27;, &#x27;&#x2018;&#x27;, &#x27;&#xba;&#x27;, &#x27;&#xaa;&#x27;, &#x27;&#xa9;&#x27;, &#x27;&#xab;&#x27;, &#x27;&#xbb;&#x27;&#xa;&#xa;&#x2f;&#x2f; str_acento &#x3d; &#x22;&#x3a;&#x3b;.&#xe1;&#xe0;&#xe3;&#xe2;&#xe4;&#xe9;&#xe8;&#xea;&#xeb;&#xed;&#xec;&#xee;&#xef;&#xf3;&#xf2;&#xf5;&#xf4;&#xf6;&#xfa;&#xf9;&#xfb;&#xfc;&#xe7;&#xf1;&#xc1;&#xc0;&#xc3;&#xc2;&#xc4;&#xc9;&#xc8;&#xca;&#xcb;&#xcd;&#xcc;&#xce;&#xcf;&#xd3;&#xd2;&#xd5;&#xd6;&#xd4;&#xda;&#xd9;&#xdb;&#xdc;&#xc7;&#xd1;&#xd0;&#x26;&#x2014;&#x2013;&#x2019;&#x2018;&#x60;&#xb4;&#xba;&#xaa;&#xb0;&#xa9;&#xa0;&#xa0;&#xbf;&#xab;&#xbb;&#x22;&#xa;str_acento &#x3d; &#x22;-&#x3a;&#x3b;.-&#xe1;&#xe0;&#xe3;&#xe2;&#xe4;&#xe9;&#xe8;&#xea;&#xeb;&#xed;&#xec;&#xee;&#xef;&#xf3;&#xf2;&#xf5;&#xf4;&#xf6;&#xfa;&#xf9;&#xfb;&#xfc;&#xe7;&#xf1;&#xc1;&#xc0;&#xc3;&#xc2;&#xc4;&#xc9;&#xc8;&#xca;&#xcb;&#xcd;&#xcc;&#xce;&#xcf;&#xd3;&#xd2;&#xd5;&#xd6;&#xd4;&#xda;&#xd9;&#xdb;&#xdc;&#xc7;&#xd1;&#xd0;&#x26;&#x2014;&#x2013;&#x2019;&#x2018;&#x60;&#xb4;&#xba;&#xaa;&#xb0;&#xa9;&#xa0;&#xa0;&#xbf;&#xab;&#xbb;&#x22;&#xa;str_acento &#x3d; str_acento &#x2b; &#x22;&#x96;&#x22;&#xa;str_sem_acento &#x3d; &#x22;     aaaaaeeeeiiiiooooouuuucnAAAAAEEEEIIIIOOOOOUUUUCNDE               &#x22;&#xa;str_sem_acento &#x3d; str_sem_acento &#x2b; &#x22; &#x22;&#xa;&#xa;var nova&#x3d;&#x22;&#x22;&#xa;	for &#x28;var i &#x3d; 0&#x3b; i &#x3c; strToReplace.length &#x3b; i&#x2b;&#x2b;&#x29; &#x7b;&#xa;		if &#x28;strToReplace.charAt&#x28;i&#x29; &#x3d;&#x3d; &#x22;&#x5c;&#x22;&#x22;&#x29; continue&#x3b;&#xa;		if &#x28;strToReplace.charAt&#x28;i&#x29; &#x3d;&#x3d; &#x22;&#x7c;&#x22;&#x29; continue&#x3b;&#xa;		if &#x28;strToReplace.charAt&#x28;i&#x29; &#x3d;&#x3d; &#x22;&#x5c;n&#x22;&#x29; continue&#x3b;&#xa;		if &#x28;str_acento.indexOf&#x28;strToReplace.charAt&#x28;i&#x29;&#x29; &#x21;&#x3d; -1&#x29; &#x7b;&#xa;			nova&#x2b;&#x3d;str_sem_acento.substr&#x28;str_acento.search&#x28;strToReplace.substr&#x28;i,1&#x29;&#x29;,1&#x29;&#x3b;&#xa;		&#x7d; else &#x7b;&#xa;			nova&#x2b;&#x3d;strToReplace.substr&#x28;i,1&#x29;&#x3b;&#xa;		&#x7d;&#xa;	&#x7d;&#xa;&#xa;	for &#x28; &#x3b; indexOf&#x28;nova, &#x27;  &#x27;&#x29; &#x3e;&#x3d; 0 &#x3b; &#x29; &#x7b;&#xa;		&#x2f;&#x2f; Alert&#x28; indexOf&#x28;nova, &#x27;  &#x27;&#x29; &#x29;&#xa;		nova &#x3d; replace&#x28;nova, &#x27;  &#x27;, &#x27; &#x27;&#x29;&#xa;	&#x7d;&#xa;	return trim&#x28;nova&#x29;&#x3b;&#xa;&#x7d;&#xa;&#x2f;&#x2f; Alert&#x28;removeAcento&#x28;&#x27;Sanss&#xe3;o  &#x26;  Dalila  &#xa7;  Primeiro&#x27;&#x29;&#x29;&#xa;&#xa;&#xa;&#xa;&#xa;&#xa;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>match_OK</name>
+        <rename>match_OK</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>dtec_NOME</name>
+        <rename>dtec_NOME</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>arr_xnome</name>
+        <rename>arr_xnome</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>arr_dtec_NOME</name>
+        <rename>arr_dtec_NOME</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>tam_nome_bal</name>
+        <rename>tam_nome_bal</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>tam_dtec_NOME</name>
+        <rename>tam_dtec_NOME</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>partes_iguais</name>
+        <rename>partes_iguais</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>dif_tamanho</name>
+        <rename>dif_tamanho</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>solr_result_fields</name>
+        <rename>solr_result_fields</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>resultado</name>
+        <rename>resultado</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>Y</replace>
+      </field>      <field>        <name>descarte_obs</name>
+        <rename>descarte_obs</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1333</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Fork - SOLR DOC</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1013</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Fork - SOLR NOME</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1013</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Fork 4</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1494</xloc>
+      <yloc>293</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Fork 5</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1494</xloc>
+      <yloc>24</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Formatar QUERY</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>var q&#x3d;&#x27;&#x27;&#xa;var q2&#x3d;&#x27;&#x27;&#xa;&#xa;var defType&#x3d;&#x27;edismax&#x27;&#xa;var debugQuery&#x3d;&#x27;false&#x27;&#xa;var qf&#x3d;&#x27;nome&#x27;&#xa;var mm&#x3d;&#x27;3&#x3c;-1&#x27;&#xa;var  fq&#x3d;&#x27;&#x28;-fonte&#x3a;&#x22;DTEC-GOV&#x22; AND -fonte&#x3a;&#x22;LISTA PARIS&#x22; AND -fonte&#x3a;&#x22;LISTA - INTERPOL&#x22;&#x29;&#x27;&#xa;var fq2&#x3d;&#x27;&#x28;-fonte&#x3a;&#x22;DTEC-GOV&#x22; AND -fonte&#x3a;&#x22;LISTA PARIS&#x22; AND -fonte&#x3a;&#x22;LISTA - INTERPOL&#x22; AND cpf&#x3a;999999999999999&#x29;&#x27;&#xa;&#xa;var CPF  &#x3d; trim&#x28;CD_DOC_IDENTF_CLIE&#x29;&#xd;&#xa;&#xd;&#xa;var NOME &#x3d; upper&#x28;trim&#x28;NM_CLIE&#x29;&#x29;&#xd;&#xa;&#xd;&#xa;var arr_nome &#x3d; removeAcento&#x28;removerPalavra&#x28;NOME&#x29;&#x29;.split&#x28;&#x27; &#x27;&#x29;.filter&#x28;Boolean&#x29;&#xd;&#xa;&#xd;&#xa;&#x2f;&#x2f;var xnome &#x3d; removerPalavra&#x28;NOME&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#x2f;&#x2f;apenas_cpf &#x3d; &#x28;apenas_cpf &#x3d;&#x3d; &#x27;SIM&#x27; &#x7c;&#x7c; NOME &#x3d;&#x3d; &#x27;&#x27; &#x7c;&#x7c; NOME &#x3d;&#x3d; null &#x29; &#x3f; &#x27;SIM&#x27; &#x3a; &#x27;NAO&#x27;&#xa;&#xa;&#x2f;&#x2f;var arr_nome &#x3d; NOME.split&#x28;&#x27; &#x27;&#x29;.filter&#x28;Boolean&#x29;&#xd;&#xa;&#xa;&#x2f;&#x2f;var primeiro_nome &#x3d; arr_nome&#x5b;0&#x5d;&#xa;&#xa;var xnome &#x3d; arr_nome.join&#x28;&#x27; &#x27;&#x29;&#xa;&#x2f;&#x2f;qnome &#x3d; arr_nome.join&#x28;&#x27;&#x3d;&#x27;&#x29;&#xa;&#xa;qry_template &#x3d; &#x27;cpf&#x3a;&#x3c;&#x3c;cpf&#x3e;&#x3e;&#x27;&#xa;qry_template2 &#x3d; &#x27;nome&#x3a;&#x3c;&#x3c;nome&#x3e;&#x3e;&#x27;&#xa;&#xa;q&#x3d;replace&#x28;qry_template ,&#x27;&#x3c;&#x3c;cpf&#x3e;&#x3e;&#x27;, CPF&#x29;&#xa;q2&#x3d;replace&#x28;qry_template2 ,&#x27;&#x3c;&#x3c;nome&#x3e;&#x3e;&#x27;, xnome&#x29;&#xa;&#xa;&#x2f;&#x2f;writeToLog&#x28; &#x22;d&#x22;, &#x22;CPF&#x2f;CNPJ&#x3a; &#x22; &#x2b; CPF &#x29;&#xa;&#x2f;&#x2f;writeToLog&#x28; &#x22;d&#x22;, &#x22;Nome&#x3a; &#x22; &#x2b; NOME &#x2b; &#x22; &#x3e;&#x3e;&#x3e; &#x22; &#x2b; xnome &#x29;&#xa;&#x2f;&#x2f;writeToLog&#x28; &#x22;d&#x22;, &#x22;query&#x3a; &#x22; &#x2b; q &#x29;&#xa;&#x2f;&#x2f;writeToLog&#x28; &#x22;d&#x22;, &#x22;query2&#x3a; &#x22; &#x2b; q2&#x29;&#xa;</jsScript_script>
+      </jsScript>      <jsScript>        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Item_0</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xa;&#x2f;&#x2a;&#x2a;&#x2a;&#xa;  Retorna string sem as palavras reservadas ou que causam erro no SOLR &#xa;  ou palavras que n&#xe3;o auxiliam na determina&#xe7;&#xe3;o do nome do cliente.&#xa;&#x2a;&#x2a;&#x2a;&#x2f;&#xa;function removerPalavra&#x28;str&#x29; &#x7b;&#xa;var palavras &#x3d; removeAcento&#x28;str&#x29;.split&#x28;&#x22; &#x22;&#x29;&#x3b;&#xa;var aStr &#x3d; &#x5b;&#x5d;&#x3b;&#xa;var xStr &#x3d; &#x22;&#x22;&#x3b;&#xa;	for &#x28; i&#x3d;0 &#x3b; i &#x3c; palavras.length &#x3b; i&#x2b;&#x2b; &#x29; &#x7b;&#xa;		w &#x3d; palavras&#x5b;i&#x5d;&#x3b;&#xa;		if &#x28;w.length &#x3e; 0&#x29; &#x7b;&#xa;			if &#x28; validarPalavra&#x28;w&#x29; &#x29; &#x7b;&#xa;				aStr.push&#x28;w&#x29;&#x3b;&#xa;			&#x7d;&#xa;		&#x7d;&#xa;	&#x7d;&#xa;	xStr &#x3d; aStr.join&#x28;&#x22; &#x22;&#x29;&#xa;	return xStr&#xa;&#x7d;&#xa;&#xa;&#x2f;&#x2a;&#x2a;&#x2a;&#xa;  Retorna true se a palavra passada N&#xc3;O consta da lista&#xa;&#x2a;&#x2a;&#x2a;&#x2f;&#xa;function validarPalavra&#x28;strPalavra&#x29; &#x7b;&#xa;	x&#x3d;upper&#x28;strPalavra&#x29;&#xa;	palavraRemover &#x3d; &#x5b;&#x22;DA&#x22;, &#x22;DAS&#x22;, &#x22;DO&#x22;, &#x22;DOS&#x22;, &#x22;DE&#x22;, &#x22;E&#x22;, &#x22;S&#x2f;A&#x22;, &#x22;S.A&#x22;, &#x22;ME&#x22;, &#x22;LTDA&#x22;, &#x22;LTD&#x22;, &#x22;LT&#x22;, &#x22;INC&#x22;, &#x22;EL&#x22;, &#x22;AL&#x22;, &#x22;CIA&#x22;, &#x22;LA&#x22;, &#x22;DEL&#x22;, &#x22;EPP&#x22;, &#x22;EIRELI&#x22;&#x5d;&#xa;	return &#x28; palavraRemover.indexOf&#x28;x&#x29; &#x3d;&#x3d; -1 &#x29;&#xa;&#x7d;&#xa;&#xa;function limpaTexto&#x28;str&#x29;&#x7b;&#xa;	&#x2f;&#x2a; regexp que identifica caracteres em outros idiomas &#x2a;&#x2f;&#xa;	reg1 &#x3d; &#x2f;&#x5b;&#x5e;&#x5c;u0000-&#x5c;u024F&#x5c;u1E00-&#x5c;u1EFF&#x5c;u2C60-&#x5c;u2C7F&#x5c;uA720-&#x5c;uA7FF&#x5d;&#x2f;g&#x3b;&#xa;&#xa;	&#x2f;&#x2a; troca caracteres por &#x27;&#xa7;&#x27; &#x2a;&#x2f;&#xa;	var nomeLimpo &#x3d; trim&#x28;replace&#x28;str.replace&#x28; reg1, &#x27;&#xa7;&#x27;&#x29;, &#x27;&#xa7;&#x27;, &#x27; &#x27;&#x29;&#x29;&#xa;&#xa;	return nomeLimpo&#xa;&#x7d;&#xa;&#xa;function removeAcento&#x28;strToReplace&#x29; &#x7b;&#xa;&#xa;if &#x28;strToReplace &#x3d;&#x3d; null&#x29; return &#x22;&#x22;&#x3b;&#xa;&#xa;strToReplace &#x3d; strToReplace.replace&#x28;&#x27;&#x28;&#x27;, &#x27; &#x27;&#x29;.replace&#x28;&#x27;&#x29;&#x27;, &#x27; &#x27;&#x29;&#xa;str_acento &#x3d; &#x22;-&#x3a;&#x3b;.-&#xe1;&#xe0;&#xe3;&#xe2;&#xe4;&#xe9;&#xe8;&#xea;&#xeb;&#xed;&#xec;&#xee;&#xef;&#xf3;&#xf2;&#xf5;&#xf4;&#xf6;&#xfa;&#xf9;&#xfb;&#xfc;&#xe7;&#xf1;&#xc1;&#xc0;&#xc3;&#xc2;&#xc4;&#xc9;&#xc8;&#xca;&#xcb;&#xcd;&#xcc;&#xce;&#xcf;&#xd3;&#xd2;&#xd5;&#xd6;&#xd4;&#xda;&#xd9;&#xdb;&#xdc;&#xc7;&#xd1;&#xd0;&#x26;&#x2014;&#x2013;&#x2019;&#x2018;&#x60;&#xb4;&#xba;&#xaa;&#xb0;&#xa9;&#xa0;&#xa0;&#xbf;&#xab;&#xbb;&#x22;&#xa;str_acento &#x3d; str_acento &#x2b; String.fromCharCode&#x28;8211&#x29; &#x2b; &#x22;&#x96;&#x22;&#xa;str_sem_acento &#x3d; &#x22;     aaaaaeeeeiiiiooooouuuucnAAAAAEEEEIIIIOOOOOUUUUCNDE               &#x22;&#xa;str_sem_acento &#x3d; str_sem_acento &#x2b; &#x22;- &#x22;&#xa;&#xa;var nova&#x3d;&#x22;&#x22;&#xa;	for &#x28;var i &#x3d; 0&#x3b; i &#x3c; strToReplace.length &#x3b; i&#x2b;&#x2b;&#x29; &#x7b;&#xa;		if &#x28;strToReplace.charAt&#x28;i&#x29; &#x3d;&#x3d; &#x22;&#x5c;&#x22;&#x22;&#x29; continue&#x3b;&#xa;		if &#x28;strToReplace.charAt&#x28;i&#x29; &#x3d;&#x3d; &#x22;&#x7c;&#x22;&#x29; continue&#x3b;&#xa;		if &#x28;strToReplace.charAt&#x28;i&#x29; &#x3d;&#x3d; &#x22;&#x5c;n&#x22;&#x29; continue&#x3b;&#xa;		if &#x28;str_acento.indexOf&#x28;strToReplace.charAt&#x28;i&#x29;&#x29; &#x21;&#x3d; -1&#x29; &#x7b;&#xa;			nova&#x2b;&#x3d;str_sem_acento.substr&#x28;str_acento.search&#x28;strToReplace.substr&#x28;i,1&#x29;&#x29;,1&#x29;&#x3b;&#xa;		&#x7d; else &#x7b;&#xa;			nova&#x2b;&#x3d;strToReplace.substr&#x28;i,1&#x29;&#x3b;&#xa;		&#x7d;&#xa;	&#x7d;&#xa;&#xa;	for &#x28; &#x3b; indexOf&#x28;nova, &#x27;  &#x27;&#x29; &#x3e;&#x3d; 0 &#x3b; &#x29; &#x7b;&#xa;		&#x2f;&#x2f; Alert&#x28; indexOf&#x28;nova, &#x27;  &#x27;&#x29; &#x29;&#xa;		nova &#x3d; replace&#x28;nova, &#x27;  &#x27;, &#x27; &#x27;&#x29;&#xa;	&#x7d;&#xa;	return trim&#x28;nova&#x29;&#x3b;&#xa;&#x7d;&#xa;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>q</name>
+        <rename>q</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>q2</name>
+        <rename>q2</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>defType</name>
+        <rename>defType</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>debugQuery</name>
+        <rename>debugQuery</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>qf</name>
+        <rename>qf</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>mm</name>
+        <rename>mm</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fq</name>
+        <rename>fq</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>fq2</name>
+        <rename>fq2</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>CPF</name>
+        <rename>CPF</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>NOME</name>
+        <rename>NOME</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>xnome</name>
+        <rename>xnome</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>arr_nome</name>
+        <rename>arr_nome</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>546</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Get Variables 2</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>solr_result_fields</name>
+        <variable>&#x24;&#x7b;solr_result_fields&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>solr_max_results</name>
+        <variable>&#x24;&#x7b;solr_max_results&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>url_base</name>
+        <variable>&#x24;&#x7b;url_base&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>url_solr</name>
+        <variable>&#x24;&#x7b;url_solr&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>apenas_cpf</name>
+        <variable>&#x24;&#x7b;apenas_cpf&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>352</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Get data from XML - SOLR DOC</name>
+    <type>getXMLData</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>Y</rownum>
+    <addresultfile>N</addresultfile>
+    <namespaceaware>N</namespaceaware>
+    <ignorecomments>Y</ignorecomments>
+    <readurl>N</readurl>
+    <validating>N</validating>
+    <usetoken>N</usetoken>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <rownum_field>row_num</rownum_field>
+    <encoding>UTF-8</encoding>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>dtec_ID</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;id&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_NOME</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;nome&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_NOME_CPF</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;nome_cpf&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_REGISTRO_NOTICIA</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;registro_noticia&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_DATA_NOTICIA</name>
+        <xpath>date&#x5b;&#x40;name&#x3d;&#x27;data_noticia&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>qtde_results</name>
+        <xpath>&#x2f;&#x2f;result&#x2f;&#x40;numFound</xpath>
+        <element_type>attribut</element_type>
+        <result_type>valueof</result_type>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_SCORE</name>
+        <xpath>float&#x5b;&#x40;name&#x3d;&#x27;score&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_APELIDO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;apelido&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_SEXO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;sexo&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_IDADE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;idade&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_ATIVIDADE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;atividade&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_PPE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;ppe&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_OPERACAO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;operacao&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_TITULO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;titulo&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_PESSOA</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;pessoa&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_TIPO_SUSPEITA</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;tipo_suspeita&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_TIPO_INFORMACAO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;tipo_informacao&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_REGIAO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;regiao&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_ESTADO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;uf&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_FONTE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;fonte&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_EXISTE_PROCESSO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;existe_processo&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_ENVOLVIMENTO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;envolvimento&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <loopxpath>&#x2f;response&#x2f;result&#x2f;doc</loopxpath>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <XmlField>resultado</XmlField>
+    <prunePath/>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1173</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Get data from XML - SOLR NOME</name>
+    <type>getXMLData</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>Y</rownum>
+    <addresultfile>N</addresultfile>
+    <namespaceaware>N</namespaceaware>
+    <ignorecomments>Y</ignorecomments>
+    <readurl>N</readurl>
+    <validating>N</validating>
+    <usetoken>N</usetoken>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <rownum_field>row_num</rownum_field>
+    <encoding>UTF-8</encoding>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields>
+      <field>
+        <name>dtec_ID</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;id&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_NOME</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;nome&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_NOME_CPF</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;nome_cpf&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_REGISTRO_NOTICIA</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;registro_noticia&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_DATA_NOTICIA</name>
+        <xpath>date&#x5b;&#x40;name&#x3d;&#x27;data_noticia&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>qtde_results</name>
+        <xpath>&#x2f;&#x2f;result&#x2f;&#x40;numFound</xpath>
+        <element_type>attribut</element_type>
+        <result_type>valueof</result_type>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_SCORE</name>
+        <xpath>float&#x5b;&#x40;name&#x3d;&#x27;score&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_APELIDO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;apelido&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_SEXO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;sexo&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_IDADE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;idade&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_ATIVIDADE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;atividade&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_PPE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;ppe&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_OPERACAO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;operacao&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_TITULO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;titulo&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_PESSOA</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;pessoa&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_TIPO_SUSPEITA</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;tipo_suspeita&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_TIPO_INFORMACAO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;tipo_informacao&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_REGIAO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;regiao&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_ESTADO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;uf&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_FONTE</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;fonte&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_EXISTE_PROCESSO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;existe_processo&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>dtec_ENVOLVIMENTO</name>
+        <xpath>str&#x5b;&#x40;name&#x3d;&#x27;envolvimento&#x27;&#x5d;</xpath>
+        <element_type>node</element_type>
+        <result_type>valueof</result_type>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <loopxpath>&#x2f;response&#x2f;result&#x2f;doc</loopxpath>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <XmlField>resultado</XmlField>
+    <prunePath/>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1173</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Group by</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>dtec_ID</name>
+        </field>
+        <field>
+          <name>CD_DOC_IDENTF_CLIE</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>CD_MES_ANO</aggregate>
+          <subject>CD_MES_ANO</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>CD_TP_IDENTF_CLIE</aggregate>
+          <subject>CD_TP_IDENTF_CLIE</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>NM_CLIE</aggregate>
+          <subject>NM_CLIE</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>CPF</aggregate>
+          <subject>CPF</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_ID</aggregate>
+          <subject>dtec_ID</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_NOME</aggregate>
+          <subject>dtec_NOME</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_NOME_CPF</aggregate>
+          <subject>dtec_NOME_CPF</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_REGISTRO_NOTICIA</aggregate>
+          <subject>dtec_REGISTRO_NOTICIA</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_DATA_NOTICIA</aggregate>
+          <subject>dtec_DATA_NOTICIA</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_ATIVIDADE</aggregate>
+          <subject>dtec_ATIVIDADE</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_PPE</aggregate>
+          <subject>dtec_PPE</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_OPERACAO</aggregate>
+          <subject>dtec_OPERACAO</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_TITULO</aggregate>
+          <subject>dtec_TITULO</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_PESSOA</aggregate>
+          <subject>dtec_PESSOA</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_TIPO_SUSPEITA</aggregate>
+          <subject>dtec_TIPO_SUSPEITA</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_FONTE</aggregate>
+          <subject>dtec_FONTE</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_EXISTE_PROCESSO</aggregate>
+          <subject>dtec_EXISTE_PROCESSO</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>dtec_ENVOLVIMENTO</aggregate>
+          <subject>dtec_ENVOLVIMENTO</subject>
+          <type>LAST_INCL_NULL</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1913</xloc>
+      <yloc>165</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>HTTP client - SOLR DOC</name>
+    <type>HTTP</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <url/>
+    <urlInField>Y</urlInField>
+    <urlField>url_solr</urlField>
+    <encoding>UTF-8</encoding>
+    <httpLogin/>
+    <httpPassword>Encrypted </httpPassword>
+    <proxyHost/>
+    <proxyPort/>
+    <socketTimeout/>
+    <connectionTimeout/>
+    <closeIdleConnectionsTime/>
+    <lookup>
+      <arg>
+        <name>q</name>
+        <parameter>q</parameter>
+      </arg>
+      <arg>
+        <name>solr_max_results</name>
+        <parameter>rows</parameter>
+      </arg>
+      <arg>
+        <name>solr_result_fields</name>
+        <parameter>fl</parameter>
+      </arg>
+      <arg>
+        <name>fq</name>
+        <parameter>fq</parameter>
+      </arg>
+    </lookup>
+    <result>
+      <name>resultado</name>
+      <code>http_status</code>
+      <response_time>rt</response_time>
+    </result>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>853</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>HTTP client - SOLR NOME</name>
+    <type>HTTP</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <url/>
+    <urlInField>Y</urlInField>
+    <urlField>url_solr</urlField>
+    <encoding>UTF-8</encoding>
+    <httpLogin/>
+    <httpPassword>Encrypted </httpPassword>
+    <proxyHost/>
+    <proxyPort/>
+    <socketTimeout/>
+    <connectionTimeout/>
+    <closeIdleConnectionsTime/>
+    <lookup>
+      <arg>
+        <name>q2</name>
+        <parameter>q</parameter>
+      </arg>
+      <arg>
+        <name>solr_max_results</name>
+        <parameter>rows</parameter>
+      </arg>
+      <arg>
+        <name>solr_result_fields</name>
+        <parameter>fl</parameter>
+      </arg>
+      <arg>
+        <name>defType</name>
+        <parameter>defType</parameter>
+      </arg>
+      <arg>
+        <name>debugQuery</name>
+        <parameter>debugQuery</parameter>
+      </arg>
+      <arg>
+        <name>mm</name>
+        <parameter>mm</parameter>
+      </arg>
+      <arg>
+        <name>fq2</name>
+        <parameter>fq</parameter>
+      </arg>
+      <arg>
+        <name>qf</name>
+        <parameter>qf</parameter>
+      </arg>
+    </lookup>
+    <result>
+      <name>resultado</name>
+      <code>http_status</code>
+      <response_time>rt</response_time>
+    </result>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>853</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert - TB_NOTICIA_CLIE</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <schema/>
+    <table>TB_NOTICIA_CLIE</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>CD_DOC_IDENTF_CLIE</column_name>
+          <stream_name>CD_DOC_IDENTF_CLIE</stream_name>
+        </field>
+        <field>
+          <column_name>CD_TP_IDENTF_CLIE</column_name>
+          <stream_name>CD_TP_IDENTF_CLIE</stream_name>
+        </field>
+        <field>
+          <column_name>CD_REGISTRO_NOTICIA</column_name>
+          <stream_name>dtec_REGISTRO_NOTICIA</stream_name>
+        </field>
+        <field>
+          <column_name>DT_NOTICIA</column_name>
+          <stream_name>dt</stream_name>
+        </field>
+        <field>
+          <column_name>FL_PESSOA_PUBLICA</column_name>
+          <stream_name>dtec_PPE</stream_name>
+        </field>
+        <field>
+          <column_name>NM_OPERACAO</column_name>
+          <stream_name>dtec_OPERACAO</stream_name>
+        </field>
+        <field>
+          <column_name>TX_ENVOLV</column_name>
+          <stream_name>dtec_ENVOLVIMENTO</stream_name>
+        </field>
+        <field>
+          <column_name>NM_FONTE_NOTICIA</column_name>
+          <stream_name>dtec_FONTE</stream_name>
+        </field>
+        <field>
+          <column_name>TX_LINK_NOTICIA</column_name>
+          <stream_name>TX_LINK_NOTICIA</stream_name>
+        </field>
+        <field>
+          <column_name>CD_TP_PESSOA</column_name>
+          <stream_name>dtec_PESSOA</stream_name>
+        </field>
+        <field>
+          <column_name>NM_TP_SUSP</column_name>
+          <stream_name>dtec_TIPO_SUSPEITA</stream_name>
+        </field>
+        <field>
+          <column_name>NM_TITULO</column_name>
+          <stream_name>dtec_TITULO</stream_name>
+        </field>
+        <field>
+          <column_name>NM_ALVO_FIEL</column_name>
+          <stream_name>dtec_NOME_CPF</stream_name>
+        </field>
+        <field>
+          <column_name>NM_ALVO</column_name>
+          <stream_name>dtec_NOME</stream_name>
+        </field>
+        <field>
+          <column_name>FL_PROCESSOS</column_name>
+          <stream_name>dtec_EXISTE_PROCESSO</stream_name>
+        </field>
+        <field>
+          <column_name>NM_ATIVID</column_name>
+          <stream_name>dtec_ATIVIDADE</stream_name>
+        </field>
+        <field>
+          <column_name>CD_LOTE</column_name>
+          <stream_name>CD_MES_ANO</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2240</xloc>
+      <yloc>165</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Match OK - SOLR DOC</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Select values - SOLR DOC</send_true_to>
+<send_false_to>Fork 5</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>match_OK</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>S</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>dtec_REGISTRO_NOTICIA</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1493</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Match OK - SOLR NOME</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Select values - SOLR NOME</send_true_to>
+<send_false_to>Fork 4</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <leftvalue>match_OK</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>String</type><text>S</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>dtec_REGISTRO_NOTICIA</leftvalue>
+   <function>IS NOT NULL</function>
+   <rightvalue/>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1493</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>SPLIT</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>635</xloc>
+      <yloc>157</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values - SOLR DOC</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>NM_CLIE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CD_DOC_IDENTF_CLIE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CD_TP_IDENTF_CLIE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CD_MES_ANO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CPF</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_NOME</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_NOME_CPF</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_REGISTRO_NOTICIA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_DATA_NOTICIA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_ATIVIDADE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_PPE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_OPERACAO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_TITULO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_PESSOA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_TIPO_SUSPEITA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_FONTE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_EXISTE_PROCESSO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_ENVOLVIMENTO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1653</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values - SOLR NOME</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>      <field>        <name>NM_CLIE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CD_DOC_IDENTF_CLIE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CD_TP_IDENTF_CLIE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CD_MES_ANO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>CPF</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_ID</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_NOME</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_NOME_CPF</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_REGISTRO_NOTICIA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_DATA_NOTICIA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_ATIVIDADE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_PPE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_OPERACAO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_TITULO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_PESSOA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_TIPO_SUSPEITA</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_FONTE</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_EXISTE_PROCESSO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>dtec_ENVOLVIMENTO</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>        <select_unspecified>N</select_unspecified>
+    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1653</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows - SOLR DOC</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>5000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>dtec_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1813</xloc>
+      <yloc>100</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows - SOLR NOME</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>5000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>dtec_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1813</xloc>
+      <yloc>203</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Strings cut 2</name>
+    <type>StringCut</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <in_stream_name>NM_CLIE</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>99</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_NOME</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>99</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_PESSOA</in_stream_name>
+        <out_stream_name/>
+        <cut_from>1</cut_from>
+        <cut_to>2</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_ATIVIDADE</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>25</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_PPE</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>2</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_ENVOLVIMENTO</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>500</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_OPERACAO</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>25</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_REGISTRO_NOTICIA</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>14</cut_to>
+      </field>
+      <field>
+        <in_stream_name>dtec_TITULO</in_stream_name>
+        <out_stream_name/>
+        <cut_from>0</cut_from>
+        <cut_to>199</cut_to>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2018</xloc>
+      <yloc>165</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Wait DELETE TB_NOTICIA_CLIE</name>
+    <type>BlockUntilStepsFinish</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <steps>
+      <step>
+        <name>DELETE TB_NOTICIA_CLIE</name>
+        <CopyNr>0</CopyNr>
+        </step>
+      </steps>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>80</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+
+</transformation>

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>TB_CONTRATO</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>&#x2f;</directory>
+    <parameters>
+    </parameters>
+    <log>
+<trans-log-table><connection/>
+<schema/>
+<table/>
+<size_limit_lines/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name></field><field><id>EXECUTING_SERVER</id><enabled>N</enabled><name>EXECUTING_SERVER</name></field><field><id>EXECUTING_USER</id><enabled>N</enabled><name>EXECUTING_USER</name></field><field><id>CLIENT</id><enabled>N</enabled><name>CLIENT</name></field></trans-log-table>
+<perf-log-table><connection/>
+<schema/>
+<table/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>SEQ_NR</id><enabled>Y</enabled><name>SEQ_NR</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>INPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>INPUT_BUFFER_ROWS</name></field><field><id>OUTPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>OUTPUT_BUFFER_ROWS</name></field></perf-log-table>
+<channel-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>LOGGING_OBJECT_TYPE</id><enabled>Y</enabled><name>LOGGING_OBJECT_TYPE</name></field><field><id>OBJECT_NAME</id><enabled>Y</enabled><name>OBJECT_NAME</name></field><field><id>OBJECT_COPY</id><enabled>Y</enabled><name>OBJECT_COPY</name></field><field><id>REPOSITORY_DIRECTORY</id><enabled>Y</enabled><name>REPOSITORY_DIRECTORY</name></field><field><id>FILENAME</id><enabled>Y</enabled><name>FILENAME</name></field><field><id>OBJECT_ID</id><enabled>Y</enabled><name>OBJECT_ID</name></field><field><id>OBJECT_REVISION</id><enabled>Y</enabled><name>OBJECT_REVISION</name></field><field><id>PARENT_CHANNEL_ID</id><enabled>Y</enabled><name>PARENT_CHANNEL_ID</name></field><field><id>ROOT_CHANNEL_ID</id><enabled>Y</enabled><name>ROOT_CHANNEL_ID</name></field></channel-log-table>
+<step-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field></step-log-table>
+<metrics-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>METRICS_DATE</id><enabled>Y</enabled><name>METRICS_DATE</name></field><field><id>METRICS_CODE</id><enabled>Y</enabled><name>METRICS_CODE</name></field><field><id>METRICS_DESCRIPTION</id><enabled>Y</enabled><name>METRICS_DESCRIPTION</name></field><field><id>METRICS_SUBJECT</id><enabled>Y</enabled><name>METRICS_SUBJECT</name></field><field><id>METRICS_TYPE</id><enabled>Y</enabled><name>METRICS_TYPE</name></field><field><id>METRICS_VALUE</id><enabled>Y</enabled><name>METRICS_VALUE</name></field></metrics-log-table>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <created_user>-</created_user>
+  <created_date>2014&#x2f;08&#x2f;12 14&#x3a;25&#x3a;33.933</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2014&#x2f;08&#x2f;12 14&#x3a;25&#x3a;33.933</modified_date>
+  </info>
+  <notepads>
+  </notepads>
+  <connection>
+    <name>brb</name>
+    <server>10.10.10.10</server>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>brb</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ld_rc_oracle</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>dtec_ld_rc_oracle</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ld_rc_oracle_encrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ldpf_sqlserver</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>dtec_ldpf_sqlserver</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>dtec_v3_oracle</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle_ecrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_sqlserver</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>dtec_v3_sqlserver</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>fpld</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>fpld</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>hc</name>
+    <server>10.10.10.10</server>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>hc</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>pep</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>pep</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>pld_pan</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>pld_pan</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>Get Variables</from><to>MERGE TB_CONTRATO</to><enabled>Y</enabled> </hop>
+  </order>
+  <step>
+    <name>Get Variables</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>CD_LOTE</name>
+        <variable>&#x24;&#x7b;LOTE&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>305</xloc>
+      <yloc>69</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>MERGE TB_CONTRATO</name>
+    <type>ExecSQL</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <execute_each_row>Y</execute_each_row>
+    <single_statement>Y</single_statement>
+    <replace_variables>Y</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>MERGE INTO TB_CONTRATO d USING &#xd;&#xa;&#x28;&#xd;&#xa;SELECT &#xd;&#xa;CO.CD_ANO_FABRIC,&#xd;&#xa;CO.CD_ANO_MODELO,&#xd;&#xa;CO.CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;CO.CD_CONTRATO,&#xd;&#xa;CO.CD_CONVENIO,&#xd;&#xa;CO.CD_CPF_CNTAT,&#xd;&#xa;CO.CD_CPF_CTR_CNTAT,&#xd;&#xa;CO.CD_CPF_OFFICER,&#xd;&#xa;CO.CD_DOC_IDENTF_BNEFC,&#xd;&#xa;CO.CD_DOC_IDENTF_CLIE,&#xd;&#xa;CO.CD_FILIAL_BCO,&#xd;&#xa;CO.CD_GRP_CONSORCIO,&#xd;&#xa;CO.CD_IDENTF_REF,&#xd;&#xa;CO.CD_LOTE, &#xd;&#xa;CO.CD_MARCA,&#xd;&#xa;CO.CD_MODELO,&#xd;&#xa;CO.CD_OFFICER,&#xd;&#xa;CO.CD_ORGAO,&#xd;&#xa;CO.CD_ORIG_CONTRATO,&#xd;&#xa;CO.CD_PPSTA,&#xd;&#xa;CO.CD_PRODUTO,&#xd;&#xa;CO.CD_SGMTO_CONTRATO,&#xd;&#xa;CO.CD_SIT_CONSORCIO,&#xd;&#xa;CO.CD_STTUS_CONTRATO,&#xd;&#xa;CO.CD_TP_CONVENIO,&#xd;&#xa;CO.CD_TP_IDENTF_BNEFC,&#xd;&#xa;CO.CD_TP_IDENTF_CLIE,&#xd;&#xa;CO.CD_TP_PLANO,&#xd;&#xa;CO.DT_BASE_CONTRATO,&#xd;&#xa;CO.DT_CAD_CONTRATO,&#xd;&#xa;CO.DT_CANCEL_CONTRATO,&#xd;&#xa;CO.DT_LIB_CONTRATO,&#xd;&#xa;CO.DT_LIQUID_CONTRATO,&#xd;&#xa;CO.DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;CO.DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;CO.DT_VENCTO_CONTRATO,&#xd;&#xa;CO.FL_AVERB,&#xd;&#xa;CO.FL_BEM_ALIENADO,&#xd;&#xa;CO.FL_BEM_APREENDD,&#xd;&#xa;CO.FL_CANCEL_CONTRATO,&#xd;&#xa;CO.FL_DUT,&#xd;&#xa;CO.FL_GARNT_ALIEN,&#xd;&#xa;CO.FL_RFINAM,&#xd;&#xa;CO.FL_TAR_CAD_FINCD,&#xd;&#xa;CI.NM_CLIE,&#xd;&#xa;CO.NM_OFFICER,&#xd;&#xa;CO.NM_OPERD_CONTRATO,&#xd;&#xa;CO.NM_SIST_ORIG,&#xd;&#xa;CO.QT_COTA_CONSORCIO,&#xd;&#xa;CO.QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;CO.QT_MES_CONTT,&#xd;&#xa;CO.QT_MES_PAGO,&#xd;&#xa;CO.VL_FINCD_CONTRATO,&#xd;&#xa;CO.VL_IOF_CONTRATO,&#xd;&#xa;CO.VL_LIQUID,&#xd;&#xa;CO.VL_OPER_CONTRATO,&#xd;&#xa;CO.VL_PCELA_CONTRATO,&#xd;&#xa;CO.VL_PRINC_CONTRATO,&#xd;&#xa;CO.VL_REBATE_PGTO,&#xd;&#xa;CO.VL_SEGURO_CONTRATO,&#xd;&#xa;CO.VL_TAR_CAD_CONTRATO,&#xd;&#xa;CO.VL_TAXA_CONTRATO,&#xd;&#xa;CO.VL_TAXA_EFETIVO,&#xd;&#xa;CO.VL_TAXA_OPER_CONTRATO,&#xd;&#xa;CO.VL_TAXA_REBATE,&#xd;&#xa;CO.VL_SALDO_CONTRATO,&#xd;&#xa;CO.DT_CONTEMPLADO&#xd;&#xa;FROM TB_CONTRATO_RU CO&#xd;&#xa;LEFT JOIN TB_CAD_CLIE CI ON CI.CD_DOC_IDENTF_CLIE &#x3d; CO.CD_DOC_IDENTF_CLIE AND CI.CD_TP_IDENTF_CLIE &#x3d; CO.CD_TP_IDENTF_CLIE&#xd;&#xa;WHERE CO.CD_LOTE &#x3d; &#x24;&#x7b;LOTE&#x7d;&#xd;&#xa;&#x29; ru &#xd;&#xa;ON &#x28;d.NM_SIST_ORIG &#x3d; ru.NM_SIST_ORIG AND d.CD_CONTRATO &#x3d; ru.CD_CONTRATO&#x29;&#xd;&#xa;WHEN MATCHED THEN&#xd;&#xa;  UPDATE SET &#xd;&#xa;  	d.CD_ANO_FABRIC &#x3d; ru.CD_ANO_FABRIC,&#xd;&#xa;	d.CD_ANO_MODELO &#x3d; ru.CD_ANO_MODELO,&#xd;&#xa;	d.CD_CANAL_VENDA_CONTRATO &#x3d; ru.CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;	d.CD_CONVENIO &#x3d; ru.CD_CONVENIO,&#xd;&#xa;	d.CD_CPF_CNTAT &#x3d; ru.CD_CPF_CNTAT,&#xd;&#xa;	d.CD_CPF_CTR_CNTAT &#x3d; ru.CD_CPF_CTR_CNTAT,&#xd;&#xa;	d.CD_CPF_OFFICER &#x3d; ru.CD_CPF_OFFICER,&#xd;&#xa;	d.CD_DOC_IDENTF_BNEFC &#x3d; ru.CD_DOC_IDENTF_BNEFC,&#xd;&#xa;	d.CD_DOC_IDENTF_CLIE &#x3d; ru.CD_DOC_IDENTF_CLIE,&#xd;&#xa;	d.CD_FILIAL_BCO &#x3d; ru.CD_FILIAL_BCO,&#xd;&#xa;	d.CD_GRP_CONSORCIO &#x3d; ru.CD_GRP_CONSORCIO,&#xd;&#xa;	d.CD_SIT_CONSORCIO &#x3d; ru.CD_SIT_CONSORCIO,&#xd;&#xa;	d.CD_IDENTF_REF &#x3d; ru.CD_IDENTF_REF,&#xd;&#xa;	d.CD_LOTE &#x3d; ru.CD_LOTE,&#xd;&#xa;	d.CD_MARCA &#x3d; ru.CD_MARCA,&#xd;&#xa;	d.CD_MODELO &#x3d; ru.CD_MODELO,&#xd;&#xa;	d.CD_OFFICER &#x3d; ru.CD_OFFICER,&#xd;&#xa;	d.CD_ORGAO &#x3d; ru.CD_ORGAO,&#xd;&#xa;	d.CD_ORIG_CONTRATO &#x3d; ru.CD_ORIG_CONTRATO,&#xd;&#xa;	d.CD_PPSTA &#x3d; ru.CD_PPSTA,&#xd;&#xa;	d.CD_PRODUTO &#x3d; ru.CD_PRODUTO,&#xd;&#xa;	d.CD_SGMTO_CONTRATO &#x3d; ru.CD_SGMTO_CONTRATO,&#xd;&#xa;	d.CD_STTUS_CONTRATO &#x3d; ru.CD_STTUS_CONTRATO,&#xd;&#xa;	d.CD_TP_CONVENIO &#x3d; ru.CD_TP_CONVENIO,&#xd;&#xa;	d.CD_TP_IDENTF_BNEFC &#x3d; ru.CD_TP_IDENTF_BNEFC,&#xd;&#xa;	d.CD_TP_IDENTF_CLIE &#x3d; ru.CD_TP_IDENTF_CLIE,&#xd;&#xa;	d.CD_TP_PLANO &#x3d; ru.CD_TP_PLANO,&#xd;&#xa;	d.DT_BASE_CONTRATO &#x3d; ru.DT_BASE_CONTRATO,&#xd;&#xa;	d.DT_CAD_CONTRATO &#x3d; ru.DT_CAD_CONTRATO,&#xd;&#xa;	d.DT_CANCEL_CONTRATO &#x3d; ru.DT_CANCEL_CONTRATO,&#xd;&#xa;	d.DT_LIB_CONTRATO &#x3d; ru.DT_LIB_CONTRATO,&#xd;&#xa;	d.DT_LIQUID_CONTRATO &#x3d; ru.DT_LIQUID_CONTRATO,&#xd;&#xa;	d.DT_PRIM_PGTO_CONTRATO &#x3d; ru.DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;	d.DT_PRIM_VCTO_CONTRATO &#x3d; ru.DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;	d.DT_VENCTO_CONTRATO &#x3d; ru.DT_VENCTO_CONTRATO,&#xd;&#xa;	d.FL_AVERB &#x3d; ru.FL_AVERB,&#xd;&#xa;	d.FL_BEM_ALIENADO &#x3d; ru.FL_BEM_ALIENADO,&#xd;&#xa;	d.FL_BEM_APREENDD &#x3d; ru.FL_BEM_APREENDD,&#xd;&#xa;	d.FL_CANCEL_CONTRATO &#x3d; ru.FL_CANCEL_CONTRATO,&#xd;&#xa;	d.FL_DUT &#x3d; ru.FL_DUT,&#xd;&#xa;	d.FL_GARNT_ALIEN &#x3d; ru.FL_GARNT_ALIEN,&#xd;&#xa;	d.FL_RFINAM &#x3d; ru.FL_RFINAM,&#xd;&#xa;	d.FL_TAR_CAD_FINCD &#x3d; ru.FL_TAR_CAD_FINCD,&#xd;&#xa;	d.NM_CLIE &#x3d; ru.NM_CLIE,&#xd;&#xa;	d.NM_OFFICER &#x3d; ru.NM_OFFICER,&#xd;&#xa;	d.NM_OPERD_CONTRATO &#x3d; ru.NM_OPERD_CONTRATO,&#xd;&#xa;	d.QT_COTA_CONSORCIO &#x3d; ru.QT_COTA_CONSORCIO,&#xd;&#xa;	d.QT_DIA_CARENCIA_CONTRATO &#x3d; ru.QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;	d.QT_MES_CONTT &#x3d; ru.QT_MES_CONTT,&#xd;&#xa;	d.QT_MES_PAGO &#x3d; ru.QT_MES_PAGO,&#xd;&#xa;	d.VL_FINCD_CONTRATO &#x3d; ru.VL_FINCD_CONTRATO,&#xd;&#xa;	d.VL_IOF_CONTRATO &#x3d; ru.VL_IOF_CONTRATO,&#xd;&#xa;	d.VL_LIQUID &#x3d; ru.VL_LIQUID,&#xd;&#xa;	d.VL_OPER_CONTRATO &#x3d; ru.VL_OPER_CONTRATO,&#xd;&#xa;	d.VL_PCELA_CONTRATO &#x3d; ru.VL_PCELA_CONTRATO,&#xd;&#xa;	d.VL_PRINC_CONTRATO &#x3d; ru.VL_PRINC_CONTRATO,&#xd;&#xa;	d.VL_REBATE_PGTO &#x3d; ru.VL_REBATE_PGTO,&#xd;&#xa;	d.VL_SEGURO_CONTRATO &#x3d; ru.VL_SEGURO_CONTRATO,&#xd;&#xa;	d.VL_TAR_CAD_CONTRATO &#x3d; ru.VL_TAR_CAD_CONTRATO,&#xd;&#xa;	d.VL_TAXA_CONTRATO &#x3d; ru.VL_TAXA_CONTRATO,&#xd;&#xa;	d.VL_TAXA_EFETIVO &#x3d; ru.VL_TAXA_EFETIVO,&#xd;&#xa;	d.VL_TAXA_OPER_CONTRATO &#x3d; ru.VL_TAXA_OPER_CONTRATO,&#xd;&#xa;	d.VL_TAXA_REBATE &#x3d; ru.VL_TAXA_REBATE,&#xd;&#xa;	d.VL_SALDO_CONTRATO &#x3d; ru.VL_SALDO_CONTRATO,&#xd;&#xa;	d.DT_CONTEMPLADO &#x3d; ru.DT_CONTEMPLADO&#xd;&#xa;  WHERE ru.CD_LOTE &#x3d; &#x24;&#x7b;LOTE&#x7d;&#xd;&#xa;WHEN NOT MATCHED THEN&#xd;&#xa;	INSERT &#xd;&#xa;	&#x28;CD_ANO_FABRIC,&#xd;&#xa;	CD_ANO_MODELO,&#xd;&#xa;	CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;	CD_CONTRATO,&#xd;&#xa;	CD_CONVENIO,&#xd;&#xa;	CD_CPF_CNTAT,&#xd;&#xa;	CD_CPF_CTR_CNTAT,&#xd;&#xa;	CD_CPF_OFFICER,&#xd;&#xa;	CD_DOC_IDENTF_BNEFC,&#xd;&#xa;	CD_DOC_IDENTF_CLIE,&#xd;&#xa;	CD_FILIAL_BCO,&#xd;&#xa;	CD_GRP_CONSORCIO,&#xd;&#xa;	CD_SIT_CONSORCIO,&#xd;&#xa;	CD_IDENTF_REF,&#xd;&#xa;	CD_LOTE, &#xd;&#xa;	CD_MARCA,&#xd;&#xa;	CD_MODELO,&#xd;&#xa;	CD_OFFICER,&#xd;&#xa;	CD_ORGAO,&#xd;&#xa;	CD_ORIG_CONTRATO,&#xd;&#xa;	CD_PPSTA,&#xd;&#xa;	CD_PRODUTO,&#xd;&#xa;	CD_SGMTO_CONTRATO,&#xd;&#xa;	CD_STTUS_CONTRATO,&#xd;&#xa;	CD_TP_CONVENIO,&#xd;&#xa;	CD_TP_IDENTF_BNEFC,&#xd;&#xa;	CD_TP_IDENTF_CLIE,&#xd;&#xa;	CD_TP_PLANO,&#xd;&#xa;	DT_BASE_CONTRATO,&#xd;&#xa;	DT_CAD_CONTRATO,&#xd;&#xa;	DT_CANCEL_CONTRATO,&#xd;&#xa;	DT_LIB_CONTRATO,&#xd;&#xa;	DT_LIQUID_CONTRATO,&#xd;&#xa;	DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;	DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;	DT_VENCTO_CONTRATO,&#xd;&#xa;	FL_AVERB,&#xd;&#xa;	FL_BEM_ALIENADO,&#xd;&#xa;	FL_BEM_APREENDD,&#xd;&#xa;	FL_CANCEL_CONTRATO,&#xd;&#xa;	FL_DUT,&#xd;&#xa;	FL_GARNT_ALIEN,&#xd;&#xa;	FL_RFINAM,&#xd;&#xa;	FL_TAR_CAD_FINCD,&#xd;&#xa;	NM_CLIE,&#xd;&#xa;	NM_OFFICER,&#xd;&#xa;	NM_OPERD_CONTRATO,&#xd;&#xa;	NM_SIST_ORIG,&#xd;&#xa;	QT_COTA_CONSORCIO,&#xd;&#xa;	QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;	QT_MES_CONTT,&#xd;&#xa;	QT_MES_PAGO,&#xd;&#xa;	VL_FINCD_CONTRATO,&#xd;&#xa;	VL_IOF_CONTRATO,&#xd;&#xa;	VL_LIQUID,&#xd;&#xa;	VL_OPER_CONTRATO,&#xd;&#xa;	VL_PCELA_CONTRATO,&#xd;&#xa;	VL_PRINC_CONTRATO,&#xd;&#xa;	VL_REBATE_PGTO,&#xd;&#xa;	VL_SEGURO_CONTRATO,&#xd;&#xa;	VL_TAR_CAD_CONTRATO,&#xd;&#xa;	VL_TAXA_CONTRATO,&#xd;&#xa;	VL_TAXA_EFETIVO,&#xd;&#xa;	VL_TAXA_OPER_CONTRATO,&#xd;&#xa;	VL_TAXA_REBATE,&#xd;&#xa;    VL_SALDO_CONTRATO,&#xd;&#xa;    DT_CONTEMPLADO&#xd;&#xa;	&#x29;     &#xd;&#xa;    VALUES&#xd;&#xa;    &#x28;ru.CD_ANO_FABRIC,&#xd;&#xa;	ru.CD_ANO_MODELO,&#xd;&#xa;	ru.CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;	ru.CD_CONTRATO,&#xd;&#xa;	ru.CD_CONVENIO,&#xd;&#xa;	ru.CD_CPF_CNTAT,&#xd;&#xa;	ru.CD_CPF_CTR_CNTAT,&#xd;&#xa;	ru.CD_CPF_OFFICER,&#xd;&#xa;	ru.CD_DOC_IDENTF_BNEFC,&#xd;&#xa;	ru.CD_DOC_IDENTF_CLIE,&#xd;&#xa;	ru.CD_FILIAL_BCO,&#xd;&#xa;	ru.CD_GRP_CONSORCIO,&#xd;&#xa;	ru.CD_SIT_CONSORCIO,&#xd;&#xa;	ru.CD_IDENTF_REF,&#xd;&#xa;	ru.CD_LOTE, &#xd;&#xa;	ru.CD_MARCA,&#xd;&#xa;	ru.CD_MODELO,&#xd;&#xa;	ru.CD_OFFICER,&#xd;&#xa;	ru.CD_ORGAO,&#xd;&#xa;	ru.CD_ORIG_CONTRATO,&#xd;&#xa;	ru.CD_PPSTA,&#xd;&#xa;	ru.CD_PRODUTO,&#xd;&#xa;	ru.CD_SGMTO_CONTRATO,&#xd;&#xa;	ru.CD_STTUS_CONTRATO,&#xd;&#xa;	ru.CD_TP_CONVENIO,&#xd;&#xa;	ru.CD_TP_IDENTF_BNEFC,&#xd;&#xa;	ru.CD_TP_IDENTF_CLIE,&#xd;&#xa;	ru.CD_TP_PLANO,&#xd;&#xa;	ru.DT_BASE_CONTRATO,&#xd;&#xa;	ru.DT_CAD_CONTRATO,&#xd;&#xa;	ru.DT_CANCEL_CONTRATO,&#xd;&#xa;	ru.DT_LIB_CONTRATO,&#xd;&#xa;	ru.DT_LIQUID_CONTRATO,&#xd;&#xa;	ru.DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;	ru.DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;	ru.DT_VENCTO_CONTRATO,&#xd;&#xa;	ru.FL_AVERB,&#xd;&#xa;	ru.FL_BEM_ALIENADO,&#xd;&#xa;	ru.FL_BEM_APREENDD,&#xd;&#xa;	ru.FL_CANCEL_CONTRATO,&#xd;&#xa;	ru.FL_DUT,&#xd;&#xa;	ru.FL_GARNT_ALIEN,&#xd;&#xa;	ru.FL_RFINAM,&#xd;&#xa;	ru.FL_TAR_CAD_FINCD,&#xd;&#xa;	ru.NM_CLIE,&#xd;&#xa;	ru.NM_OFFICER,&#xd;&#xa;	ru.NM_OPERD_CONTRATO,&#xd;&#xa;	ru.NM_SIST_ORIG,&#xd;&#xa;	ru.QT_COTA_CONSORCIO,&#xd;&#xa;	ru.QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;	ru.QT_MES_CONTT,&#xd;&#xa;	ru.QT_MES_PAGO,&#xd;&#xa;	ru.VL_FINCD_CONTRATO,&#xd;&#xa;	ru.VL_IOF_CONTRATO,&#xd;&#xa;	ru.VL_LIQUID,&#xd;&#xa;	ru.VL_OPER_CONTRATO,&#xd;&#xa;	ru.VL_PCELA_CONTRATO,&#xd;&#xa;	ru.VL_PRINC_CONTRATO,&#xd;&#xa;	ru.VL_REBATE_PGTO,&#xd;&#xa;	ru.VL_SEGURO_CONTRATO,&#xd;&#xa;	ru.VL_TAR_CAD_CONTRATO,&#xd;&#xa;	ru.VL_TAXA_CONTRATO,&#xd;&#xa;	ru.VL_TAXA_EFETIVO,&#xd;&#xa;	ru.VL_TAXA_OPER_CONTRATO,&#xd;&#xa;	ru.VL_TAXA_REBATE,&#xd;&#xa;    ru.VL_SALDO_CONTRATO,&#xd;&#xa;    ru.DT_CONTEMPLADO&#x29;&#xd;&#xa;  WHERE ru.CD_LOTE &#x3d; &#x24;&#x7b;LOTE&#x7d;</sql>
+    <set_params>N</set_params>
+    <insert_field/>
+    <update_field/>
+    <delete_field/>
+    <read_field/>
+    <arguments>
+    </arguments>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>505</xloc>
+      <yloc>69</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+
+</transformation>

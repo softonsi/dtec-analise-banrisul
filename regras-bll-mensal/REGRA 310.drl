@@ -1,0 +1,23 @@
+SELECT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 310 – Clientes com Risco Alto |' ||   
+'Objetivo: Verificar se o cliente apresenta Risco Alto |' ||   
+'Conclusão: Cliente apresenta Risco Alto |' ||   
+'Cliente: ' ||  C.NM_CLIE || '|' || 
+CASE C.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE C.CD_DOC_IDENTF_CLIE  
+END   || '|' ||   
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) || '|'  
+AS DS_INF_ANLSE     
+FROM TB_CAD_CLIE C   
+WHERE C.CD_RISCO_ATUAL = 3  
+AND EXISTS (SELECT 1 FROM TB_TRANS T       
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+            AND T.FL_ANALISADO = 1 
+            AND T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE
+            AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE)
+               
+      
+  

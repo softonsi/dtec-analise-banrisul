@@ -1,0 +1,44 @@
+select count(1) as total from
+(
+SELECT DISTINCT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TRANSACAO
+FROM TB_TRANS_ANLSE T
+WHERE CD_TP_PESSOA = 'F' 
+  AND CD_TP_OPER   = 6   
+  AND DT_PRIM_VCTO_CONTRATO IS NOT NULL
+  AND QT_MES_PAGO IS NOT NULL AND QT_MES_PAGO <> 0
+  AND CD_LOTE = 2014091801
+  and CD_CONTRATO IS NOT NULL
+  AND VL_RENDA_FAT IS NOT NULL AND VL_RENDA_FAT <> 0
+  AND VL_PCELA_CONTRATO IS NOT NULL
+  /* antecipação de parcelas: quantidade de meses pagos é maior que a quantidade que deveria estar pago*/
+  AND QT_MES_PAGO > (DATEDIFF(MONTH, DT_PRIM_VCTO_CONTRATO, DT_TRANS)) 
+  /* o percentual de antecipação é maior que um parâmetro */
+  AND (1-((DATEDIFF(MONTH, DT_PRIM_VCTO_CONTRATO, (DT_TRANS))/QT_MES_PAGO)))  > (SELECT VL_PARAM/100 FROM TB_REGRA_PARAMETRO WHERE CD_REGRA  = 202 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_Perc_Antecipacao')
+  /* Renda comprometida */
+  AND (VL_PCELA_CONTRATO/VL_RENDA_FAT) >  (SELECT VL_PARAM/100 FROM TB_REGRA_PARAMETRO WHERE CD_REGRA  = 202 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_PercRendaFat_PF')
+  /* Valores total pago antecipadamente: qtde pagas - qtde que deveriam ser pagas * o valor da parcela*/
+  AND ((QT_MES_PAGO - (DATEDIFF(MONTH, DT_PRIM_VCTO_CONTRATO, DT_TRANS))) * VL_PCELA_CONTRATO) > (SELECT VL_PARAM FROM TB_REGRA_PARAMETRO WHERE CD_REGRA  = 202 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_VlAntecipado_PF')
+   
+UNION
+SELECT DISTINCT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TRANSACAO
+FROM TB_TRANS_ANLSE T
+WHERE CD_TP_PESSOA = 'J' 
+  AND CD_TP_OPER   = 6 
+  AND DT_PRIM_VCTO_CONTRATO IS NOT NULL
+  AND QT_MES_PAGO IS NOT NULL AND QT_MES_PAGO <> 0
+  AND CD_LOTE = 2014091801
+  and CD_CONTRATO IS NOT NULL
+  AND VL_RENDA_FAT IS NOT NULL AND VL_RENDA_FAT <> 0
+  AND VL_PCELA_CONTRATO IS NOT NULL
+  /* antecipação de parcelas: quantidade de meses pagos é maior que a quantidade que deveria estar pago*/
+  AND QT_MES_PAGO > (DATEDIFF(MONTH, DT_PRIM_VCTO_CONTRATO, DT_TRANS)) 
+  /* o percentual de antecipação é maior que um parâmetro */
+  AND (1-((DATEDIFF(MONTH, DT_PRIM_VCTO_CONTRATO, (DT_TRANS))/QT_MES_PAGO))) > (SELECT VL_PARAM/100 FROM TB_REGRA_PARAMETRO WHERE CD_REGRA  = 202 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_Perc_Antecipacao')
+  /* Renda comprometida */
+  AND (VL_PCELA_CONTRATO/VL_RENDA_FAT) >  (SELECT VL_PARAM/100 FROM TB_REGRA_PARAMETRO WHERE CD_REGRA  = 202 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_PercRendaFat_PJ')
+  /* Valores total pago antecipadamente: qtde pagas - qtde que deveriam ser pagas * o valor da parcela*/
+  AND ((QT_MES_PAGO - (DATEDIFF(MONTH, DT_PRIM_VCTO_CONTRATO, DT_TRANS))) * VL_PCELA_CONTRATO) > (SELECT VL_PARAM FROM TB_REGRA_PARAMETRO WHERE CD_REGRA  = 202 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_VlAntecipado_PJ')
+    
+  ) s; 
+select count(1) as total from tb_detlh_apontamento where cd_lote = 2014091801 and cd_regra = 202
+

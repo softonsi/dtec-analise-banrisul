@@ -1,0 +1,95 @@
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 85 - Carga ou recarga, seguida por saques em caixas eletrônicos |' ||   
+'Objetivo: E) Realização de operações de carga e recarga de cartões, seguidas imediatamente por saques em caixas eletrônicos. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||   
+'Conclusão: Realização de operações de carga e recarga de cartões, seguidas imediatamente por saques em caixas eletrônicos |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T1.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||   
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Número do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||    
+'Data: Detalhes das transações' || '|' ||   
+xmlcast(  xmlagg(xmlelement(outros,  
+TO_CHAR(T2.DT_TRANS, 'DD/MM/YYYY HH24.MI.SS') || ':' ||  
+COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER TP WHERE TP.CD_TP_OPER = T2.CD_TP_OPER), 'Tipo não cadastrado') || ', ' ||   
+COALESCE((SELECT NM_FORMA_OPER FROM TB_FORMA_OPER F WHERE F.CD_FORMA_OPER = T2.CD_FORMA_OPER), 'Forma não cadastrada') || ', ' ||   
+COALESCE((SELECT NM_VIA_OPER FROM TB_VIA_OPER V WHERE V.CD_VIA_OPER = T2.CD_VIA_OPER), 'Via não cadastrada') || ', ' ||   
+ltrim(TO_CHAR(T2.VL_OPER, 'L999G999G999G990D99'))  
+|| '|')   
+order by T1.CD_DOC_IDENTF_CLIE, T2.DT_TRANS) as clob) || '|' || 
+'Tipo de Transação: Saque ' || '|' ||   
+'Data do saque: ' || TO_CHAR(T1.DT_TRANS, 'DD/MM/YYYY HH24.MI.SS') || '|' ||  
+'Valor do saque: ' || ltrim(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  
+  || '|' ||  
+'Parâmetro que indica o valor mínimo para disparo da regra (pm_valorMinimoSaque_PF): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimoSaque_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que identifica o tempo de recuo em dias a ser analisado pela regra (pm_QDiasRecuo): ' || COALESCE((':pm_QDiasRecuo'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_TRANS_ANLSE T1   
+INNER JOIN TB_TRANS T2  
+      ON T2.CD_CARTAO = T1.CD_CARTAO AND T1.CD_DOC_IDENTF_CLIE= T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE AND 
+         T2.DT_TRANS > (T1.DT_TRANS - (:pm_QDiasRecuo))  AND 
+       	 T2.DT_TRANS <= T1.DT_TRANS   
+WHERE T1.CD_LOTE    = :cd_lote    
+  AND T1.CD_SUBLOTE = :cd_sublote   
+  AND T1.CD_TP_PESSOA = 'F'   
+  AND T1.CD_TP_OPER = 7   
+  AND T1.CD_FORMA_OPER = 11   
+  AND T1.CD_VIA_OPER = 1   
+  AND T2.CD_TP_OPER IN (25 , 26)  
+  AND T2.FL_ANALISADO = 1 
+  AND T1.VL_OPER > (:pm_valorMinimoSaque_PF)   
+GROUP BY LAST_DAY(TRUNC(T1.DT_TRANS)), T1.CD_TRANSACAO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,T1.CD_CARTAO, T1.DT_TRANS, T1.VL_OPER, T1.CD_LOTE, T1.CD_AG, T1.CD_CTA  
+UNION ALL  
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 85 - Carga ou recarga, seguida por saques em caixas eletrônicos |' ||   
+'Objetivo: E) Realização de operações de carga e recarga de cartões, seguidas imediatamente por saques em caixas eletrônicos. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||   
+'Conclusão: Realização de operações de carga e recarga de cartões, seguidas imediatamente por saques em caixas eletrônicos |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T1.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||      
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Número do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||    
+'Data: Detalhes das transações' || '|' ||    
+xmlcast(  xmlagg(xmlelement(outros,  
+TO_CHAR(T2.DT_TRANS, 'DD/MM/YYYY HH24.MI.SS') || ':' ||  
+COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER TP WHERE TP.CD_TP_OPER = T2.CD_TP_OPER), 'Tipo não cadastrado') || ', ' ||   
+COALESCE((SELECT NM_FORMA_OPER FROM TB_FORMA_OPER F WHERE F.CD_FORMA_OPER = T2.CD_FORMA_OPER), 'Forma não cadastrada') || ', ' ||   
+COALESCE((SELECT NM_VIA_OPER FROM TB_VIA_OPER V WHERE V.CD_VIA_OPER = T2.CD_VIA_OPER), 'Via não cadastrada') || ', ' ||   
+ltrim(TO_CHAR(T2.VL_OPER, 'L999G999G999G990D99'))  
+|| '|')   
+order by T1.CD_DOC_IDENTF_CLIE, T2.DT_TRANS) as clob) || '|' || 
+'Tipo de Transação: Saque ' || '|' ||   
+'Data do saque: ' || TO_CHAR(T1.DT_TRANS, 'DD/MM/YY') || '|' ||  
+'Valor do saque: ' || ltrim(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  
+  || '|' ||  
+'Parâmetro que indica o valor mínimo para disparo da regra (pm_valorMinimoSaque_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimoSaque_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que identifica o tempo de recuo em dias a ser analisado pela regra (pm_QDiasRecuo): ' || COALESCE((':pm_QDiasRecuo'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_TRANS_ANLSE T1   
+INNER JOIN TB_TRANS T2  
+      ON T2.CD_CARTAO = T1.CD_CARTAO AND T1.CD_DOC_IDENTF_CLIE= T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE AND 
+         T2.DT_TRANS > (T1.DT_TRANS - (:pm_QDiasRecuo))  AND 
+       	 T2.DT_TRANS <= T1.DT_TRANS   
+WHERE T1.CD_LOTE    = :cd_lote     
+  AND T1.CD_SUBLOTE = :cd_sublote   
+  AND T1.CD_TP_PESSOA = 'J'   
+  AND T1.CD_TP_OPER = 7   
+  AND T1.CD_FORMA_OPER = 11   
+  AND T1.CD_VIA_OPER = 1   
+  AND T2.CD_TP_OPER IN (25 , 26)  
+  AND T2.FL_ANALISADO = 1 
+  AND T1.VL_OPER > (:pm_valorMinimoSaque_PJ)   
+GROUP BY LAST_DAY(TRUNC(T1.DT_TRANS)), T1.CD_TRANSACAO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,T1.CD_CARTAO, T1.DT_TRANS, T1.VL_OPER, T1.CD_LOTE, T1.CD_AG, T1.CD_CTA  
+  
+  

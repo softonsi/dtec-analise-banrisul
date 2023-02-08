@@ -1,0 +1,2 @@
+select vl_apontamento, vl_ponto_corte, case when fl_carencia is null then -1 else fl_carencia end as fl_carencia, fl_ponto_corte, fl_susp_ld 
+from tb_apontamento where cd_doc_identf_clie = '10259686115'

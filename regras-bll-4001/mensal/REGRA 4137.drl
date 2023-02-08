@@ -1,0 +1,150 @@
+/* MENSAL  (E POR TRANSACAO INTERNO)*/   
+   
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,       
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4137 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||     
+CASE T.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||       
+CASE FL_PARTIDO        WHEN 1 THEN 'Partido identificado:Sim|'     END ||   
+CASE FL_CANDIDATO_CNPJ WHEN 1 THEN 'Candidatos políticos PJ:Sim|'  END ||  
+CASE FL_CANDIDATO_CPF  WHEN 1 THEN 'Candidatos políticos PF:Sim|'  END ||   
+CASE FL_CANDIDATO_ADM  WHEN 1 THEN 'Cliente é administrador de CNPJ(s) de Candidato(s): ' || ADM END || '|' || 
+      
+'Valor da renda/faturamento: '               || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não informado') || '|' ||   
+'Mês calendário:'                            || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||    
+'Valor consolidado de crédito: '             || TO_CHAR(COALESCE(VL_CREDITO,0), 'L999G999G999G990D99') || '|' ||   
+'Quantidade de crédito: '                    || TO_CHAR(COALESCE(QT_CREDITO,0)) || '|' ||   
+'Valor consolidado de depósito em espécie: ' || TO_CHAR(COALESCE(VL_DEPOSITO,0), 'L999G999G999G990D99') || '|' ||   
+'Quantidade de depósito em espécie: '        || TO_CHAR(COALESCE(QT_DEPOSITO,0)) || '|' || 
+ 
+CASE WHEN FL_PARTIDO = 1 THEN  
+COALESCE((':DS-pm_ValorLimiteEspeciePartido' || ' (' || ':NM-pm_ValorLimiteEspeciePartido' || '):' || TO_CHAR(:pm_ValorLimiteEspeciePartido, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' ||  
+COALESCE((':DS-pm_ValorLimitePartido' || ' (' || ':NM-pm_ValorLimitePartido' || '):' || TO_CHAR(:pm_ValorLimitePartido, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'   
+WHEN FL_CANDIDATO_CNPJ = 1 THEN  
+COALESCE((':DS-pm_ValorLimiteCandidatoCNPJ' || ' (' || ':NM-pm_ValorLimiteCandidatoCNPJ' || '):' || TO_CHAR(:pm_ValorLimiteCandidatoCNPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||  
+COALESCE((':DS-pm_ValorLimiteEspecieCandidatoCNPJ' || ' (' || ':NM-pm_ValorLimiteEspecieCandidatoCNPJ' || '):' || TO_CHAR(:pm_ValorLimiteEspecieCandidatoCNPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'   
+WHEN FL_CANDIDATO_CPF = 1 THEN  
+COALESCE((':DS-pm_ValorLimiteCandidatoPF' || ' (' || ':NM-pm_ValorLimiteCandidatoPF' || '):' || TO_CHAR(:pm_ValorLimiteCandidatoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||  
+COALESCE((':DS-pm_ValorLimiteEspecieCandidatoPF' || ' (' || ':NM-pm_ValorLimiteEspecieCandidatoPF' || '):' || TO_CHAR(:pm_ValorLimiteEspecieCandidatoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||  
+COALESCE((':DS-pm_PercRendaCandidatoPF' || ' (' || ':NM-pm_PercRendaCandidatoPF' || '):' || TO_CHAR(:pm_PercRendaCandidatoPF) || '%'),'Parâmetro não cadastrado' ) || '|'    
+WHEN FL_CANDIDATO_ADM = 1 THEN  
+COALESCE((':DS-pm_ValorLimiteCandidatoAdm' || ' (' || ':NM-pm_ValorLimiteCandidatoAdm' || '):' || TO_CHAR(:pm_ValorLimiteCandidatoAdm, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||  
+COALESCE((':DS-pm_ValorLimiteEspecieCandidatoAdm' || ' (' || ':NM-pm_ValorLimiteEspecieCandidatoAdm' || '):' || TO_CHAR(:pm_ValorLimiteEspecieCandidatoAdm, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'  ||  
+COALESCE((':DS-pm_PercRendaFatAdm' || ' (' || ':NM-pm_PercRendaFatAdm' || '):' || TO_CHAR(:pm_PercRendaFatAdm) || '%'),'Parâmetro não cadastrado' ) || '|'  
+END 
+AS DS_INF_ANLSE     
+FROM   
+(SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO, VL_DEPOSITO, QT_DEPOSITO,FL_PARTIDO,FL_CANDIDATO_CNPJ, FL_CANDIDATO_CPF, FL_CANDIDATO_ADM, 
+CASE WHEN MAX(FL_CANDIDATO_ADM) = 1 THEN  
+xmlcast(xmlagg(xmlelement(outros, SUBSTR(CD_DOC_IDENTF_ADM, 1, 2) || '.' || SUBSTR(CD_DOC_IDENTF_ADM, 3, 3) || '.' || SUBSTR(CD_DOC_IDENTF_ADM, 6, 3) || '/' || SUBSTR(CD_DOC_IDENTF_ADM, 9, 4) || '-'  || SUBSTR(CD_DOC_IDENTF_ADM, 13, 2) || ', ')  order by CD_DOC_IDENTF_ADM) as clob)    
+END ADM 
+FROM ( 
+SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, CA.CD_DOC_IDENTF_CLIE CD_DOC_IDENTF_ADM,  T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO, VL_DEPOSITO, QT_DEPOSITO, 
+ CASE WHEN MAX(PI.DS_CONTEUDO)  IS NOT NULL THEN 1 ELSE 0 END FL_PARTIDO, 
+ CASE WHEN MAX(CPJ.DS_CONTEUDO) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_CNPJ, 
+ CASE WHEN MAX(CPF.DS_CONTEUDO) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_CPF, 
+ CASE WHEN MAX(CAD.DS_CONTEUDO) IS NOT NULL AND MAX(CA.CD_DOC_IDENTF_ADM) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_ADM 
+FROM  
+(SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT, SUM(VL_CREDITO) VL_CREDITO, SUM(QT_CREDITO) QT_CREDITO, SUM(VL_DEPOSITO) VL_DEPOSITO, SUM(QT_DEPOSITO) QT_DEPOSITO 
+ FROM 
+ (SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, MAX(T.NM_CLIE) NM_CLIE, MAX(T.VL_RENDA_FAT) VL_RENDA_FAT,  
+  CASE WHEN T.CD_NATUR_OPER = 1 THEN SUM(T.VL_OPER) END VL_CREDITO, 
+  CASE WHEN T.CD_NATUR_OPER = 1 THEN COUNT(*) END QT_CREDITO, 
+  CASE WHEN (T.CD_NATUR_OPER = 1 AND T.CD_TP_OPER = 4 AND T.CD_FORMA_OPER = 7) THEN SUM(VL_OPER) END VL_DEPOSITO, 
+  CASE WHEN (T.CD_NATUR_OPER = 1 AND T.CD_TP_OPER = 4 AND T.CD_FORMA_OPER = 7) THEN COUNT(*) END QT_DEPOSITO 
+ FROM TB_TRANS T  
+ WHERE T.DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+  AND T.DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))       
+  AND T.FL_ANALISADO = 1   
+  AND T.CD_NATUR_OPER = 1   
+  GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_NATUR_OPER, T.CD_FORMA_OPER, T.CD_TP_OPER 
+  ) T 
+GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, NM_CLIE, VL_RENDA_FAT 
+) T 
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR  PI ON PI.CD_LISTA_AUXILIAR  = 114 AND T.CD_TP_PESSOA = 'J' AND  TRIM(PI.DS_CONTEUDO) = T.CD_DOC_IDENTF_CLIE   /*Partidos_identificacao*/       
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CPJ ON CPJ.CD_LISTA_AUXILIAR = 115 AND T.CD_TP_PESSOA = 'J' AND TRIM(CPJ.DS_CONTEUDO) = T.CD_DOC_IDENTF_CLIE   /*CandidatosCNPJ_identificacao*/       
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CPF ON CPF.CD_LISTA_AUXILIAR = 116 AND T.CD_TP_PESSOA = 'F' AND TRIM(CPF.DS_CONTEUDO) = T.CD_DOC_IDENTF_CLIE   /*CandidatosPF_identificacao*/ 
+ LEFT JOIN TB_CADEIA_ADMINISTRADOR     CA ON CA.CD_DOC_IDENTF_ADM = T.CD_DOC_IDENTF_CLIE AND CA.CD_TP_IDENTF_ADM = T.CD_TP_IDENTF_CLIE AND CA.CD_TP_IDENTF_CLIE = 3 /*O cliente é administrador */ 
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CAD ON CAD.CD_LISTA_AUXILIAR = 115 AND TRIM(CAD.DS_CONTEUDO) = CA.CD_DOC_IDENTF_CLIE    /*CandidatosCNPJ_identificacao*/  
+ 
+GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, CA.CD_DOC_IDENTF_CLIE,  T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO, VL_DEPOSITO, QT_DEPOSITO  
+) T 
+GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO, VL_DEPOSITO, QT_DEPOSITO,FL_PARTIDO,FL_CANDIDATO_CNPJ, FL_CANDIDATO_CPF, FL_CANDIDATO_ADM 
+) T 
+WHERE  
+(FL_PARTIDO = 1 AND (VL_CREDITO >= :pm_ValorLimitePartido OR VL_DEPOSITO >= :pm_ValorLimiteEspeciePartido)) 
+OR 
+(FL_CANDIDATO_CNPJ = 1 AND (VL_CREDITO >= :pm_ValorLimiteCandidatoCNPJ  OR  VL_DEPOSITO >= :pm_ValorLimiteEspecieCandidatoCNPJ)) 
+OR 
+(FL_CANDIDATO_CPF = 1 AND ((VL_CREDITO >= :pm_ValorLimiteCandidatoPF  AND ((VL_RENDA_FAT IS NOT NULL AND VL_CREDITO > (VL_RENDA_FAT * (:pm_PercRendaCandidatoPF/100))) OR VL_RENDA_FAT IS NULL)) 
+OR  VL_DEPOSITO >= :pm_ValorLimiteEspecieCandidatoPF)) 
+OR 
+(FL_CANDIDATO_ADM = 1 AND ((VL_CREDITO >= :pm_ValorLimiteCandidatoAdm  AND ((VL_RENDA_FAT IS NOT NULL AND VL_CREDITO > (VL_RENDA_FAT * (:pm_PercRendaFatAdm/100))) OR VL_RENDA_FAT IS NULL)) 
+OR  VL_DEPOSITO >= :pm_ValorLimiteEspecieCandidatoAdm)) 
+ 
+ 
+union all 
+ 
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,       
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4137 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||     
+CASE T.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||       
+CASE FL_CANDIDATO_CNPJ WHEN 1 THEN 'Candidatos políticos PJ:Sim|'  END ||   
+CASE FL_CANDIDATO_CPF  WHEN 1 THEN 'Candidatos políticos PF:Sim|'  END ||   
+CASE FL_CANDIDATO_ADM  WHEN 1 THEN 'Cliente é administrador de CNPJ(s) de Candidato(s): ' || ADM END || '|' || 
+      
+'Valor da renda/faturamento: '   || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não informado') || '|' ||   
+'Mês calendário:'                || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||    
+'Valor do depósito em espécie: ' || TO_CHAR(COALESCE(VL_OPER,0), 'L999G999G999G990D99') || '|' ||   
+'Data do depósito em espécie: '  || TO_CHAR(DT_TRANS) || '|' ||   
+ 
+CASE  
+WHEN FL_CANDIDATO_CNPJ = 1 THEN COALESCE((':DS-pm_ValorMinimoCandidatoCNPJ' || ' (' || ':NM-pm_ValorMinimoCandidatoCNPJ' || '):' || TO_CHAR(:pm_ValorMinimoCandidatoCNPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'  
+WHEN FL_CANDIDATO_CPF = 1  THEN COALESCE((':DS-pm_ValorMinimoCandidatoPF' || ' (' || ':NM-pm_ValorMinimoCandidatoPF' || '):' || TO_CHAR(:pm_ValorMinimoCandidatoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'  
+WHEN FL_CANDIDATO_ADM = 1  THEN COALESCE((':DS-pm_ValorMinimoCandidatoAdm' || ' (' || ':NM-pm_ValorMinimoCandidatoAdm' || '):' || TO_CHAR(:pm_ValorMinimoCandidatoAdm, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'        
+END 
+AS DS_INF_ANLSE     
+FROM   
+ 
+(SELECT DT_TRANS, VL_OPER, CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(NM_CLIE) NM_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT,  
+FL_CANDIDATO_CNPJ, FL_CANDIDATO_CPF, FL_CANDIDATO_ADM, 
+CASE WHEN MAX(FL_CANDIDATO_ADM) = 1 THEN  
+xmlcast(xmlagg(xmlelement(outros, SUBSTR(A.CD_DOC_IDENTF_ADM, 1, 2) || '.' || SUBSTR(A.CD_DOC_IDENTF_ADM, 3, 3) || '.' || SUBSTR(A.CD_DOC_IDENTF_ADM, 6, 3) || '/' || SUBSTR(A.CD_DOC_IDENTF_ADM, 9, 4) || '-'  || SUBSTR(A.CD_DOC_IDENTF_ADM, 13, 2) || ', ')  order by A.CD_DOC_IDENTF_ADM) as clob)  
+END ADM 
+FROM 
+ 
+(SELECT T.DT_TRANS, T.VL_OPER, T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, CA.CD_DOC_IDENTF_CLIE CD_DOC_IDENTF_ADM,  MAX(T.NM_CLIE) NM_CLIE, MAX(T.VL_RENDA_FAT) VL_RENDA_FAT,  
+ CASE WHEN MAX(CPJ.DS_CONTEUDO) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_CNPJ, 
+ CASE WHEN MAX(CPF.DS_CONTEUDO) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_CPF, 
+ CASE WHEN MAX(CAD.DS_CONTEUDO) IS NOT NULL AND MAX(CA.CD_DOC_IDENTF_ADM) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_ADM 
+FROM TB_TRANS T  
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CPJ ON CPJ.CD_LISTA_AUXILIAR = 115 AND TRIM(CPJ.DS_CONTEUDO) = T.CD_DOC_IDENTF_CLIE     /*CandidatosCNPJ_identificacao*/       
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CPF ON CPF.CD_LISTA_AUXILIAR = 116 AND TRIM(CPF.DS_CONTEUDO) = T.CD_DOC_IDENTF_CLIE    /*CandidatosPF_identificacao*/ 
+ LEFT JOIN TB_CADEIA_ADMINISTRADOR     CA ON CA.CD_DOC_IDENTF_ADM = T.CD_DOC_IDENTF_CLIE AND CA.CD_TP_IDENTF_ADM = T.CD_TP_IDENTF_CLIE AND CA.CD_TP_IDENTF_CLIE = 3 /*O cliente é administrador */ 
+ LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CAD ON CAD.CD_LISTA_AUXILIAR = 115 AND TRIM(CAD.DS_CONTEUDO) = CA.CD_DOC_IDENTF_CLIE   /*CandidatosCNPJ_identificacao*/  
+WHERE T.DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+ AND T.DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))       
+ AND T.FL_ANALISADO  = 1   
+ AND T.CD_NATUR_OPER = 1 AND T.CD_TP_OPER = 4 AND T.CD_FORMA_OPER = 7  
+ GROUP BY T.DT_TRANS, T.VL_OPER, T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, CA.CD_DOC_IDENTF_CLIE ) A 
+  
+GROUP BY DT_TRANS, VL_OPER, CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, FL_CANDIDATO_CNPJ, FL_CANDIDATO_CPF, FL_CANDIDATO_ADM) T 
+ 
+WHERE  
+(FL_CANDIDATO_CNPJ = 1 AND VL_OPER >= :pm_ValorMinimoCandidatoCNPJ ) 
+OR 
+(FL_CANDIDATO_ADM = 1 AND VL_OPER >= :pm_ValorMinimoCandidatoAdm ) 
+OR 
+(FL_CANDIDATO_CPF = 1 AND VL_OPER >= :pm_ValorMinimoCandidatoPF ) 
+ 
+ 
+ 

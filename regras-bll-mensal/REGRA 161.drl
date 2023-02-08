@@ -1,0 +1,50 @@
+/* b) modificacao inusitada do resultado operacional da pessoa juridica do representante ou do correspondente no Pais, sem causa aparente*/ 
+ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 161 - Modificação inusitada do resultado operacional da pessoa jurídica de funcionário |' ||    
+'Objetivo: B) Modificação inusitada do resultado operacional da pessoa jurídica do representante ou do correspondente no País, sem causa aparente. C.C. Bacen n.3.542/12, Art. 1º, Inciso XIV |' ||    
+'Conclusão: Modificação inusitada do resultado operacional da pessoa jurídica de funcionário |' ||    
+'Cliente: ' ||  T.NM_CLIE || '|' ||   
+'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+|| '|' ||  
+'Radical da Sociedade: ' || CD_RADICAL_IDENTF_CLIE ||  '|' ||   
+'CPF dos Sócio(s) - Funcionários: Nomes |' || SOCIOS ||  '|' ||   
+'Mês/Ano: ' || SUBSTR(CD_MES_ANO,5,2) || '/' || SUBSTR(CD_MES_ANO,1,4) ||  '|' ||    
+'Valor Consolidado de Créditos: ' || TO_CHAR(VL_CREDITO, 'L999G999G999G990D99') ||  '|' ||    
+'Quantidade de crédito(s): ' || TO_CHAR(QT_CREDITO) ||  '|' ||    
+'Valor do Faturamento: ' || COALESCE(TO_CHAR(VL_FATURAMENTO, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||     
+'Parâmetro percentual de flexibilização do faturamento (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado.') || '|' ||    
+'Parâmetro que indica valor mínimo para Crédito consolidado (pm_ValorMinimo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE     
+FROM (          
+SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_RADICAL_IDENTF_CLIE, VL_FATURAMENTO, NM_CLIE, VL_CREDITO, QT_CREDITO,                    
+      xmlcast(  xmlagg(xmlelement(outros,    
+      'CPF-' || SUBSTR(C.CD_DOC_IDENTF_SOCIO, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_SOCIO, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_SOCIO, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_SOCIO, 10, 2)    
+      || ':' || C.NM_SOCIO  || '|')     
+      order by C.CD_DOC_IDENTF_SOCIO) as clob) SOCIOS   
+FROM TB_CADEIA_SOCTRIA C                        
+INNER JOIN                         
+   (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_RADICAL_IDENTF_CLIE, MAX(VL_RENDA_FAT) VL_FATURAMENTO,MAX(NM_CLIE) NM_CLIE, SUM(VL_OPER) VL_CREDITO, COUNT(*) QT_CREDITO  
+    FROM TB_TRANS 
+    WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+    AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+    AND CD_TP_PESSOA = 'J' 
+    AND CD_NATUR_OPER = 1 
+    AND FL_ANALISADO = 1
+    GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_RADICAL_IDENTF_CLIE 
+    HAVING SUM(VL_OPER) > (:pm_ValorMinimo)  
+       AND (MAX(VL_RENDA_FAT) IS NOT NULL AND (SUM(VL_OPER) > (MAX(VL_RENDA_FAT) * (:pm_PercFaturamento/100)))    
+        OR   
+        MAX(VL_RENDA_FAT) IS NULL)       
+    ) CAD                                    
+    ON  C.CD_RADICAL_IDENTF_SOCIEDD = CAD.CD_RADICAL_IDENTF_CLIE                          
+WHERE C.CD_TP_IDENTF_SOCIO = 2  
+AND EXISTS (SELECT 1 FROM TB_CAD_CLIE A  
+            WHERE A.FL_FUNCIONARIO = 1  
+            AND A.CD_TP_PESSOA = 'F'  
+            AND A.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_SOCIO  
+            AND A.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_SOCIO)  
+GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_RADICAL_IDENTF_CLIE, VL_FATURAMENTO, NM_CLIE, VL_CREDITO, QT_CREDITO
+) T
+
+ 

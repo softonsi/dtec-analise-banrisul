@@ -1,0 +1,34 @@
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO,T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4025 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE)  || '|' || 
+'Data da transação: '  || TO_CHAR(DT_TRANS) || '|' || 
+'Tipo de transação: ' || coalesce((select nm_tp_oper from tb_tp_oper o where o.cd_tp_oper = t.cd_tp_oper), to_char(cd_tp_oper)) || '|' 
+AS DS_INF_ANLSE  
+FROM
+(SELECT DISTINCT DT_TRANS, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, CD_TP_OPER
+ FROM TB_TRANS_ANLSE 
+ WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote
+   AND CD_TP_OPER IN  
+    (25, /*Emissão de cartão pré-pago*/
+     29, /*Solicitação de limite*/
+     61, /*Abertura de conta*/
+     62, /*Atualização de conta*/
+     21, /*Consórcio - Aquisição de Cotas*/
+     74, /*Formalização de Contrato*/
+     78, /*Atualização Cadastral*/ 
+     79, /*Proposta de Adesão (Aquisição)*/ 
+     83, /*Transferência de Titularidade*/ 
+     81, /*Pagamento de Crédito (Contemplação)*/ 
+     84) /*Cessão de Direitos de Cota (Contrato)*/ 
+  AND FL_FALSA_INFORMACAO = 1 
+ ) T 
+ 
+
+  

@@ -1,0 +1,1 @@
+select cd_lote from tb_lote_proces where cd_lote between ? and ?

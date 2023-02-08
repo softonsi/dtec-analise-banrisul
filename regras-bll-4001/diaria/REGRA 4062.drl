@@ -1,0 +1,35 @@
+SELECT LAST_DAY(DT_TRANS) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, 
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4062 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' || T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE 
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+ || '|' ||  
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||  
+'Data da transação: '  || TO_CHAR(DT_TRANS,'DD/MM/YY') || '|' || 
+'Valor da transação: ' || TO_CHAR(VL_OPER, 'L999G999G999G990D99')  || '|' || 
+'Informações sobre o beneficiário da operação: | ' || '|' || 
+CASE T.CD_TP_IDENTF_DESTORIG 
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2) 
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_DESTORIG 
+END 
+ || '|' ||  
+'Ramo de atividade: ' ||  COALESCE(NM_RAMO_ATIVID, 'nome não cadastrado') || '|' || 
+'Período de funcionamento do ramo de atividade: de ' || TO_CHAR(NU_HORA_INICIO_ATIVID) || ' até ' || TO_CHAR(NU_HORA_FIM_ATIVID) || '|'  
+AS DS_INF_ANLSE   
+FROM 
+ (SELECT  DT_TRANS, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, CD_TP_PESSOA, VL_OPER,  CD_DOC_IDENTF_DESTORIG, CD_TP_IDENTF_DESTORIG, NM_RAMO_ATIVID, NU_HORA_INICIO_ATIVID, NU_HORA_FIM_ATIVID 
+  FROM TB_TRANS_ANLSE A 
+  INNER JOIN TB_RAMO_ATIVID R ON A.CD_ATIVID_DESTORIG= R.CD_RAMO_ATIVID 
+  WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote 
+    AND CD_TP_PESSOA  = 'F' 
+    AND CD_NATUR_OPER = 2 
+	AND CD_DOC_IDENTF_DESTORIG IS NOT NULL 
+	AND CD_TP_OPER = 3  /*compra*/ 
+	AND TO_CHAR(DT_TRANS,'HH') < R.NU_HORA_INICIO_ATIVID 
+	AND TO_CHAR(DT_TRANS,'HH') > R.NU_HORA_FIM_ATIVID 
+) T	                 
+ 

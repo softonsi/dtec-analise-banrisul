@@ -1,0 +1,108 @@
+SELECT P.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 94 - Liquidação crédito por terceiros |' ||    
+'Objetivo: E) Liquidação de operações de crédito no País por terceiros, sem justificativa aparente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VII |' ||    
+'Conclusão: Liquidação de operações de crédito no País por terceiros, sem justificativa aparente |' ||    
+'Cliente: ' ||  MAX(T2.NM_CLIE) || '|' ||  
+'Tipo de Pessoa Física (CPF): ' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 10, 2)   
+|| '|' ||  
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Número do contrato: ' || TO_CHAR(MAX(P.CD_CONTRATO)) || '|' || 
+'Data do pagamento: ' || TO_CHAR(MAX(P.DT_TRANS),'DD/MM/YYYY') || '|' ||    
+'Data da liquidação: ' || TO_CHAR(MAX(P.DT_LIQUID),'DD/MM/YYYY') || '|' ||    
+'Valor da pagamento: ' || TO_CHAR(MAX(P.VL_OPER), 'L999G999G999G990D99') || '|'  ||    
+ 
+'Crédito: Detalhes das transações' || '|' || 
+xmlcast(  xmlagg(xmlelement(outros,  
+     TO_CHAR(T2.DT_TRANS,'DD/MM/YYYY') || ':'  ||  
+     LTRIM(TO_CHAR(T2.VL_OPER, 'L999G999G999G990D99')) ||   
+' Origem-' ||  
+ CASE T2.CD_TP_IDENTF_DESTORIG    
+	 WHEN 2 THEN SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	 WHEN 3 THEN SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	 ELSE T2.CD_DOC_IDENTF_DESTORIG    
+ END  || '|')   order by T2.CD_DOC_IDENTF_CLIE, T2.DT_TRANS) as clob) 
+|| '|' || 
+'Parâmetro que indica o valor mínimo para disparo da regra para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica o percentual de Valor da Operação para Pessoa Física (pm_PercValorAceitavelPF): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorAceitavelPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica a quantidade de dias de recuo entre as datas de Transação para Pessoa Física (pm_DiasRecuoPF): ' || COALESCE((':pm_DiasRecuoPF'),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE     
+FROM  TB_TRANS T2   
+INNER JOIN 
+ (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CONTRATO, DT_LIQUID, SUM(VL_OPER) VL_OPER, MAX(DT_TRANS) DT_TRANS 
+  FROM TB_TRANS_ANLSE  
+  WHERE CD_LOTE    = :cd_lote      
+    AND CD_SUBLOTE = :cd_sublote     
+    AND CD_TP_PESSOA = 'F'  
+    AND CD_TP_OPER = 6    /*pagamento*/ 
+    AND CD_FORMA_OPER = 6 /*emprestimo*/ 
+    AND CD_CONTRATO IS NOT NULL  
+    AND DT_LIQUID IS NOT NULL  
+    AND VL_OPER > (:pm_ValorMinimoPF)  
+    GROUP BY LAST_DAY(TRUNC(DT_TRANS)),CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CONTRATO, DT_LIQUID 
+  ) p 
+  ON p.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND p.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE AND 
+     T2.DT_TRANS >= (P.DT_TRANS - (:pm_DiasRecuoPF)) AND 
+     T2.DT_TRANS <= P.DT_TRANS 
+  AND T2.CD_NATUR_OPER = 1 
+  AND T2.CD_TP_OPER IN (5, 8, 9)  
+  AND T2.CD_DOC_IDENTF_DESTORIG IS NOT NULL 
+  AND T2.CD_DOC_IDENTF_CLIE <> T2.CD_DOC_IDENTF_DESTORIG 
+  AND T2.FL_ANALISADO = 1 
+  GROUP BY P.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, T2.CD_CONTRATO, P.DT_LIQUID 
+HAVING sum(T2.VL_OPER) >= (SUM(p.VL_OPER) * (:pm_PercValorAceitavelPF/100))  
+ 
+UNION ALL 
+ 
+SELECT P.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 94 - Liquidação crédito por terceiros |' ||    
+'Objetivo: E) Liquidação de operações de crédito no País por terceiros, sem justificativa aparente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VII |' ||    
+'Conclusão: Liquidação de operações de crédito no País por terceiros, sem justificativa aparente |' ||    
+'Cliente: ' ||  MAX(T2.NM_CLIE) || '|' ||  
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T2.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 13, 2)
+|| '|' ||  
+'Número do contrato: ' || TO_CHAR(MAX(P.CD_CONTRATO)) || '|' || 
+'Data do pagamento: ' || TO_CHAR(MAX(P.DT_TRANS),'DD/MM/YYYY') || '|' ||    
+'Data da liquidação: ' || TO_CHAR(MAX(P.DT_LIQUID),'DD/MM/YYYY') || '|' ||    
+'Valor da pagamento: ' || TO_CHAR(MAX(P.VL_OPER), 'L999G999G999G990D99') || '|'  ||    
+ 
+'Crédito: Detalhes das transações' || '|' || 
+xmlcast(  xmlagg(xmlelement(outros,  
+     TO_CHAR(T2.DT_TRANS,'DD/MM/YYYY') || ':'  ||  
+     LTRIM(TO_CHAR(T2.VL_OPER, 'L999G999G999G990D99')) ||   
+' Origem-' ||  
+ CASE T2.CD_TP_IDENTF_DESTORIG    
+	 WHEN 2 THEN SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	 WHEN 3 THEN SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T2.CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	 ELSE T2.CD_DOC_IDENTF_DESTORIG    
+ END  || '|')   order by T2.CD_DOC_IDENTF_CLIE, T2.DT_TRANS) as clob) 
+|| '|' || 
+'Parâmetro que indica o valor mínimo para disparo da regra para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica o percentual de Valor da Operação para Pessoa Jurídica (pm_PercValorAceitavelPJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorAceitavelPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica a quantidade de dias de recuo entre as datas de Transação para Pessoa Jurídica (pm_DiasRecuoPJ): ' || COALESCE((':pm_DiasRecuoPJ'),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE     
+FROM  TB_TRANS T2   
+INNER JOIN 
+ (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CONTRATO, DT_LIQUID, SUM(VL_OPER) VL_OPER, MAX(DT_TRANS) DT_TRANS 
+  FROM TB_TRANS_ANLSE  
+  WHERE CD_LOTE    = :cd_lote      
+    AND CD_SUBLOTE = :cd_sublote     
+    AND CD_TP_PESSOA = 'J'  
+    AND CD_TP_OPER = 6    /*pagamento*/ 
+    AND CD_FORMA_OPER = 6 /*emprestimo*/ 
+    AND CD_CONTRATO IS NOT NULL  
+    AND DT_LIQUID IS NOT NULL  
+    AND VL_OPER > (:pm_ValorMinimoPJ)  
+    GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CONTRATO, DT_LIQUID 
+  ) p 
+  ON p.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND p.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE AND 
+     T2.DT_TRANS >= (P.DT_TRANS - (:pm_DiasRecuoPJ)) AND 
+     T2.DT_TRANS <= P.DT_TRANS 
+  AND T2.CD_NATUR_OPER = 1 
+  AND T2.CD_TP_OPER IN (5, 8, 9)  
+  AND T2.CD_DOC_IDENTF_DESTORIG IS NOT NULL 
+  AND T2.CD_DOC_IDENTF_CLIE <> T2.CD_DOC_IDENTF_DESTORIG  
+  AND T2.FL_ANALISADO = 1
+  GROUP BY P.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, T2.CD_CONTRATO, P.DT_LIQUID 
+HAVING sum(T2.VL_OPER) >= (SUM(p.VL_OPER) * (:pm_PercValorAceitavelPJ/100))  
+

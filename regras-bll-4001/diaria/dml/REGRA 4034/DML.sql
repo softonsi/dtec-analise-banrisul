@@ -1,0 +1,4 @@
+INSERT INTO TB_REGRA (CD_REGRA,CD_VERSAO_SISTEMA, DT_REGRA,NM_REGRA,DS_REGRA,CD_CLASSE_REGRA,FL_ACUM_REGRA,CD_SISCOAF,FL_REGRA_ATIVA,VL_PONTO,TX_REGRA_DINAMICA,DT_REGRA_DINAMICA,DS_ERRO_REGRA,CD_USU,CD_TP_REGRA,FL_APAGADO, CD_TP_PROCES)
+VALUES (4034,4,current_timestamp,	'Mesmo E-mail ou IP por diferentes PJs','k) registro de mesmo endereço de e-mail ou de Internet Protocol (IP) por diferentes pessoas jurídicas ou organizações, sem justificativa razoável para tal ocorrência. C.C. Bacen n.4.001/2020, Art. 1º, Inciso III',403,NULL,NULL,0,NULL,NULL,current_timestamp,NULL,0,1,0,1);
+
+Insert into TB_REGRA_PARAMETRO (CD_REGRA,CD_VERSAO_SISTEMA,CD_SEQ_REGRA,NM_CAMPO_PARAM,DS_CAMPO_PARAM,VL_PARAM,DS_PARAM,VL_LIM_INIC,VL_LIM_FIM,CD_TP_ATRIB) values ('4034',4,1,'pm_QtdeDias','Quantidade de dias de recuo para busca de ocorrências.',180,null,null,null,1);

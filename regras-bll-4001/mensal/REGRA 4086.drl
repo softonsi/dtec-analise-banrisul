@@ -1,0 +1,79 @@
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || ' |Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4086 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||   
+'Valor da Renda/Faturamento: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Não cadastrado') || '|' || 
+'Contratos ativos:' || COALESCE(C.CONTRATOS, 'Não encontrados') || '|' ||  
+'Quantidade total de contratos de consórcio ativos: ' || TO_CHAR(C.QTDE_COTAS) || '|' || 
+'Consolidado dos valores das parcelas dos contratos ativos de consórcio: ' || TO_CHAR(C.TOTAL_PARCELAS, 'L999G999G999G990D99') || '|' || 
+COALESCE((':DS-pm_CodGrupoProduto' || ' (' || ':NM-pm_CodGrupoProduto' || '):' || :pm_CodGrupoProduto),'Parâmetro não cadastrado|' ) || '|'   ||
+CASE T.CD_TP_PESSOA
+WHEN 'J' THEN
+COALESCE((':DS-pm_QtdeCotasPJ' || ' (' || ':NM-pm_QtdeCotasPJ' || '):' || :pm_QtdeCotasPJ),'Parâmetro não cadastrado' ) || '|' ||    
+COALESCE((':DS-pm_percFaturamento' || ' (' || ':NM-pm_percFaturamento' || '):' || TO_CHAR(:pm_percFaturamento) || '%'),'Parâmetro não cadastrado' ) || '|' ||     
+COALESCE((':DS-pm_ValorTotalParcelaPJ' || ' (' || ':NM-pm_ValorTotalParcelaPJ' || '):' || TO_CHAR(:pm_ValorTotalParcelaPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' 
+WHEN 'F' THEN
+COALESCE((':DS-pm_QtdeCotasPF' || ' (' || ':NM-pm_QtdeCotasPF' || '):' || :pm_QtdeCotasPF),'Parâmetro não cadastrado' ) || '|' ||    
+COALESCE((':DS-pm_percRenda' || ' (' || ':NM-pm_percRenda' || '):' || TO_CHAR(:pm_percRenda) || '%'),'Parâmetro não cadastrado' ) || '|' ||     
+COALESCE((':DS-pm_ValorTotalParcelaPF' || ' (' || ':NM-pm_ValorTotalParcelaPF' || '):' || TO_CHAR(:pm_ValorTotalParcelaPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'    
+END
+AS DS_INF_ANLSE 
+FROM  (SELECT T.CD_MES_ANO, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, MAX(T.NM_CLIE) NM_CLIE, MAX(T.VL_RENDA_FAT) VL_RENDA_FAT     
+       FROM TB_TRANS T    
+	   WHERE T.DT_TRANS >=  TO_DATE(TO_CHAR(:cd_lote), 'yyyy/mm')  
+       AND   T.DT_TRANS <   ADD_MONTHS((TO_DATE(TO_CHAR(:cd_lote), 'yyyy/mm')), 1)  
+       AND   T.FL_ANALISADO = 1  
+       AND   T.CD_TP_OPER IN (79, 83)
+       AND   T.DT_LIQUID IS NULL 
+       AND   T.CD_STTUS_CONTRATO = 1 /*ativo*/ 
+       AND   T.CD_GRP_PRODUTO = (:pm_CodGrupoProduto)
+	   GROUP BY T.CD_MES_ANO, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE) T 
+INNER JOIN (SELECT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, SUM(C.VL_PCELA_CONTRATO) TOTAL_PARCELAS, SUM(C.QT_COTA_CONSORCIO) QTDE_COTAS, 
+            TO_CHAR(XMLCAST(XMLAGG(XMLELEMENT(outros, LTRIM(C.CD_CONTRATO)  || ' / ')  ORDER BY C.CD_CONTRATO) as clob)) CONTRATOS    
+            FROM TB_CONTRATO C 
+			WHERE (C.DT_LIQUID_CONTRATO IS NULL OR C.DT_LIQUID_CONTRATO >= ADD_MONTHS((TO_DATE(TO_CHAR(:cd_lote), 'yyyy/mm')), 1))
+			AND C.QT_COTA_CONSORCIO IS NOT NULL  
+            AND C.CD_STTUS_CONTRATO = 1 /*ativo*/ 
+            AND C.CD_GRP_PRODUTO = (:pm_CodGrupoProduto) 
+            AND NOT EXISTS (SELECT 1 FROM TB_TRANS T1 /* PARA DESCONSIDERAR TRANSFERENICAS NO MÊS POSTERIOR */ 
+                            WHERE T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE 
+                            AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE
+                            AND T1.CD_TP_OPER IN (79,83) /* AQUISIÇÃO OU TRANSFERENCIA DE TITULARIDADE */  
+                            AND T1.CD_CONTRATO = C.CD_CONTRATO 
+                            AND T1.NM_SIST_ORIG = C.NM_SIST_ORIG 
+                            AND T1.DT_TRANS >= ADD_MONTHS((TO_DATE(TO_CHAR(:cd_lote), 'yyyy/mm')), 1) 
+                           )
+			GROUP BY C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE 
+           ) C  
+ON T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE 
+AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE 
+WHERE C.TOTAL_PARCELAS IS NOT NULL 
+AND C.QTDE_COTAS IS NOT NULL 
+AND ((T.CD_TP_PESSOA = 'J' 
+      AND C.QTDE_COTAS > (:pm_QtdeCotasPJ)  
+      AND ((T.VL_RENDA_FAT IS NOT NULL 
+            AND C.TOTAL_PARCELAS > (T.VL_RENDA_FAT * (:pm_percFaturamento/100)))
+           OR
+           (T.VL_RENDA_FAT IS NULL 
+            AND C.TOTAL_PARCELAS > (:pm_ValorTotalParcelaPJ))
+          )
+     )    
+     OR
+     (T.CD_TP_PESSOA = 'F' 
+      AND C.QTDE_COTAS > (:pm_QtdeCotasPF)  
+      AND ((T.VL_RENDA_FAT IS NOT NULL 
+            AND C.TOTAL_PARCELAS > (T.VL_RENDA_FAT * (:pm_percRenda/100)))
+           OR
+           (T.VL_RENDA_FAT IS NULL 
+            AND C.TOTAL_PARCELAS > (:pm_ValorTotalParcelaPF))
+          )
+     ) 
+    )
+
+

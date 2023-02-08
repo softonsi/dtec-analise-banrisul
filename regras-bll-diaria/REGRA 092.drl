@@ -1,0 +1,132 @@
+SELECT  T2.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 92 - Operação de crédito no país seguida de remessa ao exterior |' ||    
+'Objetivo: C) Realização de operação de crédito no País seguida de remessa de recursos ao exterior, sem fundamento econômico ou legal, e sem relacionamento com a operação de crédito. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VII |' ||    
+'Conclusão: Operação de crédito no país seguida de remessa ao exterior |' ||    
+'Cliente: ' ||  T2.NM_CLIE || '|' ||  
+CASE T2.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T2.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T2.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' || 
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Emprestimo: Detalhes do crédito' || '|' ||  
+'Valor total de empréstimos:' || LTRIM(TO_CHAR(VL_EMPRESTIMO, 'L999G999G999G990D99')) || '|' ||  
+'Quantidade de empréstimos: ' || to_char(QT_EMPRESTIMO, '999999990') || '|' ||  
+'Período de análise: De ' ||  TO_CHAR(DT_INIC_EMP,'DD/MM/YYYY') || ' até '  || TO_CHAR(DT_FIM_EMP,'DD/MM/YYYY')  
+|| '|' ||  
+'Remessa ao exterior: Detalhes do débito' || '|' ||  
+'Valor total das remessas:' || LTRIM(TO_CHAR(VL_REMESSA, 'L999G999G999G990D99')) || '|' ||  
+'Quantidade de remessas: ' || to_char(QT_REMESSA, '999999990') || '|' ||  
+REMESSA || '|'  ||  
+'Parâmetro que indica o valor mínimo para disparo da regra para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' || 
+'Parâmetro percentual de flexibilização do valor do empréstimo para Pessoa Física (pm_PercValorPF): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' || 
+'Parâmetro que indica a quantidade de dias utilizados para recuo das transações analisadas (pm_QDiasRecuo): ' || COALESCE((SELECT TO_CHAR(:pm_QDiasRecuo, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE    
+FROM ( 
+ 
+SELECT E.DT_APONTAMENTO, MAX(NM_CLIE) NM_CLIE, R.CD_DOC_IDENTF_CLIE, R.CD_TP_IDENTF_CLIE, TRUNC(R.DT_TRANS) DT_REF, SUM(R.VL_OPER) VL_REMESSA, COUNT(*) QT_REMESSA, 
+xmlcast(  xmlagg(xmlelement(outros,  
+     ':'  ||  
+     LTRIM(TO_CHAR(R.VL_OPER, 'L999G999G999G990D99')) ||   
+     ' enviado para ' || to_char(R.CD_PAIS_DESTORIG) || '-' || coalesce((select nm_pais from tb_pais where cd_pais = R.CD_PAIS_DESTORIG), 'nome não cadastrado') 
+     || '|')   
+     order by R.CD_DOC_IDENTF_CLIE) as clob) REMESSA, MAX(VL_EMPRESTIMO) VL_EMPRESTIMO, MAX(DT_INIC_EMP) DT_INIC_EMP, MAX(DT_REF) DT_FIM_EMP, MAX(QT_EMPRESTIMO) QT_EMPRESTIMO 
+FROM TB_TRANS_ANLSE R 
+INNER JOIN  
+     (SELECT D.DT_APONTAMENTO, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE, D.DT_REF, SUM(T.VL_OPER) VL_EMPRESTIMO, COUNT(*) QT_EMPRESTIMO, (D.DT_REF - (:pm_QDiasRecuo)) DT_INIC_EMP 
+      FROM TB_TRANS T, 
+        (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, TRUNC(DT_TRANS) DT_REF FROM TB_TRANS_ANLSE 
+          WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote 
+            AND CD_TP_PESSOA  = 'F'    
+            AND CD_NATUR_OPER = 2  
+            AND CD_PAIS_DESTORIG IS NOT NULL  
+            AND CD_PAIS_DESTORIG <> 1058 
+          GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, TRUNC(DT_TRANS)
+          )  D  
+       WHERE T.CD_FORMA_OPER = 6  
+         AND T.CD_NATUR_OPER = 1 
+         AND T.FL_ANALISADO  = 1     
+         AND T.CD_TP_PESSOA  = 'F'  
+         AND T.DT_TRANS >= (D.DT_REF - (:pm_QDiasRecuo)) 
+         AND T.DT_TRANS <= D.DT_REF          
+         AND T.CD_DOC_IDENTF_CLIE = D.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = D.CD_TP_IDENTF_CLIE         
+         GROUP BY D.DT_APONTAMENTO, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE, D.DT_REF) E   
+    ON R.CD_DOC_IDENTF_CLIE = E.CD_DOC_IDENTF_CLIE AND R.CD_TP_IDENTF_CLIE = E.CD_TP_IDENTF_CLIE AND LAST_DAY(TRUNC(R.DT_TRANS)) = E.DT_APONTAMENTO AND TRUNC(R.DT_TRANS) = E.DT_REF       
+WHERE R.CD_LOTE    = :cd_lote     
+  AND R.CD_SUBLOTE = :cd_sublote     
+   AND R.CD_TP_PESSOA  = 'F'    
+  AND R.CD_NATUR_OPER = 2  
+  AND R.CD_PAIS_DESTORIG IS NOT NULL  
+  AND R.CD_PAIS_DESTORIG <> 1058  
+GROUP BY E.DT_APONTAMENTO, TRUNC(DT_TRANS), R.CD_DOC_IDENTF_CLIE, R.CD_TP_IDENTF_CLIE 
+HAVING SUM(R.VL_OPER) >= (MAX(VL_EMPRESTIMO) * (:pm_PercValorPF/100))  
+  AND SUM(R.VL_OPER) > (:pm_ValorMinimoPF)  
+) T2 
+ 
+UNION ALL 
+
+SELECT T2.DT_APONTAMENTO, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 92 - Operação de crédito no país seguida de remessa ao exterior |' ||    
+'Objetivo: C) Realização de operação de crédito no País seguida de remessa de recursos ao exterior, sem fundamento econômico ou legal, e sem relacionamento com a operação de crédito. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VII |' ||    
+'Conclusão: Operação de crédito no país seguida de remessa ao exterior |' ||    
+'Cliente: ' ||  T2.NM_CLIE || '|' ||  
+CASE T2.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T2.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T2.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T2.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' || 
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Emprestimo: Detalhes do crédito' || '|' ||  
+'Valor total de empréstimos:' || LTRIM(TO_CHAR(VL_EMPRESTIMO, 'L999G999G999G990D99')) || '|' ||  
+'Quantidade de empréstimos: ' || to_char(QT_EMPRESTIMO, '999999990') || '|' ||  
+'Período de análise: de ' ||  TO_CHAR(DT_INIC_EMP,'DD/MM/YYYY') || ' até '  || TO_CHAR(DT_FIM_EMP,'DD/MM/YYYY')  
+|| '|' ||  
+'Remessa ao exterior: Detalhes do débito' || '|' ||  
+'Valor total das remessas:' || LTRIM(TO_CHAR(VL_REMESSA, 'L999G999G999G990D99')) || '|' ||  
+'Quantidade de remessas: ' || to_char(QT_REMESSA, '999999990') || '|' ||  
+REMESSA || '|'  ||  
+'Parâmetro que indica o valor mínimo para disparo da regra para Pessoa Física (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' || 
+'Parâmetro percentual de flexibilização do valor do empréstimo para Pessoa Física (pm_PercValorPJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' || 
+'Parâmetro que indica a quantidade de dias utilizados para recuo das transações analisadas (pm_QDiasRecuo): ' || COALESCE((SELECT TO_CHAR(:pm_QDiasRecuo, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE    
+FROM ( 
+  
+SELECT E.DT_APONTAMENTO, MAX(NM_CLIE) NM_CLIE, R.CD_DOC_IDENTF_CLIE, R.CD_TP_IDENTF_CLIE, TRUNC(R.DT_TRANS) DT_REF, SUM(R.VL_OPER) VL_REMESSA, COUNT(*) QT_REMESSA, 
+xmlcast(  xmlagg(xmlelement(outros,  
+     ':'  ||  
+     LTRIM(TO_CHAR(R.VL_OPER, 'L999G999G999G990D99')) ||   
+     ' enviado para ' || to_char(R.CD_PAIS_DESTORIG) || '-' || coalesce((select nm_pais from tb_pais where cd_pais = R.CD_PAIS_DESTORIG), 'nome não cadastrado') 
+     || '|')   
+     order by R.CD_DOC_IDENTF_CLIE) as clob) REMESSA, MAX(VL_EMPRESTIMO) VL_EMPRESTIMO, MAX(DT_INIC_EMP) DT_INIC_EMP, MAX(DT_REF) DT_FIM_EMP, MAX(QT_EMPRESTIMO) QT_EMPRESTIMO 
+FROM TB_TRANS_ANLSE R 
+INNER JOIN  
+     (SELECT D.DT_APONTAMENTO, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE, D.DT_REF, SUM(T.VL_OPER) VL_EMPRESTIMO, COUNT(*) QT_EMPRESTIMO, (D.DT_REF - (:pm_QDiasRecuo)) DT_INIC_EMP 
+      FROM TB_TRANS T, 
+        (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, TRUNC(DT_TRANS) DT_REF FROM TB_TRANS_ANLSE 
+          WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote 
+            AND CD_TP_PESSOA  = 'J'    
+            AND CD_NATUR_OPER = 2  
+            AND CD_PAIS_DESTORIG IS NOT NULL  
+            AND CD_PAIS_DESTORIG <> 1058 
+          GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, TRUNC(DT_TRANS)
+          )  D  
+       WHERE T.CD_FORMA_OPER = 6  
+         AND T.CD_NATUR_OPER = 1 
+         AND T.FL_ANALISADO  = 1     
+         AND T.CD_TP_PESSOA  = 'J'  
+         AND T.DT_TRANS >= (D.DT_REF - (:pm_QDiasRecuo)) 
+         AND T.DT_TRANS <= D.DT_REF 
+         GROUP BY D.DT_APONTAMENTO, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE, D.DT_REF) E   
+    ON R.CD_DOC_IDENTF_CLIE = E.CD_DOC_IDENTF_CLIE AND R.CD_TP_IDENTF_CLIE = E.CD_TP_IDENTF_CLIE AND LAST_DAY(TRUNC(R.DT_TRANS)) = E.DT_APONTAMENTO AND TRUNC(R.DT_TRANS) = E.DT_REF       
+WHERE R.CD_LOTE    = :cd_lote     
+  AND R.CD_SUBLOTE = :cd_sublote     
+  AND R.CD_TP_PESSOA  = 'J'    
+  AND R.CD_NATUR_OPER = 2  
+  AND R.CD_PAIS_DESTORIG IS NOT NULL  
+  AND R.CD_PAIS_DESTORIG <> 1058  
+GROUP BY E.DT_APONTAMENTO, TRUNC(DT_TRANS), R.CD_DOC_IDENTF_CLIE, R.CD_TP_IDENTF_CLIE 
+HAVING SUM(R.VL_OPER) >= (MAX(VL_EMPRESTIMO) * (:pm_PercValorPJ/100))  
+  AND SUM(R.VL_OPER) > (:pm_ValorMinimoPJ)  
+) T2 

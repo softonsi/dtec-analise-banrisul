@@ -1,0 +1,42 @@
+/*mensal*/ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, 
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4066 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' || T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE 
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+ || '|' ||  
+'Mês calendário: ' || TO_CHAR(T.CD_MES_ANO) || '|' ||  
+'Valor consolidado de crédito: ' || TO_CHAR( VL_CREDITO, 'L999G999G999G990D99') || '|' || 
+'Quantidade de transações de crédito: ' || TO_CHAR(QT_CREDITO) || '|' || 
+'Valor consolidado de débito: ' || TO_CHAR( VL_DEBITO, 'L999G999G999G990D99') || '|' || 
+'Quantidade de transações de debito: ' || TO_CHAR(QT_DEBITO) || '|' || 
+'Valor do faturamento: ' || TO_CHAR( VL_RENDA_FAT, 'L999G999G999G990D99') || '|' || 
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_percFaturamento) FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4066 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_percFaturamento'),'Parametro nao cadastrado|' ) || '|'  
+AS DS_INF_ANLSE   
+FROM 
+(SELECT CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.CD_LOTE, A.VL_RENDA_FAT, SUM(VL_CREDITO) VL_CREDITO, SUM(QT_CREDITO) QT_CREDITO, SUM(VL_DEBITO) VL_DEBITO, SUM(QT_DEBITO) QT_DEBITO 
+FROM  
+(SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, VL_RENDA_FAT,  
+CASE CD_NATUR_OPER WHEN 1 THEN SUM(VL_OPER) END VL_CREDITO, 
+CASE CD_NATUR_OPER WHEN 1 THEN COUNT(*) END QT_CREDITO, 
+CASE CD_NATUR_OPER WHEN 2 THEN SUM(VL_OPER) END VL_DEBITO, 
+CASE CD_NATUR_OPER WHEN 2 THEN COUNT(*) END QT_DEBITO 
+ FROM TB_TRANS 
+ WHERE CD_TP_PESSOA = 'J' 
+   AND CD_NATUR_OPER IN (1, 2)  
+   AND FL_ANALISADO = 1  
+   AND DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+   AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+ GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, VL_RENDA_FAT, CD_NATUR_OPER 
+ ) A 
+GROUP BY  CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.CD_LOTE, A.VL_RENDA_FAT 
+) T 
+WHERE (VL_CREDITO >= ( VL_RENDA_FAT * (:pm_percFaturamento/100)) 
+       OR  
+       VL_DEBITO >= ( VL_RENDA_FAT * (:pm_percFaturamento/100)) 
+	   ) 
+ 
+ 

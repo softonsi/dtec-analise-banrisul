@@ -1,0 +1,70 @@
+SELECT CC.DT_APONTAMENTO, CC.CD_DOC_IDENTF_CLIE, CC.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 87 – Saldo credor expressivo de cartão pré-pago |' ||  
+'Objetivo: Verificar saldo credor expressivo de cartão pré-pago |' ||  
+'Conclusão: Saldo credor expressivo de cartão pré-pago |' ||  
+'Cliente: ' ||  MAX(CC.NM_CLIE) || '|' ||  
+CASE CC.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(CC.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE CC.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||  
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||  
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(CC.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Somatório do saldo credor, nos diversos cartões, no dia: ' || COALESCE(TO_CHAR(SUM(CPP.VL_SALDO_CARTAO), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+xmlcast(  xmlagg(xmlelement(outros,  
+'Cartão pré-pago ' || TO_CHAR(CPP.CD_CARTAO_PRE_PAGO) || ':' || 'Saldo credor-' || ltrim(TO_CHAR(CPP.VL_SALDO_CARTAO, 'L999G999G999G990D99'))  
+|| '|')   
+order by CC.CD_DOC_IDENTF_CLIE) as clob) || '|' || 
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica valor expressivo de saldo credor, para pessoas sem renda (pm_ValorSaldoCartaoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorSaldoCartaoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica valor mínimo para disparo da regra (pm_ValorSaldoMinimoCartaoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorSaldoMinimoCartaoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM VM_CLIE CC  
+INNER JOIN TB_CARTAO_PRE_PAGO CPP  
+      ON CC.CD_DOC_IDENTF_CLIE = CPP.CD_DOC_IDENTF_CLIE  AND CC.CD_TP_IDENTF_CLIE = CPP.CD_TP_IDENTF_CLIE  
+WHERE CC.CD_LOTE  = :cd_lote    
+AND CC.CD_TP_PESSOA = 'F'  
+GROUP BY CC.DT_APONTAMENTO, CC.CD_DOC_IDENTF_CLIE, CC.CD_TP_IDENTF_CLIE 
+HAVING SUM(CPP.VL_SALDO_CARTAO) > (:pm_ValorSaldoMinimoCartaoPF)  
+   AND ( 
+       (MAX(CC.VL_RENDA_FAT) IS NULL AND SUM(CPP.VL_SALDO_CARTAO) > (:pm_ValorSaldoCartaoPF) ) 
+         OR  
+       (MAX(CC.VL_RENDA_FAT) IS NOT NULL AND SUM(CPP.VL_SALDO_CARTAO) > (MAX(CC.VL_RENDA_FAT) * (:pm_PercRenda/100))) 
+        ) 
+UNION ALL 
+SELECT CC.DT_APONTAMENTO, CC.CD_DOC_IDENTF_CLIE, CC.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 87 – Saldo credor expressivo de cartão pré-pago |' ||  
+'Objetivo: Verificar saldo credor expressivo de cartão pré-pago |' ||  
+'Conclusão: Saldo credor expressivo de cartão pré-pago |' ||  
+'Cliente: ' ||  MAX(CC.NM_CLIE) || '|' ||  
+CASE CC.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(CC.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(CC.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE CC.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' || 
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(CC.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Somatório do saldo credor, nos diversos cartões, no dia: ' || COALESCE(TO_CHAR(SUM(CPP.VL_SALDO_CARTAO), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+xmlcast(  xmlagg(xmlelement(outros,  
+'Cartão pré-pago ' || TO_CHAR(CPP.CD_CARTAO_PRE_PAGO) || ':' || 'Saldo credor-' || ltrim(TO_CHAR(CPP.VL_SALDO_CARTAO, 'L999G999G999G990D99'))  
+|| '|')   
+order by CC.CD_DOC_IDENTF_CLIE) as clob) || '|' || 
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica valor expressivo de saldo credor, para pessoas sem renda (pm_ValorSaldoCartaoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorSaldoCartaoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro que indica valor mínimo para disparo da regra (pm_ValorSaldoMinimoCartaoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorSaldoMinimoCartaoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM VM_CLIE CC  
+INNER JOIN TB_CARTAO_PRE_PAGO CPP  
+      ON CC.CD_DOC_IDENTF_CLIE = CPP.CD_DOC_IDENTF_CLIE  AND CC.CD_TP_IDENTF_CLIE = CPP.CD_TP_IDENTF_CLIE  
+WHERE CC.CD_LOTE  = :cd_lote    
+AND CC.CD_TP_PESSOA = 'J'  
+GROUP BY CC.DT_APONTAMENTO, CC.CD_DOC_IDENTF_CLIE, CC.CD_TP_IDENTF_CLIE 
+HAVING SUM(CPP.VL_SALDO_CARTAO) > (:pm_ValorSaldoMinimoCartaoPJ)  
+   AND ( 
+       (MAX(CC.VL_RENDA_FAT) IS NULL AND SUM(CPP.VL_SALDO_CARTAO) > (:pm_ValorSaldoCartaoPJ) ) 
+         OR  
+       (MAX(CC.VL_RENDA_FAT) IS NOT NULL AND SUM(CPP.VL_SALDO_CARTAO) > (MAX(CC.VL_RENDA_FAT) * (:pm_PercFaturamento/100))) 
+        ) 
+               

@@ -1,0 +1,1 @@
+select * from tb_param_global

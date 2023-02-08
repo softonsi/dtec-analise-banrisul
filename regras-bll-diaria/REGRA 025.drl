@@ -1,0 +1,74 @@
+/* f) Movimentação de recursos em espécie em municipios localizados em regioes de fronteira, */  
+/* que apresentem indícios de atipicidade ou de incompatibilidade com a capacidade econômico-financeira do cliente;*/  
+  
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 25 - Movimentação em Espécie, em municípios localizados em fronteiras |' ||   
+'Objetivo: F) Movimentação de recursos em espécie em municípios localizados em regiões de fronteira, que apresentem indícios de atipicidade ou de incompatibilidade com a capacidade econômico-financeira do cliente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||   
+'Conclusão: Movimentação de recursos em espécie em municípios localizados em regiões de fronteira, que apresentem indícios de atipicidade ou de incompatibilidade com a capacidade econômico-financeira do cliente |' ||   
+'Cliente: ' ||  T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||   
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||   
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Banco da Transação: ' || COALESCE(TO_CHAR(T.CD_BANCO_OPER,'000'), 'Banco da transação não cadastrado') || '|' ||   
+'Agência da Transação, localizada em região de Fronteira: ' || COALESCE(TO_CHAR(T.CD_AG_OPER,'0000'), 'Agência da transação não cadastrada') || '|' ||   
+'Parâmetro de valor mínimo para valor da operação. Somente Pessoa Física (pm_ValorMinimo_PF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T    
+WHERE T.CD_LOTE       = :cd_lote     
+  AND T.CD_SUBLOTE    = :cd_sublote    
+  AND T.CD_TP_PESSOA  = 'F'   
+  AND T.CD_FORMA_OPER = 7   
+  AND T.CD_AG_OPER   IS NOT NULL   
+  AND T.VL_OPER      IS NOT NULL   
+  AND T.VL_OPER > (:pm_ValorMinimo_PF)   
+  AND ((T.VL_RENDA_FAT IS NOT NULL    
+        AND T.VL_OPER >= (T.VL_RENDA_FAT * (:pm_PercRenda/100) ))   
+       OR T.VL_RENDA_FAT IS NULL)   
+  AND EXISTS (SELECT 1 FROM TB_AGENCIA WHERE CD_AG = T.CD_AG_OPER AND FL_FRONT = 1)     
+UNION  ALL   
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 25 - Movimentação em Espécie, em municípios localizados em fronteiras |' ||   
+'Objetivo: F) Movimentação de recursos em espécie em municípios localizados em regiões de fronteira, que apresentem indícios de atipicidade ou de incompatibilidade com a capacidade econômico-financeira do cliente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||   
+'Conclusão: Movimentação de recursos em espécie em municípios localizados em regiões de fronteira, que apresentem indícios de atipicidade ou de incompatibilidade com a capacidade econômico-financeira do cliente |' ||   
+'Cliente: ' ||  T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||   
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||   
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Banco da Transação: ' || COALESCE(TO_CHAR(T.CD_BANCO_OPER,'000'), 'Banco da transação não cadastrado') || '|' ||   
+'Agência da Transação, localizada em região de Fronteira: ' || COALESCE(TO_CHAR(T.CD_AG_OPER,'0000'), 'Agência da transação não cadastrada') || '|' ||   
+'Parâmetro de valor mínimo para valor da operação. Somente Pessoa Jurídica (pm_ValorMinimo_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Valor Faturamento: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização do faturamento (pm_PercFatmt): ' || COALESCE((SELECT TO_CHAR(:pm_PercFatmt, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T    
+WHERE T.CD_LOTE       = :cd_lote    
+  AND T.CD_SUBLOTE    = :cd_sublote   
+  AND T.CD_TP_PESSOA  = 'J'   
+  AND T.CD_FORMA_OPER = 7   
+  AND T.CD_AG_OPER   IS NOT NULL   
+  AND T.VL_OPER      IS NOT NULL   
+  AND T.VL_OPER > (:pm_ValorMinimo_PJ)   
+  AND ((T.VL_RENDA_FAT IS NOT NULL    
+        AND T.VL_OPER >= (VL_RENDA_FAT * (:pm_PercFatmt/100) ))   
+       OR T.VL_RENDA_FAT IS NULL)   
+  AND EXISTS (SELECT 1 FROM TB_AGENCIA WHERE CD_AG = T.CD_AG_OPER AND FL_FRONT = 1)
+  
+  

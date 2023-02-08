@@ -1,0 +1,139 @@
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 84 - Utilização de várias fontes de recursos |' ||     
+'Objetivo: D) Utilização de diversas fontes de recursos para carga e recarga de cartões. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||     
+'Conclusão: Utilização de várias fontes de recursos |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||     
+'Número do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Tipo de Cartão: ' ||   
+CASE T1.CD_TP_CARTAO   
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||     
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' || 
+'Data de referência: ' || TO_CHAR(T1.DT_REF,'DD/MM/YYYY') || '|' ||   
+'Período de análise: de ' || TO_CHAR((T1.DT_REF - (:pm_QDiasRecuo)),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_REF),'DD/MM/YYYY') ||  '|' || 
+'Valor transacionado no lote: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||   
+'Quantidade de origens distintas: ' || TO_CHAR(QT) || '|' ||  
+'CPF/CNPJ Origens :' ||  TRANS || '|' || 
+'Parâmetro que indica valor mínimo para disparo da regra para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica quantidade de dias de recuo, para analise dos dados (pm_QDiasRecuo): ' || COALESCE((':pm_QDiasRecuo'),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica quantidade expressiva de origens diferentes (pm_QtdeOrigensDiferentesPF): ' || COALESCE((':pm_QtdeOrigensDiferentesPF'),'Parâmetro não cadastrado') || '|'     
+AS DS_INF_ANLSE      
+FROM ( 
+ 
+SELECT DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(CD_CARTAO) CD_CARTAO, MAX(NM_CLIE) NM_CLIE, COUNT(*) QT, MAX(CD_TP_CARTAO) CD_TP_CARTAO, MAX(DT_REF) DT_REF, MAX(VL_OPER) VL_OPER, 
+xmlcast(  xmlagg(xmlelement(outros,  
+CASE CD_TP_IDENTF_DESTORIG    
+	WHEN 2 THEN SUBSTR(CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	WHEN 3 THEN SUBSTR(CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	ELSE CD_DOC_IDENTF_DESTORIG    
+END  
+|| ' / ')   
+order by CD_DOC_IDENTF_CLIE) as clob) TRANS 
+FROM (SELECT T2.DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_CARTAO, T1.CD_DOC_IDENTF_DESTORIG, T1.CD_TP_IDENTF_DESTORIG, MAX(NM_CLIE) NM_CLIE, 
+      MAX(CD_TP_CARTAO) CD_TP_CARTAO, MAX(DT_REF) DT_REF, MAX(T2.VL_OPER) VL_OPER 
+      FROM TB_TRANS T1     
+      INNER JOIN 
+      (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO, MAX(DT_TRANS) DT_REF, SUM(VL_OPER) VL_OPER FROM TB_TRANS_ANLSE  
+       WHERE CD_LOTE    = :cd_lote     
+       AND CD_SUBLOTE = :cd_sublote    
+       AND CD_TP_PESSOA = 'F'   
+       AND CD_TP_OPER IN (25, 26, 64, 65)    
+       AND CD_NATUR_OPER = 1 
+       AND CD_CARTAO IS NOT NULL 
+       GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO 
+       HAVING SUM(VL_OPER)  > (:pm_ValorMinimoPF)  
+      ) T2 
+      ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE=T2.CD_TP_IDENTF_CLIE AND T1.CD_CARTAO=T2.CD_CARTAO 
+      WHERE CD_TP_OPER IN (25, 26, 64, 65) 
+      AND T1.CD_NATUR_OPER = 1 
+      AND T1.VL_OPER > (:pm_ValorMinimoPF)   
+      AND T1.DT_TRANS > (T2.DT_REF - (:pm_QDiasRecuo))     
+      AND T1.DT_TRANS <= T2.DT_REF   
+      AND T1.FL_ANALISADO = 1   
+      GROUP BY T2.DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_CARTAO, T1.CD_DOC_IDENTF_DESTORIG, T1.CD_TP_IDENTF_DESTORIG   
+    ) a 
+    GROUP BY DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO 
+    HAVING COUNT(*) > (:pm_QtdeOrigensDiferentesPF)     
+   ) T1 
+   
+UNION ALL 
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 84 - Utilização de várias fontes de recursos |' ||     
+'Objetivo: D) Utilização de diversas fontes de recursos para carga e recarga de cartões. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||     
+'Conclusão: Utilização de várias fontes de recursos |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||     
+'Número do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Tipo de Cartão: ' ||   
+CASE T1.CD_TP_CARTAO   
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||     
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' || 
+'Data de referência: ' || TO_CHAR(T1.DT_REF,'DD/MM/YYYY') || '|' ||   
+'Período de análise: de ' || TO_CHAR((T1.DT_REF - (:pm_QDiasRecuo)),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_REF),'DD/MM/YYYY') ||  '|' || 
+'Valor transacionado no lote: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||   
+'Quantidade de origens distintas: ' || TO_CHAR(QT) || '|' ||  
+'CPF/CNPJ Origens :' || TRANS || '|' || 
+'Parâmetro que indica valor mínimo para disparo da regra para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica quantidade de dias de recuo, para analise dos dados (pm_QDiasRecuo): ' || COALESCE((':pm_QDiasRecuo'),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica quantidade expressiva de origens diferentes (pm_QtdeOrigensDiferentesPJ): ' || COALESCE((':pm_QtdeOrigensDiferentesPJ'),'Parâmetro não cadastrado') || '|'     
+AS DS_INF_ANLSE      
+FROM ( 
+ 
+SELECT DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(CD_CARTAO) CD_CARTAO, MAX(NM_CLIE) NM_CLIE, COUNT(*) QT, MAX(CD_TP_CARTAO) CD_TP_CARTAO, MAX(DT_REF) DT_REF, MAX(VL_OPER) VL_OPER, 
+xmlcast(  xmlagg(xmlelement(outros,  
+CASE CD_TP_IDENTF_DESTORIG    
+	WHEN 2 THEN SUBSTR(CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	WHEN 3 THEN SUBSTR(CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	ELSE CD_DOC_IDENTF_DESTORIG    
+END  
+|| ' / ')   
+order by CD_DOC_IDENTF_CLIE) as clob) TRANS 
+FROM ( 
+SELECT T2.DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_CARTAO, T1.CD_DOC_IDENTF_DESTORIG, T1.CD_TP_IDENTF_DESTORIG, MAX(NM_CLIE) NM_CLIE, 
+      MAX(CD_TP_CARTAO) CD_TP_CARTAO, MAX(DT_REF) DT_REF, MAX(T2.VL_OPER) VL_OPER 
+FROM TB_TRANS T1     
+INNER JOIN 
+   (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO, MAX(DT_TRANS) DT_REF, SUM(VL_OPER) VL_OPER FROM TB_TRANS_ANLSE  
+     WHERE CD_LOTE    = :cd_lote      
+       AND CD_SUBLOTE = :cd_sublote     
+       AND CD_TP_PESSOA = 'J'   
+       AND CD_TP_OPER IN (25, 26, 64, 65)    
+       AND CD_NATUR_OPER = 1 
+       AND CD_CARTAO IS NOT NULL  
+       GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO 
+       HAVING SUM(VL_OPER)  > (:pm_ValorMinimoPJ)  
+       ) T2 
+       ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE=T2.CD_TP_IDENTF_CLIE AND T1.CD_CARTAO=T2.CD_CARTAO 
+WHERE CD_TP_OPER IN (25, 26, 64, 65) 
+  AND T1.CD_NATUR_OPER = 1 
+  AND T1.VL_OPER > (:pm_ValorMinimoPJ)   
+  AND T1.DT_TRANS > (T2.DT_REF - (:pm_QDiasRecuo))     
+  AND T1.DT_TRANS <= T2.DT_REF
+  AND T1.FL_ANALISADO = 1     
+GROUP BY T2.DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_CARTAO, T1.CD_DOC_IDENTF_DESTORIG, T1.CD_TP_IDENTF_DESTORIG  ) a 
+group by DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO 
+HAVING COUNT(*) > (:pm_QtdeOrigensDiferentesPJ)     
+ 
+) T1 
+ 
+ 
+ 
+ 

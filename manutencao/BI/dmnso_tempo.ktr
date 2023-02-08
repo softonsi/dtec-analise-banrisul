@@ -1,0 +1,3500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>INSERT TB_DIMENSAO_TEMPO</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>&#x2f;</directory>
+    <parameters>
+    </parameters>
+    <log>
+<trans-log-table><connection/>
+<schema/>
+<table/>
+<size_limit_lines/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>N</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>N</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>N</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field><field><id>EXECUTING_SERVER</id><enabled>N</enabled><name>EXECUTING_SERVER</name></field><field><id>EXECUTING_USER</id><enabled>N</enabled><name>EXECUTING_USER</name></field><field><id>CLIENT</id><enabled>N</enabled><name>CLIENT</name></field></trans-log-table>
+<perf-log-table><connection/>
+<schema/>
+<table/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>SEQ_NR</id><enabled>Y</enabled><name>SEQ_NR</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>INPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>INPUT_BUFFER_ROWS</name></field><field><id>OUTPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>OUTPUT_BUFFER_ROWS</name></field></perf-log-table>
+<channel-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>LOGGING_OBJECT_TYPE</id><enabled>Y</enabled><name>LOGGING_OBJECT_TYPE</name></field><field><id>OBJECT_NAME</id><enabled>Y</enabled><name>OBJECT_NAME</name></field><field><id>OBJECT_COPY</id><enabled>Y</enabled><name>OBJECT_COPY</name></field><field><id>REPOSITORY_DIRECTORY</id><enabled>Y</enabled><name>REPOSITORY_DIRECTORY</name></field><field><id>FILENAME</id><enabled>Y</enabled><name>FILENAME</name></field><field><id>OBJECT_ID</id><enabled>Y</enabled><name>OBJECT_ID</name></field><field><id>OBJECT_REVISION</id><enabled>Y</enabled><name>OBJECT_REVISION</name></field><field><id>PARENT_CHANNEL_ID</id><enabled>Y</enabled><name>PARENT_CHANNEL_ID</name></field><field><id>ROOT_CHANNEL_ID</id><enabled>Y</enabled><name>ROOT_CHANNEL_ID</name></field></channel-log-table>
+<step-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field></step-log-table>
+<metrics-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>METRICS_DATE</id><enabled>Y</enabled><name>METRICS_DATE</name></field><field><id>METRICS_CODE</id><enabled>Y</enabled><name>METRICS_CODE</name></field><field><id>METRICS_DESCRIPTION</id><enabled>Y</enabled><name>METRICS_DESCRIPTION</name></field><field><id>METRICS_SUBJECT</id><enabled>Y</enabled><name>METRICS_SUBJECT</name></field><field><id>METRICS_TYPE</id><enabled>Y</enabled><name>METRICS_TYPE</name></field><field><id>METRICS_VALUE</id><enabled>Y</enabled><name>METRICS_VALUE</name></field></metrics-log-table>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>1000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>5000</feedback_size>
+    <using_thread_priorities>N</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>Y</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit/>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <created_user/>
+  <created_date>2011&#x2f;10&#x2f;21 16&#x3a;11&#x3a;37.734</created_date>
+  <modified_user>admin</modified_user>
+  <modified_date>2010&#x2f;04&#x2f;01 11&#x3a;44&#x3a;26.593</modified_date>
+  </info>
+  <notepads>
+  </notepads>
+  <connection>
+    <name>Conn</name>
+    <server/>
+    <type>POSTGRESQL</type>
+    <access>JNDI</access>
+    <database>PWC_POS_SISAF_ID_PENTAHO</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle_ecrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>PWC_POS_SISAF_ID_CARGA</name>
+    <server/>
+    <type>POSTGRESQL</type>
+    <access>JNDI</access>
+    <database>PWC_POS_SISAF_ID_CARGA</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>PWC_POS_SISAF_ID_PENTAHO</name>
+    <server/>
+    <type>POSTGRESQL</type>
+    <access>JNDI</access>
+    <database>PWC_POS_SISAF_ID_PENTAHO</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>no_bimestre</from><to>no_trimestre</to><enabled>Y</enabled> </hop>
+  <hop> <from>bimestre</from><to>no_bimestre_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_bimestre_n</from><to>no_bimestre</to><enabled>Y</enabled> </hop>
+  <hop> <from>dia_semana</from><to>dia_semana_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>dia_semana_n</from><to>no_dia_semana</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_faixa_horario</from><to>no_faixa_horario_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_faixa_horario_n</from><to>no_faixa_horario_desc</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_faixa_horario_desc</from><to>no_turno</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_mes</from><to>no_bimestre</to><enabled>Y</enabled> </hop>
+  <hop> <from>mes</from><to>no_mes_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_mes_n</from><to>no_mes</to><enabled>Y</enabled> </hop>
+  <hop> <from>quinzena_mes</from><to>no_quinzena_mes_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_quinzena_mes_n</from><to>no_quinzena_mes</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_semestre</from><to>no_faixa_horario_desc</to><enabled>Y</enabled> </hop>
+  <hop> <from>semestre</from><to>no_semestre_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_semestre_n</from><to>no_semestre</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_trimestre</from><to>no_semestre</to><enabled>Y</enabled> </hop>
+  <hop> <from>trimestre</from><to>no_trimestre_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_trimestre_n</from><to>no_trimestre</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_turno</from><to>no_quinzena_mes</to><enabled>Y</enabled> </hop>
+  <hop> <from>turno</from><to>no_turno_n</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_turno_n</from><to>no_turno</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_dia_semana</from><to>no_mes</to><enabled>Y</enabled> </hop>
+  <hop> <from>seq_int</from><to>Calculo dos codigos</to><enabled>Y</enabled> </hop>
+  <hop> <from>no_quinzena_mes</from><to>Campos</to><enabled>Y</enabled> </hop>
+  <hop> <from>Generate Rows</from><to>Get Variables</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get Variables</from><to>seq_int</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculo dos codigos</from><to>no_dia_semana</to><enabled>Y</enabled> </hop>
+  <hop> <from>Campos</from><to>Add sequence</to><enabled>Y</enabled> </hop>
+  <hop> <from>Add sequence</from><to>INSERT TB_DIMENSAO_TEMPO</to><enabled>Y</enabled> </hop>
+  </order>
+  <step>
+    <name>Add sequence</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <valuename>NU_DIMENSAO_TEMPO</valuename>
+      <use_database>Y</use_database>
+      <connection>dtec_v3_oracle_ecrypt</connection>
+      <schema>&#x24;&#x7b;db_user&#x7d;</schema>
+      <seqname>SQ_DIMENSAO_TEMPO</seqname>
+      <use_counter>N</use_counter>
+      <counter_name/>
+      <start_at>1</start_at>
+      <increment_by>1</increment_by>
+      <max_value>999999999</max_value>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>727</xloc>
+      <yloc>772</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Calculo dos codigos</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;data da faixa de inicio&#xa;var dt_faixa_inicio &#x3d; dateAdd&#x28;primeiro_dia_ano, &#x22;hh&#x22;, nr_horas_total_x&#x29;&#x3b;&#xa;var co_faixa_inicio &#x3d; dt_faixa_inicio&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo da descricao da faixa de horario&#xa;var co_faixa_horario_descricao &#x3d; dateAdd&#x28;primeiro_dia_ano, &#x22;hh&#x22;, nr_horas_total_x&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo da faixa de horario&#xa;&#x2f;&#x2f;var co_faixa_horario &#x3d; dh_faixa_inicio.getHours&#x28;&#x29;&#x3b;&#xa;&#x2f;&#x2f;codigo da faixa de horario&#xa;var co_faixa_horario_int &#x3d; dt_faixa_inicio.getHours&#x28;&#x29;&#x3b;&#xa;var co_faixa_horario &#x3d; num2str&#x28;co_faixa_horario_int, &#x22;0&#x22;&#x29;&#x3b;&#xa;if&#x28;co_faixa_horario_int &#x3c; 10&#x29;&#xa;	&#x7b;&#xa;	co_faixa_horario &#x3d; &#x22;0&#x22; &#x2b; co_faixa_horario&#x3b;&#xa;	&#x7d;&#xa;&#xa;&#x2f;&#x2f;quant. dias no ano&#xa;var dia_ano &#x3d; getDayNumber&#x28;dt_faixa_inicio, &#x22;y&#x22;&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero do dia do mes&#xa;var nu_dia_mes &#x3d; getDayNumber&#x28;dt_faixa_inicio, &#x22;m&#x22;&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do dia do mes&#xa;var co_dia_mes_int &#x3d; getDayNumber&#x28;dt_faixa_inicio, &#x22;m&#x22;&#x29;&#x3b;&#xa;var co_dia_mes &#x3d; num2str&#x28;co_dia_mes_int, &#x22;0&#x22;&#x29;&#x3b;&#xa;if&#x28;co_dia_mes &#x3c; 10&#x29;&#xa;	&#x7b;&#xa;	co_dia_mes &#x3d; &#x22;0&#x22; &#x2b; co_dia_mes&#x3b;&#xa;	&#x7d;&#xa;&#xa;&#x2f;&#x2f;codigo do dia da semana&#xa;var co_dia_semana &#x3d; getDayNumber&#x28;dt_faixa_inicio, &#x22;w&#x22;&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero do dia da semana&#xa;var nu_dia_semana &#x3d; getDayNumber&#x28;dt_faixa_inicio, &#x22;w&#x22;&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do turno&#xa;var co_turno &#x3d; &#x28;co_faixa_horario &#x2f; 6&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do mes&#xa;&#x2f;&#x2f;var co_mes &#x3d; month&#x28;dh_faixa_inicio&#x29; &#x2b; 1&#x3b;&#xa;&#x2f;&#x2f;codigo do mes&#xa;var co_mes_int &#x3d; month&#x28;dt_faixa_inicio&#x29; &#x2b; 1&#x3b;&#xa;var co_mes &#x3d; num2str&#x28;co_mes_int, &#x22;0&#x22;&#x29;&#x3b;&#xa;if&#x28;co_mes &#x3c; 10&#x29;&#xa;	&#x7b;&#xa;	co_mes &#x3d; &#x22;0&#x22; &#x2b; co_mes&#x3b;&#xa;	&#x7d;&#xa;&#xa;&#x2f;&#x2f;numero do mes&#xa;var nu_mes &#x3d; co_mes&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero da quinzena do mes&#xa;var nu_quinzena_mes &#x3d; &#x28;nu_dia_mes &#x3c;&#x3d; 15&#x29; &#x3f; 1 &#x3a; 2&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo da quinzena do mes&#xa;var co_quinzena_mes &#x3d; nu_quinzena_mes&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero da semana do ano&#xa;var nu_semana_ano &#x3d; &#x28;&#x28;&#x28;&#x28;dia_ano - co_dia_semana&#x29; &#x2b; 7&#x29; &#x2f; 7 &#x29; &#x2b; 1&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo da semana do ano&#xa;&#x2f;&#x2f;var co_semana_ano &#x3d; nu_semana_ano&#xa;&#x2f;&#x2f;codigo da semana do ano&#xa;&#xa;var co_semana_ano_int &#x3d; &#x28;&#x28;&#x28;&#x28;dia_ano - co_dia_semana&#x29; &#x2b; 7&#x29; &#x2f; 7 &#x29; &#x2b; 1&#x29;&#x3b;&#xa;var co_semana_ano &#x3d; num2str&#x28;co_semana_ano_int, &#x22;0&#x22;&#x29;&#x3b;&#xa;if&#x28;co_semana_ano &#x3c; 10&#x29;&#xa;	&#x7b;&#xa;	co_semana_ano &#x3d; &#x22;0&#x22; &#x2b; co_semana_ano&#x3b;&#xa;	&#x7d;&#xa;&#xa;&#x2f;&#x2f;numero do bimestre&#xa;var nu_bimestre&#x3b;&#xa;switch &#x28;nu_mes&#x29; &#x7b;&#xa;	case &#x27;01&#x27;&#x3a; nu_bimestre &#x3d; 1&#x3b; break&#x3b;&#xa;	case &#x27;02&#x27;&#x3a; nu_bimestre &#x3d; 1&#x3b; break&#x3b;&#xa;	case &#x27;03&#x27;&#x3a; nu_bimestre &#x3d; 2&#x3b; break&#x3b;&#xa;	case &#x27;04&#x27;&#x3a; nu_bimestre &#x3d; 2&#x3b; break&#x3b;&#xa;	case &#x27;05&#x27;&#x3a; nu_bimestre &#x3d; 3&#x3b; break&#x3b;&#xa;	case &#x27;06&#x27;&#x3a; nu_bimestre &#x3d; 3&#x3b; break&#x3b;&#xa;	case &#x27;07&#x27;&#x3a; nu_bimestre &#x3d; 4&#x3b; break&#x3b;&#xa;	case &#x27;08&#x27;&#x3a; nu_bimestre &#x3d; 4&#x3b; break&#x3b;&#xa;	case &#x27;09&#x27;&#x3a; nu_bimestre &#x3d; 5&#x3b; break&#x3b;&#xa;	case &#x27;10&#x27;&#x3a; nu_bimestre &#x3d; 5&#x3b; break&#x3b;&#xa;	case &#x27;11&#x27;&#x3a; nu_bimestre &#x3d; 6&#x3b; break&#x3b;&#xa;	case &#x27;12&#x27;&#x3a; nu_bimestre &#x3d; 6&#x3b; break&#x3b;&#xa;	default&#x3a; nu_bimestre &#x3d; 0&#xa;	&#x7d;&#xa;&#xa;&#x2f;&#x2f;codigo do bimestre&#xa;var co_bimestre &#x3d; nu_bimestre&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do trimestre&#xa;var co_trimestre &#x3d; quarter&#x28;dt_faixa_inicio&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero do trimestre&#xa;var nu_trimestre &#x3d; co_trimestre&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do semestre&#xa;var co_semestre &#x3d; &#x28;nu_mes &#x3c;&#x3d; 6&#x29; &#x3f; 1 &#x3a; 2&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero do semestre&#xa;var nu_semestre &#x3d; co_semestre&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do ano&#xa;var co_ano &#x3d; year&#x28;dt_faixa_inicio&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero do ano&#xa;var nu_ano &#x3d; year&#x28;dt_faixa_inicio&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;numero da semana no mes&#xa;var nu_semana_mes &#x3d; &#x28;&#x28;&#x28;&#x28;nu_dia_mes - co_dia_semana&#x29; &#x2b; 7&#x29; &#x2f; 7&#x29; &#x2b; 1&#x29;&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo da semana no mes&#xa;var co_semana_mes &#x3d; nu_semana_mes&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do mes-ano&#xa;var co_mes_ano &#x3d;  co_mes &#x2b; &#x27;-&#x27; &#x2b; co_ano&#x3b; &#xa;&#xa;&#x2f;&#x2f;codigo do ano-mes&#xa;var co_ano_mes &#x3d;  co_ano &#x2b; &#x27;-&#x27; &#x2b; co_mes&#x3b;&#xa;&#xa;&#x2f;&#x2f;busca o feriado para atribui o dia nao util&#xa;var dt_fx_inicio_busca_feriado &#x3d; truncDate&#x28;dt_faixa_inicio, 3&#x29;&#x3b;&#xa;&#xa;var co_data_transacao &#x3d; dt_fx_inicio_busca_feriado&#x3b;&#xa;&#xa;&#x2f;&#x2f;codigo do dia util&#xa;if&#x28;co_dia_semana &#x3e; 1 &#x26;&#x26; co_dia_semana &#x3c; 7&#x29; &#xa;	&#x7b;&#xa;    var co_dia_util &#x3d; 1&#x3b;&#xa;    &#x7d;&#xa;else&#xa;    &#x7b;&#xa;    co_dia_util &#x3d; 0&#x3b;&#xa;    &#x7d;&#xa;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>dt_faixa_inicio</name>
+        <rename>dt_faixa_inicio</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_faixa_inicio</name>
+        <rename>co_faixa_inicio</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_faixa_horario_descricao</name>
+        <rename>co_faixa_horario_descricao</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_faixa_horario</name>
+        <rename>co_faixa_horario</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_dia_mes</name>
+        <rename>nu_dia_mes</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_dia_mes</name>
+        <rename>co_dia_mes</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_dia_semana</name>
+        <rename>co_dia_semana</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_turno</name>
+        <rename>co_turno</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_mes</name>
+        <rename>co_mes</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_mes</name>
+        <rename>nu_mes</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_quinzena_mes</name>
+        <rename>nu_quinzena_mes</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_quinzena_mes</name>
+        <rename>co_quinzena_mes</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_semana_ano</name>
+        <rename>nu_semana_ano</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_bimestre</name>
+        <rename>nu_bimestre</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_bimestre</name>
+        <rename>co_bimestre</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_trimestre</name>
+        <rename>co_trimestre</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_trimestre</name>
+        <rename>nu_trimestre</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_semestre</name>
+        <rename>co_semestre</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_semestre</name>
+        <rename>nu_semestre</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_ano</name>
+        <rename>co_ano</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_ano</name>
+        <rename>nu_ano</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_semana_mes</name>
+        <rename>nu_semana_mes</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_semana_mes</name>
+        <rename>co_semana_mes</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>dt_fx_inicio_busca_feriado</name>
+        <rename>dt_fx_inicio_busca_feriado</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_dia_util</name>
+        <rename>co_dia_util</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_semana_ano</name>
+        <rename>co_semana_ano</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>nu_dia_semana</name>
+        <rename>nu_dia_semana</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_mes_int</name>
+        <rename>co_mes_int</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_faixa_horario_int</name>
+        <rename>co_faixa_horario_int</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_dia_mes_int</name>
+        <rename>co_dia_mes_int</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_semana_ano_int</name>
+        <rename>co_semana_ano_int</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_mes_ano</name>
+        <rename>co_mes_ano</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_ano_mes</name>
+        <rename>co_ano_mes</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>co_data_transacao</name>
+        <rename>co_data_transacao</rename>
+        <type>Date</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>133</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Campos</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>nr_horas_total</name>
+      </remove>      <remove>        <name>primeiro_dia_ano</name>
+      </remove>      <remove>        <name>nr_horas_total_x</name>
+      </remove>      <remove>        <name>co_faixa_horario_descricao</name>
+      </remove>      <remove>        <name>dt_fx_inicio_busca_feriado</name>
+      </remove>      <remove>        <name>co_faixa_horario</name>
+      </remove>      <remove>        <name>co_dia_semana</name>
+      </remove>      <remove>        <name>co_turno</name>
+      </remove>      <remove>        <name>co_dia_util</name>
+      </remove>      <remove>        <name>nu_dia_semana</name>
+      </remove>      <remove>        <name>co_mes_int</name>
+      </remove>      <remove>        <name>co_faixa_horario_int</name>
+      </remove>      <remove>        <name>co_dia_mes_int</name>
+      </remove>      <remove>        <name>co_semana_ano_int</name>
+      </remove>      <remove>        <name>no_dia_semana</name>
+      </remove>      <remove>        <name>no_abrdo_dia_semana</name>
+      </remove>      <remove>        <name>no_faixa_horario_descricao</name>
+      </remove>      <remove>        <name>no_turno</name>
+      </remove>      <meta>        <name>co_quinzena_mes</name>
+        <rename>co_quinzena_mes</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_bimestre</name>
+        <rename>co_bimestre</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_trimestre</name>
+        <rename>co_trimestre</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_semestre</name>
+        <rename>co_semestre</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_ano</name>
+        <rename>co_ano</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_semana_mes</name>
+        <rename>co_semana_mes</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_ano_mes</name>
+        <rename>co_ano_mes</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_mes_ano</name>
+        <rename>co_mes_ano</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_faixa_inicio</name>
+        <rename>co_faixa_inicio</rename>
+        <type>String</type>
+        <length>30</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>co_data_transacao</name>
+        <rename>co_data_transacao</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask>dd&#x2f;MM&#x2f;yyyy</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>630</xloc>
+      <yloc>772</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Generate Rows</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+    </fields>
+    <limit>&#x24;&#x7b;NR_HORAS_TOTAL&#x7d;</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>34</xloc>
+      <yloc>12</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Get Variables</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>nr_horas_total</name>
+        <variable>&#x24;&#x7b;NR_HORAS_TOTAL&#x7d;</variable>
+        <type>Integer</type>
+        <format>&#x23;</format>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>primeiro_dia_ano</name>
+        <variable>&#x24;&#x7b;PRIMEIRO_DIA_ANO&#x7d;</variable>
+        <type>Date</type>
+        <format>yyyy&#x2f;MM&#x2f;dd HH&#x3a;mm&#x3a;ss.SSS</format>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>12</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>INSERT TB_DIMENSAO_TEMPO</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_v3_oracle_ecrypt</connection>
+    <schema>&#x24;&#x7b;db_user&#x7d;</schema>
+    <table>TB_DIMENSAO_TEMPO</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>NU_DIMENSAO_TEMPO</column_name>
+          <stream_name>NU_DIMENSAO_TEMPO</stream_name>
+        </field>
+        <field>
+          <column_name>DT_FAIXA_INICIO</column_name>
+          <stream_name>dt_faixa_inicio</stream_name>
+        </field>
+        <field>
+          <column_name>CD_FAIXA_INICIO</column_name>
+          <stream_name>co_faixa_inicio</stream_name>
+        </field>
+        <field>
+          <column_name>NU_DIA_MES</column_name>
+          <stream_name>nu_dia_mes</stream_name>
+        </field>
+        <field>
+          <column_name>CD_DIA_MES</column_name>
+          <stream_name>co_dia_mes</stream_name>
+        </field>
+        <field>
+          <column_name>CD_MES</column_name>
+          <stream_name>co_mes</stream_name>
+        </field>
+        <field>
+          <column_name>NU_MES</column_name>
+          <stream_name>nu_mes</stream_name>
+        </field>
+        <field>
+          <column_name>NU_QUINZENA_MES</column_name>
+          <stream_name>nu_quinzena_mes</stream_name>
+        </field>
+        <field>
+          <column_name>CD_QUINZENA_MES</column_name>
+          <stream_name>co_quinzena_mes</stream_name>
+        </field>
+        <field>
+          <column_name>NU_SEMANA_ANO</column_name>
+          <stream_name>nu_semana_ano</stream_name>
+        </field>
+        <field>
+          <column_name>NU_BIMESTRE</column_name>
+          <stream_name>nu_bimestre</stream_name>
+        </field>
+        <field>
+          <column_name>CD_BIMESTRE</column_name>
+          <stream_name>co_bimestre</stream_name>
+        </field>
+        <field>
+          <column_name>CD_TRIMESTRE</column_name>
+          <stream_name>co_trimestre</stream_name>
+        </field>
+        <field>
+          <column_name>NU_TRIMESTRE</column_name>
+          <stream_name>nu_trimestre</stream_name>
+        </field>
+        <field>
+          <column_name>CD_SEMESTRE</column_name>
+          <stream_name>co_semestre</stream_name>
+        </field>
+        <field>
+          <column_name>NU_SEMESTRE</column_name>
+          <stream_name>nu_semestre</stream_name>
+        </field>
+        <field>
+          <column_name>CD_ANO</column_name>
+          <stream_name>co_ano</stream_name>
+        </field>
+        <field>
+          <column_name>NU_ANO</column_name>
+          <stream_name>nu_ano</stream_name>
+        </field>
+        <field>
+          <column_name>NU_SEMANA_MES</column_name>
+          <stream_name>nu_semana_mes</stream_name>
+        </field>
+        <field>
+          <column_name>CD_SEMANA_MES</column_name>
+          <stream_name>co_semana_mes</stream_name>
+        </field>
+        <field>
+          <column_name>CD_SEMANA_ANO</column_name>
+          <stream_name>co_semana_ano</stream_name>
+        </field>
+        <field>
+          <column_name>CD_MES_ANO</column_name>
+          <stream_name>co_mes_ano</stream_name>
+        </field>
+        <field>
+          <column_name>CD_ANO_MES</column_name>
+          <stream_name>co_ano_mes</stream_name>
+        </field>
+        <field>
+          <column_name>CD_DATA_TRANSACAO</column_name>
+          <stream_name>co_data_transacao</stream_name>
+        </field>
+        <field>
+          <column_name>NM_MES</column_name>
+          <stream_name>no_mes</stream_name>
+        </field>
+        <field>
+          <column_name>NM_BIMESTRE</column_name>
+          <stream_name>no_bimestre</stream_name>
+        </field>
+        <field>
+          <column_name>NM_TRIMESTRE</column_name>
+          <stream_name>no_trimestre</stream_name>
+        </field>
+        <field>
+          <column_name>NM_SEMESTRE</column_name>
+          <stream_name>no_semestre</stream_name>
+        </field>
+        <field>
+          <column_name>NM_QUINZENA_MES</column_name>
+          <stream_name>no_quinzena_mes</stream_name>
+        </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>873</xloc>
+      <yloc>772</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>bimestre</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_bimestre_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_bimestre_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1&#xb0; Bimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_bimestre_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_bimestre_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2&#xb0; Bimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_bimestre_3</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_bimestre_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3&#xb0; Bimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_bimestre_4</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_bimestre_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4&#xb0; Bimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_bimestre_5</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>5</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_bimestre_5</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>5&#xb0; Bimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_bimestre_6</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>6</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_bimestre_6</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>6&#xb0; Bimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>879</xloc>
+      <yloc>268</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>dia_semana</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_dia_semana_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Segunda-Feira</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>SEG</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_dia_semana_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Ter&#xe7;a-Feira</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>TER</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_dia_semana_3</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Quarta-Feira</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>QUA</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_dia_semana_4</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>5</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Quinta-Feira</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>QUI</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_dia_semana_5</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>6</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_5</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Sexta-Feira</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_5</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>SEX</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_dia_semana_6</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>7</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_6</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>S&#xe1;bado</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_6</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>SAB</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_dia_semana_7</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_dia_semana_7</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Domingo</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_abrdo_dia_semana_7</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>DOM</nullif>
+        <length>3</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>879</xloc>
+      <yloc>92</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>dia_semana_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>dias</typefield>
+    <fields>      <field>        <name>co_dia_semana_1</name>
+        <value>1</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_1</name>
+        <value>1</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_1</name>
+        <value>1</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      <field>        <name>co_dia_semana_2</name>
+        <value>2</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_2</name>
+        <value>2</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_2</name>
+        <value>2</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      <field>        <name>co_dia_semana_3</name>
+        <value>3</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_3</name>
+        <value>3</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_3</name>
+        <value>3</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      <field>        <name>co_dia_semana_4</name>
+        <value>4</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_4</name>
+        <value>4</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_4</name>
+        <value>4</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      <field>        <name>co_dia_semana_5</name>
+        <value>5</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_5</name>
+        <value>5</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_5</name>
+        <value>5</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      <field>        <name>co_dia_semana_6</name>
+        <value>6</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_6</name>
+        <value>6</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_6</name>
+        <value>6</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      <field>        <name>co_dia_semana_7</name>
+        <value>7</value>
+        <norm>co_dia_semana_x</norm>
+        </field>      <field>        <name>no_dia_semana_7</name>
+        <value>7</value>
+        <norm>no_dia_semana_x</norm>
+        </field>      <field>        <name>no_abrdo_dia_semana_7</name>
+        <value>7</value>
+        <norm>no_abrdo_dia_semana_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>695</xloc>
+      <yloc>92</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>mes</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_mes_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Janeiro</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Fevereiro</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_3</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Mar&#xe7;o</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_4</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Abril</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_5</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>5</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_5</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Maio</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_6</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>6</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_6</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Junho</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_7</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>7</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_7</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Julho</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_8</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>8</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_8</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Agosto</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_9</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>9</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_9</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Setembro</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_10</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>10</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_10</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Outubro</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_11</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>11</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_11</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Novembro</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_mes_12</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>12</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_mes_12</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Dezembro</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>879</xloc>
+      <yloc>177</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_bimestre</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_bimestre_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_bimestre</name>
+        <field>co_bimestre_x</field>
+      </key>
+      <value>
+        <name>no_bimestre_x</name>
+        <rename>no_bimestre</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>268</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_bimestre_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>no_bimestre</typefield>
+    <fields>      <field>        <name>co_bimestre_1</name>
+        <value>1</value>
+        <norm>co_bimestre_x</norm>
+        </field>      <field>        <name>no_bimestre_1</name>
+        <value>1</value>
+        <norm>no_bimestre_x</norm>
+        </field>      <field>        <name>co_bimestre_2</name>
+        <value>2</value>
+        <norm>co_bimestre_x</norm>
+        </field>      <field>        <name>no_bimestre_2</name>
+        <value>2</value>
+        <norm>no_bimestre_x</norm>
+        </field>      <field>        <name>co_bimestre_3</name>
+        <value>3</value>
+        <norm>co_bimestre_x</norm>
+        </field>      <field>        <name>no_bimestre_3</name>
+        <value>3</value>
+        <norm>no_bimestre_x</norm>
+        </field>      <field>        <name>co_bimestre_4</name>
+        <value>4</value>
+        <norm>co_bimestre_x</norm>
+        </field>      <field>        <name>no_bimestre_4</name>
+        <value>4</value>
+        <norm>no_bimestre_x</norm>
+        </field>      <field>        <name>co_bimestre_5</name>
+        <value>5</value>
+        <norm>co_bimestre_x</norm>
+        </field>      <field>        <name>no_bimestre_5</name>
+        <value>5</value>
+        <norm>no_bimestre_x</norm>
+        </field>      <field>        <name>co_bimestre_6</name>
+        <value>6</value>
+        <norm>co_bimestre_x</norm>
+        </field>      <field>        <name>no_bimestre_6</name>
+        <value>6</value>
+        <norm>no_bimestre_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>695</xloc>
+      <yloc>268</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_dia_semana</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>dia_semana_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_dia_semana</name>
+        <field>co_dia_semana_x</field>
+      </key>
+      <value>
+        <name>no_dia_semana_x</name>
+        <rename>no_dia_semana</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>no_abrdo_dia_semana_x</name>
+        <rename>no_abrdo_dia_semana</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>92</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_faixa_horario</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>horas_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>0</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 00&#x3a;00 &#xe0;s 00&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 01&#x3a;00 &#xe0;s 01&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_3</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 02&#x3a;00 &#xe0;s 02&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_4</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 03&#x3a;00 &#xe0;s 03&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_5</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_5</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 04&#x3a;00 &#xe0;s 04&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_6</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>5</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_6</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 05&#x3a;00 &#xe0;s 05&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_7</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>6</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_7</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 06&#x3a;00 &#xe0;s 06&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_8</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>7</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_8</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 07&#x3a;00 &#xe0;s 07&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_9</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>8</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_9</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 08&#x3a;00 &#xe0;s 08&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_10</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>9</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_10</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 09&#x3a;00 &#xe0;s 09&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_11</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>10</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_11</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 10&#x3a;00 &#xe0;s 10&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_12</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>11</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_12</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 11&#x3a;00 &#xe0;s 11&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_13</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>12</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_13</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 12&#x3a;00 &#xe0;s 12&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_14</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>13</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_14</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 13&#x3a;00 &#xe0;s 13&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_15</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>14</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_15</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 14&#x3a;00 &#xe0;s 14&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_16</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>15</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_16</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 15&#x3a;00 &#xe0;s 15&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_17</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>16</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_17</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 16&#x3a;00 &#xe0;s 16&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_18</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>17</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_18</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 17&#x3a;00 &#xe0;s 17&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_19</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>18</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_19</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 18&#x3a;00 &#xe0;s 18&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_20</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>19</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_20</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 19&#x3a;00 &#xe0;s 19&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_21</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>20</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_21</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 20&#x3a;00 &#xe0;s 20&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_22</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>21</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_22</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 21&#x3a;00 &#xe0;s 21&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_23</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>22</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_23</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 22&#x3a;00 &#xe0;s 22&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>horas_24</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>23</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_faixa_horario_descricao_24</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Das 23&#x3a;00 &#xe0;s 23&#x3a;59</nullif>
+        <length>30</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>570</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_faixa_horario_desc</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_faixa_horario_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_faixa_horario</name>
+        <field>horas_x</field>
+      </key>
+      <value>
+        <name>no_faixa_horario_descricao_x</name>
+        <rename>no_faixa_horario_descricao</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>570</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_faixa_horario_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>no_faixa_horario_descricao</typefield>
+    <fields>      <field>        <name>horas_1</name>
+        <value>1</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_1</name>
+        <value>1</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_2</name>
+        <value>2</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_2</name>
+        <value>2</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_3</name>
+        <value>3</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_3</name>
+        <value>3</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_4</name>
+        <value>4</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_4</name>
+        <value>4</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_5</name>
+        <value>5</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_5</name>
+        <value>5</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_6</name>
+        <value>6</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_6</name>
+        <value>6</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_7</name>
+        <value>7</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_7</name>
+        <value>7</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_8</name>
+        <value>8</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_8</name>
+        <value>8</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_9</name>
+        <value>9</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_9</name>
+        <value>9</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_10</name>
+        <value>10</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_10</name>
+        <value>10</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_11</name>
+        <value>11</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_11</name>
+        <value>11</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_12</name>
+        <value>12</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_12</name>
+        <value>12</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_13</name>
+        <value>13</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_13</name>
+        <value>13</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_14</name>
+        <value>14</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_14</name>
+        <value>14</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_15</name>
+        <value>15</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_15</name>
+        <value>15</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_16</name>
+        <value>16</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_16</name>
+        <value>16</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_17</name>
+        <value>17</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_17</name>
+        <value>17</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_18</name>
+        <value>18</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_18</name>
+        <value>18</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_19</name>
+        <value>19</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_19</name>
+        <value>19</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_20</name>
+        <value>20</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_20</name>
+        <value>20</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_21</name>
+        <value>21</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_21</name>
+        <value>21</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_22</name>
+        <value>22</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_22</name>
+        <value>22</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_23</name>
+        <value>23</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_23</name>
+        <value>23</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      <field>        <name>horas_24</name>
+        <value>24</value>
+        <norm>horas_x</norm>
+        </field>      <field>        <name>no_faixa_horario_descricao_24</name>
+        <value>24</value>
+        <norm>no_faixa_horario_descricao_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>353</xloc>
+      <yloc>570</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_mes</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_mes_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_mes</name>
+        <field>co_mes_x</field>
+      </key>
+      <value>
+        <name>no_mes_x</name>
+        <rename>no_mes</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>177</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_mes_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>no_mes</typefield>
+    <fields>      <field>        <name>co_mes_1</name>
+        <value>1</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_1</name>
+        <value>1</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_2</name>
+        <value>2</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_2</name>
+        <value>2</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_3</name>
+        <value>3</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_3</name>
+        <value>3</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_4</name>
+        <value>4</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_4</name>
+        <value>4</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_5</name>
+        <value>5</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_5</name>
+        <value>5</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_6</name>
+        <value>6</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_6</name>
+        <value>6</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_7</name>
+        <value>7</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_7</name>
+        <value>7</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_8</name>
+        <value>8</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_8</name>
+        <value>8</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_9</name>
+        <value>9</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_9</name>
+        <value>9</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_10</name>
+        <value>10</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_10</name>
+        <value>10</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_11</name>
+        <value>11</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_11</name>
+        <value>11</value>
+        <norm>no_mes_x</norm>
+        </field>      <field>        <name>co_mes_12</name>
+        <value>12</value>
+        <norm>co_mes_x</norm>
+        </field>      <field>        <name>no_mes_12</name>
+        <value>12</value>
+        <norm>no_mes_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>695</xloc>
+      <yloc>177</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_quinzena_mes</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_quinzena_mes_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_quinzena_mes</name>
+        <field>co_quinzena_mes_x</field>
+      </key>
+      <value>
+        <name>no_quinzena_mes_x</name>
+        <rename>no_quinzena_mes</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>772</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_quinzena_mes_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>co_quinzena_mes</typefield>
+    <fields>      <field>        <name>co_quinzena_mes_1</name>
+        <value>1</value>
+        <norm>co_quinzena_mes_x</norm>
+        </field>      <field>        <name>no_quinzena_mes_1</name>
+        <value>1</value>
+        <norm>no_quinzena_mes_x</norm>
+        </field>      <field>        <name>co_quinzena_mes_2</name>
+        <value>2</value>
+        <norm>co_quinzena_mes_x</norm>
+        </field>      <field>        <name>no_quinzena_mes_2</name>
+        <value>2</value>
+        <norm>no_quinzena_mes_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>353</xloc>
+      <yloc>772</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_semestre</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_semestre_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_semestre</name>
+        <field>co_semestre_x</field>
+      </key>
+      <value>
+        <name>no_semestre_x</name>
+        <rename>no_semestre</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>465</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_semestre_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>no_semestre</typefield>
+    <fields>      <field>        <name>co_semestre_1</name>
+        <value>1</value>
+        <norm>co_semestre_x</norm>
+        </field>      <field>        <name>no_semestre_1</name>
+        <value>1</value>
+        <norm>no_semestre_x</norm>
+        </field>      <field>        <name>co_semestre_2</name>
+        <value>2</value>
+        <norm>co_semestre_x</norm>
+        </field>      <field>        <name>no_semestre_2</name>
+        <value>2</value>
+        <norm>no_semestre_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>353</xloc>
+      <yloc>465</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_trimestre</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_trimestre_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_trimestre</name>
+        <field>co_trimestre_x</field>
+      </key>
+      <value>
+        <name>no_trimestre_x</name>
+        <rename>no_trimestre</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>518</xloc>
+      <yloc>365</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_trimestre_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>no_trimestre</typefield>
+    <fields>      <field>        <name>co_trimestre_1</name>
+        <value>1</value>
+        <norm>co_trimestre_x</norm>
+        </field>      <field>        <name>no_trimestre_1</name>
+        <value>1</value>
+        <norm>no_trimestre_x</norm>
+        </field>      <field>        <name>co_trimestre_2</name>
+        <value>2</value>
+        <norm>co_trimestre_x</norm>
+        </field>      <field>        <name>no_trimestre_2</name>
+        <value>2</value>
+        <norm>no_trimestre_x</norm>
+        </field>      <field>        <name>co_trimestre_3</name>
+        <value>3</value>
+        <norm>co_trimestre_x</norm>
+        </field>      <field>        <name>no_trimestre_3</name>
+        <value>3</value>
+        <norm>no_trimestre_x</norm>
+        </field>      <field>        <name>co_trimestre_4</name>
+        <value>4</value>
+        <norm>co_trimestre_x</norm>
+        </field>      <field>        <name>no_trimestre_4</name>
+        <value>4</value>
+        <norm>no_trimestre_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>353</xloc>
+      <yloc>365</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_turno</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <from>no_turno_n</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>N</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup>
+      <key>
+        <name>co_turno</name>
+        <field>co_turno_x</field>
+      </key>
+      <value>
+        <name>no_turno_x</name>
+        <rename>no_turno</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>517</xloc>
+      <yloc>672</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>no_turno_n</name>
+    <type>Normaliser</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+   <typefield>no_turno</typefield>
+    <fields>      <field>        <name>co_turno_1</name>
+        <value>1</value>
+        <norm>co_turno_x</norm>
+        </field>      <field>        <name>no_turno_1</name>
+        <value>1</value>
+        <norm>no_turno_x</norm>
+        </field>      <field>        <name>co_turno_2</name>
+        <value>2</value>
+        <norm>co_turno_x</norm>
+        </field>      <field>        <name>no_turno_2</name>
+        <value>2</value>
+        <norm>no_turno_x</norm>
+        </field>      <field>        <name>co_turno_3</name>
+        <value>3</value>
+        <norm>co_turno_x</norm>
+        </field>      <field>        <name>no_turno_3</name>
+        <value>3</value>
+        <norm>no_turno_x</norm>
+        </field>      <field>        <name>co_turno_4</name>
+        <value>4</value>
+        <norm>co_turno_x</norm>
+        </field>      <field>        <name>no_turno_4</name>
+        <value>4</value>
+        <norm>no_turno_x</norm>
+        </field>      </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>353</xloc>
+      <yloc>672</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>quinzena_mes</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_quinzena_mes_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_quinzena_mes_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1&#xb0; Quinzena</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_quinzena_mes_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_quinzena_mes_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2&#xb0; Quinzena</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>772</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>semestre</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_semestre_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_semestre_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1&#xb0; Semestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_semestre_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_semestre_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2&#xb0; Semestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>465</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>seq_int</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <valuename>nr_horas_total_x</valuename>
+      <use_database>N</use_database>
+      <connection/>
+      <schema/>
+      <seqname>SEQ_</seqname>
+      <use_counter>Y</use_counter>
+      <counter_name/>
+      <start_at>0</start_at>
+      <increment_by>1</increment_by>
+      <max_value>&#x24;&#x7b;NR_HORAS_TOTAL&#x7d;</max_value>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>24</xloc>
+      <yloc>133</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>trimestre</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_trimestre_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_trimestre_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>1&#xb0; Trimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_trimestre_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_trimestre_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>2&#xb0; Trimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_trimestre_3</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_trimestre_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>3&#xb0; Trimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_trimestre_4</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_trimestre_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>4&#xb0; Trimestre</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>365</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>turno</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>co_turno_1</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>00</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_turno_1</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Madrugada</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_turno_2</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>01</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_turno_2</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Manh&#xe3;</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_turno_3</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>02</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_turno_3</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Tarde</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>co_turno_4</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>03</nullif>
+        <length>2</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>no_turno_4</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Noite</nullif>
+        <length>20</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <limit>1</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms/>
+    <row_time_field/>
+    <last_time_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>192</xloc>
+      <yloc>672</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+
+</transformation>

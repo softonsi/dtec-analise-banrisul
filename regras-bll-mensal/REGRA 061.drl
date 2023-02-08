@@ -1,0 +1,104 @@
+SELECT DISTINCT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 61 - Tentativa de ocultação da origem e destino de valores |' ||    
+'Objetivo: I) Realização de operações que, por sua habitualidade, valor e forma, configurem artifício para burla da identificação da origem, do destino, dos responsáveis ou dos beneficiários finais. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Realização de operações que, por sua habitualidade, valor e forma, configurem artifício para burla da identificação da origem, do destino, dos responsáveis ou dos beneficiários finais |' ||    
+'Cliente: ' ||  T.NM_CLIE || '|' ||    
+CASE T.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||     
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||   
+'Valor Identificado de Débito: ' || TO_CHAR(VALORI, 'L999G999G999G990D99') || '|' ||    
+'Valor Não Identificado de Débito: ' || TO_CHAR(VALORNI, 'L999G999G999G990D99') || '|' ||    
+'Quantidade Identificada de Débito: ' || QTDEI || '|' ||    
+'Quantidade Não Identificada de Débito: ' || QTDENI || '|' ||   
+'Parâmetro de valor mínimo para valor consolidado das transações de débito com destino identificado e não identificado (pm_ValorMinimoConsDebito): ' || COALESCE((TO_CHAR(:pm_ValorMinimoConsDebito, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual para identificar diferença expressiva da quantidade entre transações de débito com destino identificado e não identificado (pm_PercQtdeDebito): ' || COALESCE((TO_CHAR(:pm_PercQtdeDebito, '999999990D99')),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual para identificar diferença expressiva do valor entre transações de débito com destino identificado e não identificado (pm_PercValorDebito): ' || COALESCE((TO_CHAR(:pm_PercValorDebito, '999999990D99')),'Parâmetro não cadastrado') || '|' ||    
+'Lista de tipos de operações, cujo destino deve ser identificado (pm_ListaDestinoIdentificado): ' || COALESCE((':LS-pm_ListaDestinoIdentificado'),'Parâmetro não cadastrado') || '|' ||    
+'Lista de tipos de operações, cujo destino não deve ser identificado (pm_ListaDestinoNaoIdentificado): ' || COALESCE((':LS-pm_ListaDestinoNaoIdentificado'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE     
+FROM (SELECT I.CD_DOC_IDENTF_CLIE, I.CD_TP_IDENTF_CLIE, I.NM_CLIE, I.CD_MES_ANO, SUM(I.VALORI) VALORI, SUM(I.QTDEI) QTDEI, SUM(NI.VALORNI) VALORNI, SUM(NI.QTDENI) QTDENI    
+      FROM (SELECT TI.CD_DOC_IDENTF_CLIE, TI.CD_TP_IDENTF_CLIE, TI.NM_CLIE, TI.CD_MES_ANO, SUM(TI.VL_OPER) VALORI, COUNT(*) QTDEI    
+            FROM TB_TRANS TI       
+            WHERE TI.CD_NATUR_OPER = 2    
+            AND TI.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND TI.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+            AND TI.FL_ANALISADO = 1  
+            AND TI.CD_TP_OPER IN (:LS-pm_ListaDestinoIdentificado)    
+            GROUP BY TI.CD_DOC_IDENTF_CLIE, TI.CD_TP_IDENTF_CLIE, TI.NM_CLIE, TI.CD_MES_ANO     
+           ) I,     
+           (SELECT TNI.CD_DOC_IDENTF_CLIE, TNI.CD_TP_IDENTF_CLIE, SUM(TNI.VL_OPER) VALORNI, COUNT(*) QTDENI    
+            FROM TB_TRANS TNI    
+            WHERE TNI.CD_NATUR_OPER = 2    
+            AND TNI.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND TNI.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+            AND TNI.FL_ANALISADO = 1   
+            AND TNI.CD_TP_OPER IN (:LS-pm_ListaDestinoNaoIdentificado)    
+            GROUP BY TNI.CD_DOC_IDENTF_CLIE, TNI.CD_TP_IDENTF_CLIE    
+           ) NI    
+     WHERE I.CD_DOC_IDENTF_CLIE = NI.CD_DOC_IDENTF_CLIE    
+     AND I.CD_TP_IDENTF_CLIE = NI.CD_TP_IDENTF_CLIE    
+     GROUP BY I.CD_DOC_IDENTF_CLIE, I.CD_TP_IDENTF_CLIE, I.NM_CLIE, I.CD_MES_ANO    
+    ) T    
+WHERE (VALORNI + VALORI) > (:pm_ValorMinimoConsDebito)    
+AND (    
+     (QTDENI / (QTDEI + QTDENI) * 100) > (:pm_PercQtdeDebito)    
+      OR    
+     (VALORNI / (VALORI + VALORNI) * 100) > (:pm_PercValorDebito)    
+    )    
+UNION ALL    
+SELECT DISTINCT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 61 - Tentativa de ocultação da origem e destino de valores |' ||    
+'Objetivo: I) Realização de operações que, por sua habitualidade, valor e forma, configurem artifício para burla da identificação da origem, do destino, dos responsáveis ou dos beneficiários finais. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Realização de operações que, por sua habitualidade, valor e forma, configurem artifício para burla da identificação da origem, do destino, dos responsáveis ou dos beneficiários finais |' ||    
+'Cliente: ' ||  T.NM_CLIE || '|' ||    
+CASE T.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||     
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor Identificado de Crédito: ' || TO_CHAR(VALORI, 'L999G999G999G990D99') || '|' ||    
+'Valor Não Identificado de Crédito: ' || TO_CHAR(VALORNI, 'L999G999G999G990D99') || '|' ||    
+'Quantidade Identificada de Crédito: ' || QTDEI || '|' ||    
+'Quantidade Não Identificada de Crédito: ' || QTDENI || '|' ||   
+'Parâmetro de valor mínimo para valor consolidado das transações de crédito com destino identificado e não identificado (pm_ValorMinimoConsCredito): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoConsCredito, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual para identificar diferença expressiva da quantidade entre transações de crédito com destino identificado e não identificado (pm_PercQtdeCredito): ' || COALESCE((SELECT TO_CHAR(:pm_PercQtdeCredito, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual para identificar diferença expressiva do valor entre transações de crédito com destino identificado e não identificado (pm_PercValorCredito): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorCredito, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Lista de tipos de operações, cujo destino deve ser identificado (pm_ListaDestinoIdentificado): ' || COALESCE((':LS-pm_ListaDestinoIdentificado'),'Parâmetro não cadastrado') || '|' ||    
+'Lista de tipos de operações, cujo destino não deve ser identificado (pm_ListaDestinoNaoIdentificado): ' || COALESCE((':LS-pm_ListaDestinoNaoIdentificado'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE     
+FROM (SELECT I.CD_DOC_IDENTF_CLIE, I.CD_TP_IDENTF_CLIE, I.NM_CLIE, I.CD_MES_ANO, SUM(I.VALORI) VALORI, SUM(I.QTDEI) QTDEI, SUM(NI.VALORNI) VALORNI, SUM(NI.QTDENI) QTDENI    
+      FROM (SELECT TI.CD_DOC_IDENTF_CLIE, TI.CD_TP_IDENTF_CLIE, TI.NM_CLIE, TI.CD_MES_ANO, SUM(TI.VL_OPER) VALORI, COUNT(*) QTDEI    
+            FROM TB_TRANS TI    
+            WHERE TI.CD_NATUR_OPER = 1    
+            AND TI.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND TI.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+            AND TI.FL_ANALISADO = 1  
+            AND TI.CD_TP_OPER IN (:LS-pm_ListaDestinoIdentificado)    
+            GROUP BY TI.CD_DOC_IDENTF_CLIE, TI.CD_TP_IDENTF_CLIE, TI.NM_CLIE, TI.CD_MES_ANO     
+           ) I,     
+           (SELECT TNI.CD_DOC_IDENTF_CLIE, TNI.CD_TP_IDENTF_CLIE, SUM(TNI.VL_OPER) VALORNI, COUNT(*) QTDENI    
+            FROM TB_TRANS TNI    
+            WHERE TNI.CD_NATUR_OPER = 1    
+            AND TNI.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND TNI.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+            AND TNI.FL_ANALISADO = 1
+            AND TNI.CD_TP_OPER IN (:LS-pm_ListaDestinoNaoIdentificado)    
+            GROUP BY TNI.CD_DOC_IDENTF_CLIE, TNI.CD_TP_IDENTF_CLIE    
+           ) NI    
+     WHERE I.CD_DOC_IDENTF_CLIE = NI.CD_DOC_IDENTF_CLIE    
+     AND I.CD_TP_IDENTF_CLIE = NI.CD_TP_IDENTF_CLIE    
+     GROUP BY I.CD_DOC_IDENTF_CLIE, I.CD_TP_IDENTF_CLIE, I.NM_CLIE, I.CD_MES_ANO   
+    ) T    
+WHERE (VALORNI + VALORI) > (:pm_ValorMinimoConsCredito)    
+AND (    
+     (QTDENI / (QTDEI + QTDENI) * 100) > (:pm_PercQtdeCredito)    
+      OR    
+     (VALORNI / (VALORI + VALORNI) * 100) > (:pm_PercValorCredito)    
+    )    
+ 

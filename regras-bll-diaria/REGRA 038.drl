@@ -1,0 +1,28 @@
+   
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 38 - Troca de grandes quantias em moeda nacional por moeda estrangeira e vice-versa. |' ||     
+'Objetivo: Troca de grandes quantias em moeda nacional por moeda estrangeira e vice-versa. |' ||     
+'Conclusão: Cliente realizou conversão de moeda em valor expressivo. |' ||     
+'Cliente: ' ||  T.NM_CLIE || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||     
+'Lote: ' || TO_CHAR(CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|' ||   
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Parâmetro que indica valor expressivo para conversão de moeda (pm_ValorElevado): ' || COALESCE((SELECT TO_CHAR(:pm_ValorElevado, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado.')  
+AS DS_INF_ANLSE      
+FROM TB_TRANS_ANLSE T 
+WHERE CD_FORMA_OPER = 8   /*Moeda estrangeira*/ 
+  AND VL_OPER IS NOT NULL   
+  AND DT_TRANS IS NOT NULL   
+  AND VL_OPER > (:pm_ValorElevado) 
+  AND CD_LOTE = :cd_lote 
+  AND CD_SUBLOTE = :cd_sublote 
+   
+   

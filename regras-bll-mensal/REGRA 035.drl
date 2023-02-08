@@ -1,0 +1,69 @@
+SELECT  T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: 35 – Cliente com débito em câmbio incompatível com Renda/Faturamento (Faixa 1) |' ||    
+'Objetivo: Pessoa Natural ou Pessoa Jurídica com débito em câmbio incompatível com Renda/Faturamento (Faixa 1) |' ||    
+'Conclusão: Cliente com débito em câmbio incompatível com Renda/Faturamento (Faixa 1)  |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Renda:' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Renda não informada')  ||  '|' ||  
+'Valor consolidado de transações câmbio:' || TO_CHAR(VL_CONS, 'L999G999G999G990D99')  ||  '|' ||   
+'Parâmetro que indica valor expressivo, faixa baixa, de transações de débito em câmbio,  no mês calendário fechado (Mês do Processamento), para PF (pm_ValorCambioDebBaixoPF):' || (SELECT TO_CHAR(:pm_ValorCambioDebBaixoPF, 'L999G999G999G990D99') FROM DUAL) ||  '|' || 
+'Parâmetro que indica valor expressivo, faixa alta, de transações de débito em câmbio,  no mês calendário fechado (Mês do Processamento), para PF (pm_ValorCambioDebAltoPF):' || (SELECT TO_CHAR(:pm_ValorCambioDebAltoPF, 'L999G999G999G990D99') FROM DUAL) ||  '|' || 
+'Parâmetro percentual de flexibilização da Renda do cliente (pm_PercRenda):' || (SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL) 
+AS DS_INF_ANLSE     
+FROM  
+(SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT, SUM(VL_OPER) VL_CONS, COUNT(*) QT_CONS 
+ FROM TB_TRANS T 
+ WHERE T.CD_TP_PESSOA  = 'F' 
+   AND T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+   AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+   AND T.FL_ANALISADO  = 1
+   AND T.CD_NATUR_OPER = 2 
+   AND T.CD_TP_OPER    = 2 /*cambio*/ 
+   GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO) T1 
+WHERE T1.VL_CONS >= (:pm_ValorCambioDebBaixoPF) 
+  AND T1.VL_CONS <  (:pm_ValorCambioDebAltoPF) 
+  AND(( T1.VL_RENDA_FAT IS NOT NULL AND T1.VL_CONS >= (T1.VL_RENDA_FAT * (:pm_PercRenda/100))) 
+       OR  
+       T1.VL_RENDA_FAT IS NULL ) 
+UNION        
+SELECT  T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: 35 – Cliente com débito em câmbio incompatível com Renda/Faturamento (Faixa 1) |' ||    
+'Objetivo: Pessoa Natural ou Pessoa Jurídica com débito em câmbio incompatível com Renda/Faturamento (Faixa 1) |' ||    
+'Conclusão: Cliente com débito em câmbio incompatível com Renda/Faturamento (Faixa 1)  |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Faturamento:' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Faturamento não informado')  ||  '|' ||   
+'Valor consolidado de transações câmbio:' || TO_CHAR(VL_CONS, 'L999G999G999G990D99')  ||  '|' ||   
+'Parâmetro que indica valor expressivo, faixa baixa, de transações de débito em câmbio,  no mês calendário fechado (Mês do Processamento), para PJ (pm_ValorCambioDebBaixoPJ):' || (SELECT TO_CHAR(:pm_ValorCambioDebBaixoPJ, 'L999G999G999G990D99') FROM DUAL) ||  '|' || 
+'Parâmetro que indica valor expressivo, faixa alta, de transações de débito em câmbio, no mês calendário fechado (Mês do Processamento), para PJ (pm_ValorCambioDebAltoPJ):' || (SELECT TO_CHAR(:pm_ValorCambioDebAltoPJ, 'L999G999G999G990D99') FROM DUAL) ||  '|' || 
+'Parâmetro percentual de flexibilização do faturamento do cliente (pm_PercFaturamento):' || (SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL) 
+AS DS_INF_ANLSE     
+FROM  
+(SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT, SUM(VL_OPER) VL_CONS, COUNT(*) QT_CONS 
+ FROM TB_TRANS T 
+ WHERE T.CD_TP_PESSOA  = 'J' 
+   AND T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+   AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+   AND T.FL_ANALISADO  = 1
+   AND T.CD_NATUR_OPER = 2 
+   AND T.CD_TP_OPER    = 2 /*cambio*/ 
+   GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO) T1 
+WHERE T1.VL_CONS >= (:pm_ValorCambioDebBaixoPJ) 
+  AND T1.VL_CONS <  (:pm_ValorCambioDebAltoPJ) 
+  AND(( T1.VL_RENDA_FAT IS NOT NULL AND T1.VL_CONS >= (T1.VL_RENDA_FAT * (:pm_PercFaturamento/100))) 
+       OR  
+       T1.VL_RENDA_FAT IS NULL ) 
+ 
+        

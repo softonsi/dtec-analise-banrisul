@@ -1,0 +1,162 @@
+SELECT T2.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: 82 - Saques com cartão em terminais distantes do local da contratação ou recarga |' ||   
+'Objetivo: B) Realização de múltiplos saques com cartão em terminais eletrônicos em localidades diversas e distantes do local de contratação ou recarga. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||   
+'Conclusão: Realização de múltiplos saques com cartão em terminais eletrônicos em localidades diversas e distantes do local de contratação ou recarga |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||  
+'Número do cartão: ' || TO_CHAR(T1.CD_CARTAO) || '|' || 
+'Tipo de Cartão: ' ||    
+CASE max(T1.CD_TP_CARTAO) 
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||    
+'Lote: ' || TO_CHAR(MAX(T2.CD_LOTE)) || '|' || 
+'Data de referência: ' || TO_CHAR(MAX(T2.DT_REF),'DD/MM/YYYY') || '|' ||   
+'Período de análise: de ' || TO_CHAR((MAX(T2.DT_REF) - (:pm_QDiasRecuo)),'DD/MM/YYYY') || ' até ' || TO_CHAR((MAX(T2.DT_REF)),'DD/MM/YYYY') ||  '|' || 
+'Valor transacionado no lote: ' || TO_CHAR(MAX(T2.VL_OPER), 'L999G999G999G990D99') || '|'  ||   
+'Quantidade transacionada no lote: ' || TO_CHAR(COUNT(*), '999999990') || '|'  ||   
+'Data: Valor, cidade e UF das transações no lote: '  || '|' ||  
+xmlcast(  xmlagg(xmlelement(outros,  
+TO_CHAR(T1.DT_TRANS, 'DD/MM/YYYY') || ':' || ltrim(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99')) || ', ' || COALESCE(T1.NM_CID_OPER, 'Cidade não cadastrada') || ', ' || COALESCE(T1.SG_UF_AG_OPER, 'UF não cadastrada') 
+|| '|')   
+order by T1.CD_DOC_IDENTF_CLIE) as clob) 
+ || '|' ||  
+'Cidade e UF da Emissão do Cartão: ' || COALESCE(max(T1.NM_CID_EMISS_CARTAO), 'Cidade não cadastrada') || ' - ' || COALESCE(max(T1.SG_UF_EMISS_CARTAO), 'UF não cadastrada') || '|' ||   
+'Valor Renda (valor médio no período analisado): ' || COALESCE(TO_CHAR(avg(T1.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Quantidade de multiplos saques: ' || TO_CHAR(COUNT(*), 'L999G999G990') || '|' ||  
+'Valor total dos multiplos saques: ' || TO_CHAR(sum(T1.VL_OPER), 'L999G999G999G990D99') || '|'  || 
+'Parâmetro percentual de flexibilização da renda na comparação com o valor total de múltiplos saque de Pessoa Física (pm_percTotalMultiploSaques_PF): ' || COALESCE((SELECT TO_CHAR(:pm_percTotalMultiploSaques_PF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica um mínimo valor para investimento de Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica valor mínimo de múltiplos saque de Pessoa Física sem renda (pm_TotalMultiploSaques_PF): ' || COALESCE((SELECT TO_CHAR(:pm_TotalMultiploSaques_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica quantidade expressiva para múltiplos saques de Pessoa Física (pm_QtdeMultiploSaques_PF): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeMultiploSaques_PF, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica quantidade de dias de recuo (pm_QDiasRecuo): ' || COALESCE((SELECT TO_CHAR(:pm_QDiasRecuo, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE   
+FROM TB_TRANS T1 
+INNER JOIN  
+    (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO, MAX(DT_TRANS) DT_REF, SUM(VL_OPER) VL_OPER FROM TB_TRANS_ANLSE  
+     WHERE CD_LOTE    = :cd_lote      
+       AND CD_SUBLOTE = :cd_sublote      
+       AND CD_TP_PESSOA = 'F'   
+       AND CD_TP_OPER = 7   
+       AND CD_TP_CARTAO IN (1, 3)   
+       AND CD_VIA_OPER IN (1, 2)   
+       AND SG_UF_AG_OPER IS NOT NULL   
+       AND NM_CID_OPER IS NOT NULL   
+       AND SG_UF_EMISS_CARTAO IS NOT NULL   
+       AND NM_CID_EMISS_CARTAO IS NOT NULL   
+       AND (NM_CID_OPER <> NM_CID_EMISS_CARTAO OR SG_UF_AG_OPER <> SG_UF_EMISS_CARTAO)   
+       GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO 
+       HAVING SUM(VL_OPER)  > (:pm_ValorMinimoPF)  
+       ) T2 
+       ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE=T2.CD_TP_IDENTF_CLIE AND T1.CD_CARTAO=T2.CD_CARTAO 
+ WHERE T1.CD_TP_OPER = 7   
+  AND T1.CD_VIA_OPER IN (1, 2)   
+  AND T1.SG_UF_AG_OPER IS NOT NULL   
+  AND T1.NM_CID_OPER IS NOT NULL   
+  AND T1.SG_UF_EMISS_CARTAO IS NOT NULL   
+  AND T1.NM_CID_EMISS_CARTAO IS NOT NULL  
+  AND (T1.NM_CID_OPER <> T1.NM_CID_EMISS_CARTAO OR  T1.SG_UF_AG_OPER <> T1.SG_UF_EMISS_CARTAO)   
+  AND T1.DT_TRANS > (T2.DT_REF - (:pm_QDiasRecuo))   
+  AND T1.DT_TRANS <= T2.DT_REF 
+  AND T1.FL_ANALISADO = 1
+  GROUP BY T2.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_CARTAO 
+  HAVING COUNT(*) > (:pm_QtdeMultiploSaques_PF)   
+     AND (SUM(T1.VL_OPER) > (:pm_TotalMultiploSaques_PF)) 
+     AND  
+          ((AVG(T1.VL_RENDA_FAT) IS NOT NULL   
+            AND   
+            SUM(T1.VL_OPER) > (AVG(T1.VL_RENDA_FAT) * (:pm_percTotalMultiploSaques_PF/100))   
+            )   
+       	   OR   
+       	   AVG(T1.VL_RENDA_FAT) IS NULL    
+       		)   
+ 
+UNION ALL 
+SELECT T2.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: 82 - Saques com cartão em terminais distantes do local da contratação ou recarga |' ||   
+'Objetivo: B) Realização de múltiplos saques com cartão em terminais eletrônicos em localidades diversas e distantes do local de contratação ou recarga. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||   
+'Conclusão: Realização de múltiplos saques com cartão em terminais eletrônicos em localidades diversas e distantes do local de contratação ou recarga |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||  
+'Número do cartão: ' || TO_CHAR(T1.CD_CARTAO) || '|' || 
+'Tipo de Cartão: ' ||    
+CASE max(T1.CD_TP_CARTAO) 
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||    
+'Lote: ' || TO_CHAR(MAX(T2.CD_LOTE)) || '|' || 
+'Data de referência: ' || TO_CHAR(MAX(T2.DT_REF),'DD/MM/YYYY') || '|' ||   
+'Período de análise: de ' || TO_CHAR((MAX(T2.DT_REF) - (:pm_QDiasRecuo)),'DD/MM/YYYY') || ' até ' || TO_CHAR((MAX(T2.DT_REF)),'DD/MM/YYYY') ||  '|' ||  
+'Valor transacionado no lote: ' || TO_CHAR(MAX(T2.VL_OPER), 'L999G999G999G990D99') || '|'  ||   
+'Quantidade transacionada no lote: ' || TO_CHAR(COUNT(*),'999999990') || '|'  ||   
+'Data: Valor, cidade e UF das transações no lote: '  || '|' ||  
+xmlcast(  xmlagg(xmlelement(outros,  
+TO_CHAR(T1.DT_TRANS, 'DD/MM/YYYY') || ':' || ltrim(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99')) || ', ' || COALESCE(T1.NM_CID_OPER, 'Cidade não cadastrada') || ', ' || COALESCE(T1.SG_UF_AG_OPER, 'UF não cadastrada') 
+|| '|')   
+order by T1.CD_DOC_IDENTF_CLIE) as clob) 
+ || '|' ||  
+'Cidade e UF da Emissão do Cartão: ' || COALESCE(max(T1.NM_CID_EMISS_CARTAO), 'Cidade não cadastrada') || ' - ' || COALESCE(max(T1.SG_UF_EMISS_CARTAO), 'UF não cadastrada') || '|' ||   
+'Valor Renda (valor médio no período analisado): ' || COALESCE(TO_CHAR(avg(T1.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Quantidade de multiplos saques: ' || TO_CHAR(COUNT(*),'999999990') || '|' ||  
+'Valor total dos multiplos saques: ' || TO_CHAR(sum(T1.VL_OPER), 'L999G999G999G990D99') || '|'  || 
+'Parâmetro percentual de flexibilização da renda na comparação com o valor total de múltiplos saque de Pessoa Física (pm_percTotalMultiploSaques_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_percTotalMultiploSaques_PJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica um mínimo valor para investimento de Pessoa Física (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica valor mínimo de múltiplos saque de Pessoa Física sem renda (pm_TotalMultiploSaques_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_TotalMultiploSaques_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica quantidade expressiva para múltiplos saques de Pessoa Física (pm_QtdeMultiploSaques_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeMultiploSaques_PJ, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica quantidade de dias de recuo (pm_QDiasRecuo): ' || COALESCE((SELECT TO_CHAR(:pm_QDiasRecuo, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_TRANS T1 
+INNER JOIN  
+    (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO, MAX(DT_TRANS) DT_REF, SUM(VL_OPER) VL_OPER FROM TB_TRANS_ANLSE  
+     WHERE CD_LOTE    = :cd_lote     
+       AND CD_SUBLOTE = :cd_sublote    
+       AND CD_TP_PESSOA = 'J'   
+       AND CD_TP_OPER = 7   
+       AND CD_TP_CARTAO IN (1, 3)   
+       AND CD_VIA_OPER IN (1, 2)   
+       AND SG_UF_AG_OPER IS NOT NULL   
+       AND NM_CID_OPER IS NOT NULL   
+       AND SG_UF_EMISS_CARTAO IS NOT NULL   
+       AND NM_CID_EMISS_CARTAO IS NOT NULL   
+       AND (NM_CID_OPER <> NM_CID_EMISS_CARTAO OR SG_UF_AG_OPER <> SG_UF_EMISS_CARTAO)   
+       GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO 
+       HAVING SUM(VL_OPER)  > (:pm_ValorMinimoPJ)  
+       ) T2 
+       ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE=T2.CD_TP_IDENTF_CLIE AND T1.CD_CARTAO=T2.CD_CARTAO 
+ WHERE T1.CD_TP_OPER = 7   
+  AND T1.CD_VIA_OPER IN (1, 2)   
+  AND T1.SG_UF_AG_OPER IS NOT NULL   
+  AND T1.NM_CID_OPER IS NOT NULL   
+  AND T1.SG_UF_EMISS_CARTAO IS NOT NULL   
+  AND T1.NM_CID_EMISS_CARTAO IS NOT NULL  
+  AND (T1.NM_CID_OPER <> T1.NM_CID_EMISS_CARTAO OR  T1.SG_UF_AG_OPER <> T1.SG_UF_EMISS_CARTAO)   
+  AND T1.DT_TRANS > (T2.DT_REF - (:pm_QDiasRecuo))   
+  AND T1.DT_TRANS <= T2.DT_REF 
+  AND T1.FL_ANALISADO = 1
+  GROUP BY T2.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_CARTAO 
+  HAVING COUNT(*) > (:pm_QtdeMultiploSaques_PJ)   
+     AND (SUM(T1.VL_OPER) > (:pm_TotalMultiploSaques_PJ)) 
+     AND  
+          ((AVG(T1.VL_RENDA_FAT) IS NOT NULL   
+            AND   
+            SUM(T1.VL_OPER) > (AVG(T1.VL_RENDA_FAT) * (:pm_percTotalMultiploSaques_PJ/100))   
+            )   
+       	   OR   
+       	   AVG(T1.VL_RENDA_FAT) IS NULL    
+       		)   
+ 
+ 

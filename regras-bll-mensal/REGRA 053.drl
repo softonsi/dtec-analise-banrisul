@@ -1,0 +1,78 @@
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 53 - Cliente com várias contas |' ||     
+'Objetivo: d) Manutenção de numerosas contas destinadas ao acolhimento de depósitos em nome de um mesmo cliente, cujos valores, somados, resultem em quantia significativa. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||     
+'Conclusão: Manutenção de numerosas contas destinadas ao acolhimento de depósitos em nome de um mesmo cliente, cujos valores, somados, resultem em quantia significativa |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||    
+CASE T1.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T1.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Quantidade Média de Contas: ' || COALESCE(TO_CHAR(T1.QTDE_MEDIA_CTA), 'Valor não cadastrado') || '|' ||    
+'Valor Consolidado de Crédito: ' || COALESCE(TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||    
+'Valor Médio de Renda: ' || COALESCE(TO_CHAR(T1.VL_MEDIA_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||     
+'Parâmetro percentual de flexibilização de renda (pm_percRenda): ' || COALESCE((SELECT TO_CHAR(:pm_percRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||      
+'Parâmetro de comparação, que indica numerosas contas, para Pessoa Física (pm_NumerosasContasPF): ' || COALESCE((':pm_NumerosasContasPF'),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro de comparação para transações de valor significativo, para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'     
+AS DS_INF_ANLSE      
+FROM (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO, SUM(T2.VL_OPER) VL_TOTAL, AVG(T2.VL_RENDA_FAT) VL_MEDIA_RENDA_FAT,     
+      AVG(QT_CTA_CLIE) QTDE_MEDIA_CTA FROM TB_TRANS T2     
+      WHERE T2.CD_NATUR_OPER = 1     
+      AND T2.CD_TP_PESSOA = 'F'    
+      AND T2.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T2.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+      AND T2.FL_ANALISADO = 1   
+      GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO) T1     
+WHERE T1.QTDE_MEDIA_CTA IS NOT NULL     
+  AND T1.QTDE_MEDIA_CTA > (:pm_NumerosasContasPF)     
+  AND T1.VL_TOTAL > (:pm_ValorMinimoPF)    
+  AND ((T1.VL_MEDIA_RENDA_FAT IS NOT NULL AND    
+        T1.VL_TOTAL > (T1.VL_MEDIA_RENDA_FAT * (:pm_percRenda/100)))     
+        OR    
+        T1.VL_MEDIA_RENDA_FAT IS NULL    
+      )     
+UNION ALL      
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 53 - Cliente com várias contas |' ||     
+'Objetivo: d) Manutenção de numerosas contas destinadas ao acolhimento de depósitos em nome de um mesmo cliente, cujos valores, somados, resultem em quantia significativa. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||     
+'Conclusão: Manutenção de numerosas contas destinadas ao acolhimento de depósitos em nome de um mesmo cliente, cujos valores, somados, resultem em quantia significativa |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||    
+CASE T1.CD_TP_IDENTF_CLIE     
+	 WHEN 2 THEN SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)     
+	 WHEN 3 THEN SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)      
+	 ELSE T1.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||     
+'Tipo de Pessoa: ' ||      
+CASE T1.CD_TP_IDENTF_CLIE     
+	 WHEN 2 THEN 'Física (CPF)'     
+	 WHEN 3 THEN 'Jurídica (CNPJ)'     
+	 ELSE 'Tipo de pessoa não cadastrada'     
+END || '|' ||     
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Quantidade Média de Contas: ' || COALESCE(TO_CHAR(T1.QTDE_MEDIA_CTA), 'Valor não cadastrado') || '|' ||     
+'Valor Consolidado de Crédito: ' || COALESCE(TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Valor Médio de Faturamento: ' || COALESCE(TO_CHAR(T1.VL_MEDIA_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||     
+'Parâmetro percentual de flexibilização de faturamento (pm_percFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_percFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||      
+'Parâmetro de comparação, que indica numerosas contas, para Pessoa Jurídica (pm_NumerosasContasPJ): ' || COALESCE((':pm_NumerosasContasPJ'),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro de comparação para transações de valor significativo, para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'     
+AS DS_INF_ANLSE      
+FROM (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO, SUM(T2.VL_OPER) VL_TOTAL, AVG(T2.VL_RENDA_FAT) VL_MEDIA_RENDA_FAT,     
+      AVG(QT_CTA_CLIE) QTDE_MEDIA_CTA FROM TB_TRANS T2     
+      WHERE T2.CD_NATUR_OPER = 1    
+      AND T2.CD_TP_PESSOA = 'J'    
+      AND T2.CD_DOC_IDENTF_CLIE <> T2.CD_DOC_IDENTF_DESTORIG    
+      AND T2.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T2.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+      AND T2.FL_ANALISADO = 1
+      GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO) T1     
+WHERE T1.QTDE_MEDIA_CTA IS NOT NULL     
+  AND T1.QTDE_MEDIA_CTA > (:pm_NumerosasContasPJ)     
+  AND T1.VL_TOTAL > (:pm_ValorMinimoPJ)    
+  AND ((T1.VL_MEDIA_RENDA_FAT IS NOT NULL AND    
+        T1.VL_TOTAL > (T1.VL_MEDIA_RENDA_FAT * (:pm_percFaturamento/100)))     
+        OR    
+        T1.VL_MEDIA_RENDA_FAT IS NULL    
+      ) 

@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <RESULTADO cd_sttus_evento_atual="20" vl_apontamento="5" vl_ponto_corte="5" fl_carencia="1" fl_ponto_corte="1" fl_susp_ld="1"/>
+  <RESULTADO cd_sttus_evento_atual="0" vl_apontamento="7" vl_ponto_corte="5" fl_carencia="1" fl_ponto_corte="1" fl_susp_ld="1"/>
+</dataset>

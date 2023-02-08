@@ -1,0 +1,111 @@
+/* c) aumentos substanciais no volume de depósitos em espécie de qualquer pessoa natural ou jurídica, */  
+/* sem causa aparente, nos casos em que tais depósitos forem posteriormente transferidos, dentro de */  
+/* curto período de tempo, a destino não relacionado com o cliente;*/  
+  
+SELECT D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4003 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' ||  D.NM_CLIE || '|' ||   
+CASE D.CD_TP_IDENTF_CLIE    
+       WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 10, 2)    
+       WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(D.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(D.CD_DOC_IDENTF_CLIE, 13, 2)     
+       ELSE D.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Valor Consolidado de Débito: ' || COALESCE(TO_CHAR(ValorConsolidadoDebito, 'L999G999G999G990D99'), 'Valor não calculado') || '|' ||   
+'Valor Consolidado de Crédito: ' || COALESCE(TO_CHAR(ValorConsolidadoCredito, 'L999G999G999G990D99'), 'Valor não calculado') || '|' ||  
+CASE CD_TP_IDENTF_CLIE WHEN 2 THEN
+COALESCE((':DS-pm_QtdeDiaRecuo' || ' (' || ':NM-pm_QtdeDiaRecuo' || '):' || :pm_QtdeDiaRecuo),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercDepTransf_PF' || ' (' || ':NM-pm_PercDepTransf_PF' || '):' || :pm_PercDepTransf_PF || '%'),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercQtdeDepEspecie_PF' || ' (' || ':NM-pm_PercQtdeDepEspecie_PF' || '):' || :pm_PercQtdeDepEspecie_PF || '%'),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercValorDepEspecie_PF' || ' (' || ':NM-pm_PercValorDepEspecie_PF' || '):' || :pm_PercValorDepEspecie_PF || '%'),'Parâmetro não cadastrado') || '|' 
+WHEN 3 THEN
+COALESCE((':DS-pm_QtdeDiaRecuo' || ' (' || ':NM-pm_QtdeDiaRecuo' || '):' || :pm_QtdeDiaRecuo),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercDepTransf_PJ' || ' (' || ':NM-pm_PercDepTransf_PJ' || '):' || :pm_PercDepTransf_PJ || '%'),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercQtdeDepEspecie_PJ' || ' (' || ':NM-pm_PercQtdeDepEspecie_PJ' || '):' || :pm_PercQtdeDepEspecie_PJ || '%'),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercValorDepEspecie_PJ' || ' (' || ':NM-pm_PercValorDepEspecie_PJ' || '):' || :pm_PercValorDepEspecie_PJ || '%'),'Parâmetro não cadastrado') || '|' 
+END
+AS DS_INF_ANLSE    
+FROM  
+
+(SELECT c.cd_mes_ano, c.CD_DOC_IDENTF_CLIE, c.CD_TP_IDENTF_CLIE, c.ValorConsolidadoDebito, c.ValorConsolidadoCredito, c.NM_CLIE, QT_TOTAL, VL_TOTAL, QTODOS, VTODOS
+from
+(SELECT c.cd_mes_ano, c.CD_DOC_IDENTF_CLIE, c.CD_TP_IDENTF_CLIE, c.ValorConsolidadoDebito, c.ValorConsolidadoCredito, c.NM_CLIE, MC.QT_TOTAL, MC.VL_TOTAL, SUM(P.QT_TOTAL) QTODOS, SUM(P.VL_TOTAL) VTODOS
+FROM
+(SELECT distinct d.CD_MES_ANO, d.CD_DOC_IDENTF_CLIE, d.CD_TP_IDENTF_CLIE, ValorConsolidadoDebito, ValorConsolidadoCredito, NM_CLIE
+FROM
+      (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) as ValorConsolidadoDebito, MAX(NM_CLIE) NM_CLIE   
+       FROM TB_TRANS   
+       WHERE DT_TRANS >= to_date(to_char(:cd_lote), 'yyyy/mm')  
+       AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)        
+       AND FL_ANALISADO = 1 
+       AND CD_NATUR_OPER = 2   
+       AND CD_DOC_IDENTF_DESTORIG IS NOT NULL   
+       AND CD_DOC_IDENTF_CLIE <> CD_DOC_IDENTF_DESTORIG   
+       GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) D,    
+       
+       (SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, SUM(VL_OPER) as ValorConsolidadoCredito
+        FROM TB_TRANS T
+        WHERE T.FL_ANALISADO = 1  
+        AND CD_NATUR_OPER = 1 /*credito*/   
+        AND CD_FORMA_OPER = 7 /*especie*/   
+        AND CD_TP_OPER    = 4 /*deposito*/   
+        AND EXISTS 
+           (SELECT 1 FROM TB_TRANS A 
+            WHERE A.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+              AND A.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+              AND A.CD_NATUR_OPER = 2
+              AND A.CD_DOC_IDENTF_DESTORIG IS NOT NULL   
+              AND A.CD_DOC_IDENTF_CLIE <> A.CD_DOC_IDENTF_DESTORIG 
+              AND A.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE
+              AND A.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE
+              AND T.DT_TRANS <= A.DT_TRANS /*credito ocorreu antes da transferencia*/   
+              AND T.DT_TRANS >= (A.DT_TRANS - (:pm_QtdeDiaRecuo))   
+              )
+        GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE   
+       ) C   
+ WHERE D.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE   
+ AND D.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE   
+ 
+ AND (
+ (C.CD_TP_IDENTF_CLIE = 2
+ AND D.ValorConsolidadoDebito > (C.ValorConsolidadoCredito * (1 - (:pm_PercDepTransf_PF/100 )))   
+ AND D.ValorConsolidadoDebito <  ( C.ValorConsolidadoCredito * (1 + (:pm_PercDepTransf_PF/100 ))) 
+ )
+ OR
+ (C.CD_TP_IDENTF_CLIE = 3
+ AND D.ValorConsolidadoDebito > (C.ValorConsolidadoCredito * (1 - (:pm_PercDepTransf_PJ/100 )))   
+ AND D.ValorConsolidadoDebito <  ( C.ValorConsolidadoCredito * (1 + (:pm_PercDepTransf_PJ/100 )))
+ ))
+  ) C
+ INNER JOIN TB_PERFIL_MES_CALENDARIO MC ON 
+       MC.CD_IDENTF_PERFIL     = 9   
+   AND MC.CD_VARIAVEL_PRIMEIRA = C.CD_DOC_IDENTF_CLIE   
+   AND MC.CD_VARIAVEL_SEGUNDA  = C.CD_TP_IDENTF_CLIE   
+   AND MC.CD_VARIAVEL_TERCEIRA = 4   
+   AND MC.CD_VARIAVEL_QUARTA   = 7   
+   AND MC.CD_ANO_MES           = C.CD_MES_ANO   
+   
+INNER JOIN TB_PERFIL_MES_CALENDARIO P ON 
+       P.CD_IDENTF_PERFIL     = 9   
+   AND P.CD_VARIAVEL_PRIMEIRA = C.CD_DOC_IDENTF_CLIE   
+   AND P.CD_VARIAVEL_SEGUNDA  = C.CD_TP_IDENTF_CLIE   
+   AND P.CD_VARIAVEL_TERCEIRA = 4   
+   AND P.CD_VARIAVEL_QUARTA   = 7   
+   AND P.CD_ANO_MES           <> C.CD_MES_ANO   
+    
+group by c.cd_mes_ano, c.CD_DOC_IDENTF_CLIE, c.CD_TP_IDENTF_CLIE, c.ValorConsolidadoDebito, c.ValorConsolidadoCredito, c.NM_CLIE, MC.QT_TOTAL, MC.VL_TOTAL
+) c
+where 
+(CD_TP_IDENTF_CLIE = 2
+   AND QTODOS < (QT_TOTAL * (:pm_PercQtdeDepEspecie_PF/100))   
+   AND VTODOS < (VL_TOTAL * (:pm_PercValorDepEspecie_PF/100))   
+)
+OR
+(CD_TP_IDENTF_CLIE = 3
+   AND QTODOS < (QT_TOTAL * (:pm_PercQtdeDepEspecie_PJ/100))   
+   AND VTODOS < (VL_TOTAL * (:pm_PercValorDepEspecie_PJ/100))   
+)
+ ) D
+
+

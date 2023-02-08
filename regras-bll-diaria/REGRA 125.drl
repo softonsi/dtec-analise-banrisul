@@ -1,0 +1,112 @@
+/* f) realização de transferências internacionais nas quais Não se justifique a origem dos fundos envolvidos ou */  
+/* que se mostrem incompatívies com a capacidade econômico-financeira ou com o perfil do cliente;*/  
+  
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 125 - Transferência internacionais incompatível com a capacidade financeira do cliente |' ||  
+'Objetivo: F) Realização de transferências internacionais nas quais não se justifique a origem dos fundos envolvidos ou que se mostrem incompatíveis com a capacidade econômico-financeira ou com o perfil do cliente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso XI |' ||  
+'Conclusão: Realização de transferências internacionais nas quais não se justifique a origem dos fundos envolvidos ou que se mostrem incompatíveis com a capacidade econômico-financeira ou com o perfil do cliente |' ||  
+'Cliente: ' ||  T.NM_CLIE || '|' ||
+CASE T.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' || 
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' || 
+'Nome da pessoa de Origem: ' || COALESCE(T.NM_DESTORIG, 'Nome não cadastrado') || '|' ||  
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Natureza da Transação: ' ||   
+CASE T.CD_NATUR_OPER  
+	 WHEN 1 THEN 'Crédito'  
+	 WHEN 2 THEN 'Débito'  
+	 WHEN 3 THEN 'Evento'  
+	 ELSE 'Natureza não cadastrada'  
+END || '|' ||  
+'Tipo da Transação: ' || T.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), 'Tipo não cadastrado') || '|' ||  
+'País Destino/Origem: ' || T.CD_PAIS_DESTORIG || COALESCE((SELECT '-' || NM_PAIS FROM TB_PAIS WHERE CD_PAIS = T.CD_PAIS_DESTORIG), 'País não cadastrado') || '|' ||  
+'Valor Renda: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização da renda (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica valor mínimo para apontamento da regra para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T  
+WHERE T.CD_LOTE    = :cd_lote   
+  AND T.CD_SUBLOTE = :cd_sublote  
+  AND T.CD_TP_PESSOA = 'F'  
+  AND T.CD_NATUR_OPER = 2  
+  AND T.VL_OPER IS NOT NULL  
+  AND T.VL_OPER > (:pm_ValorMinimoPF)  
+  AND T.NM_DESTORIG IS NOT NULL  
+  AND T.NM_CLIE IS NOT NULL  
+  AND T.NM_CLIE <> T.NM_DESTORIG  
+  AND T.CD_PAIS_DESTORIG IS NOT NULL 
+  AND T.CD_PAIS_DESTORIG <> 1058  
+  AND NOT EXISTS   
+                (SELECT 1 FROM TB_PERFIL_MES_CALENDARIO P  
+                 WHERE P.CD_IDENTF_PERFIL = 4 
+                 AND   P.CD_VARIAVEL_PRIMEIRA = T.CD_DOC_IDENTF_CLIE  
+                 AND   P.CD_VARIAVEL_SEGUNDA  = T.CD_TP_IDENTF_CLIE 
+                 AND   P.CD_VARIAVEL_TERCEIRA = T.NM_DESTORIG)    
+  AND ((T.VL_RENDA_FAT IS NOT NULL AND  
+        T.VL_OPER > (T.VL_RENDA_FAT * (:pm_PercRenda/100)))  
+       OR                  
+       T.VL_RENDA_FAT IS NULL  
+      )  
+UNION  ALL 
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 125 - Transferência internacionais incompatível com a capacidade financeira do cliente |' ||  
+'Objetivo: F) Realização de transferências internacionais nas quais não se justifique a origem dos fundos envolvidos ou que se mostrem incompatíveis com a capacidade econômico-financeira ou com o perfil do cliente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso XI |' ||  
+'Conclusão: Realização de transferências internacionais nas quais não se justifique a origem dos fundos envolvidos ou que se mostrem incompatíveis com a capacidade econômico-financeira ou com o perfil do cliente |' ||  
+'Cliente: ' ||  T.NM_CLIE || '|' ||
+CASE T.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' ||  
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' || 
+'Nome da pessoa de Origem: ' || COALESCE(T.NM_DESTORIG, 'Nome não cadastrado') || '|' ||    
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Natureza da Transação: ' ||   
+CASE T.CD_NATUR_OPER  
+	 WHEN 1 THEN 'Crédito'  
+	 WHEN 2 THEN 'Débito'  
+	 WHEN 3 THEN 'Evento'  
+	 ELSE 'Natureza não cadastrada'  
+END || '|' ||  
+'Tipo da Transação: ' || T.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), 'Tipo não cadastrado') || '|' ||  
+'País Destino/Origem: ' || T.CD_PAIS_DESTORIG || COALESCE((SELECT '-' || NM_PAIS FROM TB_PAIS WHERE CD_PAIS = T.CD_PAIS_DESTORIG), 'País não cadastrado') || '|' ||  
+'Valor Faturamento: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização do faturamento (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica valor mínimo para apontamento da regra para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T  
+WHERE T.CD_LOTE    = :cd_lote   
+  AND T.CD_SUBLOTE = :cd_sublote  
+  AND T.CD_TP_PESSOA = 'J'  
+  AND CD_NATUR_OPER = 2  
+  AND T.VL_OPER IS NOT NULL  
+  AND T.VL_OPER > (:pm_ValorMinimoPJ)  
+  AND T.NM_DESTORIG IS NOT NULL  
+  AND T.NM_CLIE IS NOT NULL  
+  AND T.NM_CLIE <> T.NM_DESTORIG  
+  AND T.CD_PAIS_DESTORIG IS NOT NULL 
+  AND T.CD_PAIS_DESTORIG <> 1058  
+  AND NOT EXISTS   
+                (SELECT 1 FROM TB_PERFIL_MES_CALENDARIO P  
+                 WHERE P.CD_IDENTF_PERFIL = 4 
+                 AND   P.CD_VARIAVEL_PRIMEIRA = T.CD_DOC_IDENTF_CLIE  
+                 AND   P.CD_VARIAVEL_SEGUNDA  = T.CD_TP_IDENTF_CLIE 
+                 AND   P.CD_VARIAVEL_TERCEIRA = T.NM_DESTORIG)  
+  AND ((T.VL_RENDA_FAT IS NOT NULL AND  
+        T.VL_OPER > (T.VL_RENDA_FAT * (:pm_PercFaturamento/100)))  
+       OR                  
+       T.VL_RENDA_FAT IS NULL  
+      ) 
+      
+      

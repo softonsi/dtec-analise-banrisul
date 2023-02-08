@@ -1,0 +1,78 @@
+/* BANRISUL - MENSAL */   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4100 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||  
+CASE T.CD_TP_IDENTF_DESTORIG     
+	WHEN 2 THEN 'Destino/Origem (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	WHEN 3 THEN 'Destino/Origem (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_DESTORIG    
+END  
+|| '|' ||  
+'Nome Destino/Origem: ' ||  COALESCE(T.NM_DESTORIG, 'Nome não informado') || '|' ||   
+'Fonte: Lista CSNU - DTEC-flex|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG, T.CD_TP_IDENTF_DESTORIG, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE, MAX(T.NM_DESTORIG) NM_DESTORIG     
+      FROM TB_TRANS T      
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+        AND T.FL_ANALISADO = 1   
+        AND T.CD_DOC_IDENTF_DESTORIG IS NOT NULL  
+      GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG, T.CD_TP_IDENTF_DESTORIG, T.CD_MES_ANO 
+     ) T   
+WHERE EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N      
+              WHERE N.FL_ARMAS_DESTRUICAO_MASSA = 1  
+		      AND (UPPER(N.NM_TP_SUSP) <> 'GOVERNO' AND UPPER(N.NM_TP_SUSP) <> 'SOCIOAMBIENTAL' AND UPPER(N.NM_TP_SUSP) <> 'LISTAS DIVERSAS')   
+              AND N.NM_FONTE_NOTICIA LIKE '%LISTA - %'   
+		      AND (N.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_DESTORIG AND N.CD_TP_IDENTF_CLIE  = T.CD_TP_IDENTF_DESTORIG)  
+              )     
+AND NOT EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                WHERE CLA.DS_CONTEUDO LIKE '%' || T.CD_DOC_IDENTF_DESTORIG || '%'   
+                AND CLA.CD_LISTA_AUXILIAR = 100 /*Lista branca*/    
+               )    
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4100 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||  
+CASE T.CD_TP_IDENTF_DESTORIG     
+	WHEN 2 THEN 'Destino/Origem (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	WHEN 3 THEN 'Destino/Origem (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_DESTORIG    
+END  
+|| '|' ||  
+'Nome Destino/Origem: ' ||  COALESCE(T.NM_DESTORIG, 'Nome não informado') || '|' ||  
+'Fonte: Listas auxiliares de Lista de Armas|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG, T.CD_TP_IDENTF_DESTORIG, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE, MAX(T.NM_DESTORIG) NM_DESTORIG     
+      FROM TB_TRANS T      
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+        AND T.FL_ANALISADO = 1   
+        AND T.CD_DOC_IDENTF_DESTORIG IS NOT NULL  
+      GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_DOC_IDENTF_DESTORIG, T.CD_TP_IDENTF_DESTORIG, T.CD_MES_ANO 
+     ) T   
+WHERE EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+              WHERE CLA.DS_CONTEUDO LIKE '%' || T.CD_DOC_IDENTF_DESTORIG || '%'   
+              AND CLA.CD_LISTA_AUXILIAR = 109 /*Lista Armas Identificacao*/    
+             )  
+OR EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+           WHERE T.NM_DESTORIG IS NOT NULL  
+           AND CLA.DS_CONTEUDO LIKE '%' || T.NM_DESTORIG || '%'   
+           AND CLA.CD_LISTA_AUXILIAR = 110 /*Lista Armas NOME*/    
+          ) 
+ 
+ 
+          

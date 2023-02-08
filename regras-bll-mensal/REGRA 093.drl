@@ -1,0 +1,82 @@
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 93 - Operações de crédito liquidadas antecipadamente |' ||    
+'Objetivo: D) Realização de operações de crédito no País, simultâneas ou consecutivas, liquidadas antecipadamente ou em prazo muito curto. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VII |' ||    
+'Conclusão: Realização de operações de crédito no País, simultâneas ou consecutivas, liquidadas antecipadamente ou em prazo muito curto |' ||    
+'Cliente: ' ||  MAX(T.NM_CLIE) || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||    
+'Quantidade de contratos antecipados:' || TO_CHAR(COUNT(*)) || '|' ||   
+'Contratos: Percentual de antecipação' || '|' ||   
+xmlcast(  xmlagg(xmlelement(outros,   
+TO_CHAR(CD_CONTRATO) || ' : ' || TO_CHAR((((DT_LIQUID - DT_LIB_CONTRATO) /(DT_VENCTO - DT_LIB_CONTRATO)) * 100),'9990D99')   
+|| '| ')    
+order by CD_CONTRATO) as clob)   
+|| '|' ||   
+'Parâmetro que indica o valor mínimo para disparo da regra para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica o percentual  considerado curto para prazo do Contrato para Pessoa Física (pm_PercPrazoCurtoPF): ' || COALESCE((SELECT TO_CHAR(:pm_PercPrazoCurtoPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica a quantidade de ocorrências que atendem aos filtros descritos na regra para Pessoa Física (pm_QtdeOcorrênciasPF): ' || COALESCE((':pm_QtdeOcorrênciasPF'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE   
+FROM TB_TRANS T 
+WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)     
+  AND FL_ANALISADO = 1 
+  AND CD_TP_PESSOA = 'F'   
+  AND CD_FORMA_OPER = 6   
+  AND CD_TP_OPER = 6   
+  AND VL_OPER > (:pm_ValorMinimoPF)   
+  AND DT_LIB_CONTRATO IS NOT NULL   
+  AND DT_LIQUID IS NOT NULL   
+  AND DT_VENCTO IS NOT NULL   
+  AND (((DT_LIQUID - DT_LIB_CONTRATO)/(DT_VENCTO - DT_LIB_CONTRATO)) * 100 <    
+           (:pm_PercPrazoCurtoPF))              
+            
+GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO    
+HAVING COUNT(*) > (:pm_QtdeOcorrênciasPF)   
+ 
+UNION ALL 
+ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 93 - Operações de crédito liquidadas antecipadamente |' ||    
+'Objetivo: D) Realização de operações de crédito no País, simultâneas ou consecutivas, liquidadas antecipadamente ou em prazo muito curto. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VII |' ||    
+'Conclusão: Realização de operações de crédito no País, simultâneas ou consecutivas, liquidadas antecipadamente ou em prazo muito curto |' ||    
+'Cliente: ' ||  MAX(T.NM_CLIE) || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||    
+'Quantidade de contratos antecipados:' || TO_CHAR(COUNT(*)) || '|' ||   
+'Contratos: Percentual de antecipação' || '|' ||   
+xmlcast(  xmlagg(xmlelement(outros,   
+TO_CHAR(CD_CONTRATO) || ' : ' || TO_CHAR((((DT_LIQUID - DT_LIB_CONTRATO) /(DT_VENCTO - DT_LIB_CONTRATO)) * 100),'9990D99')   
+|| '| ')    
+order by CD_CONTRATO) as clob)   
+|| '|' ||   
+'Parâmetro que indica o valor mínimo para disparo da regra para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica o percentual  considerado curto para prazo do Contrato para Pessoa Jurídica (pm_PercPrazoCurtoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercPrazoCurtoPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica a quantidade de ocorrências que atendem aos filtros descritos na regra para Pessoa Jurídica (pm_QtdeOcorrênciasPJ): ' || COALESCE((':pm_QtdeOcorrênciasPJ'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE   
+FROM TB_TRANS T 
+WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+  AND FL_ANALISADO = 1  
+  AND CD_TP_PESSOA = 'J'   
+  AND CD_FORMA_OPER = 6   
+  AND CD_TP_OPER = 6   
+  AND VL_OPER > (:pm_ValorMinimoPJ)   
+  AND DT_LIB_CONTRATO IS NOT NULL   
+  AND DT_LIQUID IS NOT NULL   
+  AND DT_VENCTO IS NOT NULL   
+  AND (((DT_LIQUID - DT_LIB_CONTRATO)/(DT_VENCTO - DT_LIB_CONTRATO)) * 100 <    
+           (:pm_PercPrazoCurtoPJ))         
+GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO    
+HAVING COUNT(*) > (:pm_QtdeOcorrênciasPJ)   
+ 
+      

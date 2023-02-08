@@ -1,0 +1,73 @@
+/* BANRISUL - MENSAL  */ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4116 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||     
+'Mês Calendário: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' || 
+'Valor Consolidado de Débitos por Facilitadora de Pagamentos, para fora do Brasil:' || TO_CHAR(T.TOTAL_FACILTADORA, 'L999G999G999G990D99') || '|' || 
+COALESCE((':DS-pm_CodBrasil' || ' (' || ':NM-pm_CodBrasil' || '):' || :pm_CodBrasil),'Parâmetro não cadastrado' ) || '|' ||  
+CASE T.CD_TP_PESSOA 
+     WHEN 'F' THEN COALESCE((':DS-pm_ValorConsolidadoPF' || ' (' || ':NM-pm_ValorConsolidadoPF' || '):' || TO_CHAR(:pm_ValorConsolidadoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'   
+	 WHEN 'J' THEN COALESCE((':DS-pm_ValorConsolidadoPJ' || ' (' || ':NM-pm_ValorConsolidadoPJ' || '):' || TO_CHAR(:pm_ValorConsolidadoPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'   
+END 
+AS DS_INF_ANLSE 
+FROM (SELECT T.CD_DOC_IDENTF_CLIE,  T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.NM_CLIE, T.CD_MES_ANO, SUM(T.VL_OPER) TOTAL_FACILTADORA    
+      FROM TB_TRANS T  
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+        AND T.FL_ANALISADO = 1 
+        AND T.CD_NATUR_OPER = 2 
+	    AND T.CD_FORMA_OPER = 16 /* Facilitadora de Pagamento */ 
+	    AND T.CD_PAIS_DESTORIG <> (:pm_CodBrasil) 
+	  GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.NM_CLIE, T.CD_MES_ANO 
+	 ) T 
+WHERE ((T.CD_TP_PESSOA = 'F' 
+        AND T.TOTAL_FACILTADORA >= (:pm_ValorConsolidadoPF) 
+       )
+	   OR 
+	   (T.CD_TP_PESSOA = 'J' 
+        AND T.TOTAL_FACILTADORA >= (:pm_ValorConsolidadoPJ) 
+       )
+	  )
+UNION ALL 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4116 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||     
+'Mês Calendário: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' || 
+'Valor Consolidado de Compra/Saque, por Cartão de Crédito, fora do Brasil:' ||  TO_CHAR(T.TOTAL_CARTAO, 'L999G999G999G990D99') || '|' || 
+COALESCE((':DS-pm_CodBrasil' || ' (' || ':NM-pm_CodBrasil' || '):' || :pm_CodBrasil),'Parâmetro não cadastrado' ) || '|' ||  
+CASE T.CD_TP_PESSOA 
+     WHEN 'F' THEN COALESCE((':DS-pm_ValorConsolidadoPF' || ' (' || ':NM-pm_ValorConsolidadoPF' || '):' || TO_CHAR(:pm_ValorConsolidadoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'   
+	 WHEN 'J' THEN COALESCE((':DS-pm_ValorConsolidadoPJ' || ' (' || ':NM-pm_ValorConsolidadoPJ' || '):' || TO_CHAR(:pm_ValorConsolidadoPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'   
+END 
+AS DS_INF_ANLSE 
+FROM (SELECT T.CD_DOC_IDENTF_CLIE,  T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.NM_CLIE, T.CD_MES_ANO, SUM(T.VL_OPER) TOTAL_CARTAO     
+      FROM TB_TRANS T  
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+        AND T.FL_ANALISADO = 1 
+        AND T.CD_TP_OPER IN (3, 7) /* COMPRA OU SAQUE */  
+	    AND T.CD_FORMA_OPER = 13 /* CARTÃO DE CRÉDITO */ 
+	    AND T.CD_PAIS_DESTORIG <> (:pm_CodBrasil) 
+	  GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.NM_CLIE, T.CD_MES_ANO    
+	) T 
+WHERE ((T.CD_TP_PESSOA = 'F' 
+        AND T.TOTAL_CARTAO >= (:pm_ValorConsolidadoPF) 
+       )
+	   OR 
+	   (T.CD_TP_PESSOA = 'J' 
+        AND T.TOTAL_CARTAO >= (:pm_ValorConsolidadoPJ) 
+       )
+	  )
+

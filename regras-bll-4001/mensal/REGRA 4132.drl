@@ -1,0 +1,40 @@
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4132 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Mês de consolidação: ' || TO_CHAR(CD_MES_ANO)  || '|' ||
+'Valor resgate no mês: ' || TO_CHAR(VL_RESGATE, 'L999G999G999G990D99') || '|' ||
+'Quantidade resgate no mês: ' || TO_CHAR(QT_RESGATE) || '|' ||
+'Código do país destino/origem: ' || COALESCE((SELECT NM_PAIS FROM TB_PAIS P WHERE P.CD_PAIS = T.CD_PAIS_DESTORIG), TO_CHAR(T.CD_PAIS_DESTORIG))  || '|' ||
+COALESCE((':DS-pm_QMesRecuo' || ' (' || ':NM-pm_QMesRecuo' || '):' || :pm_QMesRecuo),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_CodBrasil' || ' (' || ':NM-pm_CodBrasil' || '):' || :pm_CodBrasil),'Parâmetro não cadastrado') || '|'   
+
+AS DS_INF_ANLSE  
+from (
+SELECT CD_MES_ANO, NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_PAIS_DESTORIG, SUM(VL_OPER) VL_RESGATE, COUNT(*) QT_RESGATE
+FROM TB_TRANS R
+WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+  AND CD_TP_OPER =  1 /*aplicacao*/
+  AND CD_NATUR_OPER = 1 /*credito*/
+  AND CD_PAIS_DESTORIG <> :pm_CodBrasil
+  AND NOT EXISTS 
+    (SELECT 1 FROM TB_TRANS A
+     WHERE A.CD_TP_OPER = 1 /*aplicacao*/
+       AND A.CD_NATUR_OPER = 2 /*debito*/
+       AND A.CD_PAIS_DESTORIG <> :pm_CodBrasil
+       AND R.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE
+       AND R.CD_TP_IDENTF_CLIE = A.CD_TP_IDENTF_CLIE
+       AND TRUNC(A.DT_TRANS) >= (TRUNC(R.DT_TRANS) - :pm_QMesRecuo)
+       AND TRUNC(A.DT_TRANS) <= TRUNC(R.DT_TRANS))
+GROUP BY CD_MES_ANO, NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_PAIS_DESTORIG
+) T
+    
+ 
+
+  

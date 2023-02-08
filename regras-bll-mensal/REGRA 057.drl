@@ -1,0 +1,90 @@
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 57 – Ausência repentina de movimentação |' ||    
+'Objetivo: F) Ausência repentina de movimentação financeira em conta que anteriormente apresentava grande movimentação.C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Ausência repentina de movimentação |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||    
+'Valor da Renda: ' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não cadastrado') ||  '|' ||  
+'Valor de movimentação no mês anterior (' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) || '): ' || TO_CHAR(VL_MES_ANTERIOR, 'L999G999G999G990D99') ||  '|' ||  
+'Quantidade de movimentação no mês anterior (' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) || '): ' || TO_CHAR(QT_MES_ANTERIOR) ||  '|' ||  
+'Parâmetro de valor que indica conta com grande movimentação (pm_ValorMesAnteriorPF):' || COALESCE((SELECT TO_CHAR(:pm_ValorMesAnteriorPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de quantidade que indica conta com grande movimentação (pm_QtdeMesAnteriorPF):' || COALESCE((':pm_QtdeMesAnteriorPF'),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de valor que indica conta com grande movimentação para clientes sem Renda (pm_vlMesAnterior_SRendaPF):' || COALESCE((SELECT TO_CHAR(:pm_vlMesAnterior_SRendaPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual de flexibilização da Renda (pm_percRenda):' || COALESCE((':pm_percRenda'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE   
+FROM (SELECT CD_MES_ANO, NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, VL_MES_ANTERIOR, QT_MES_ANTERIOR, VL_RENDA_FAT  
+      FROM (SELECT CD_MES_ANO, MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) VL_MES_ANTERIOR, COUNT(*) QT_MES_ANTERIOR, MAX(VL_RENDA_FAT) VL_RENDA_FAT  
+            FROM TB_TRANS  
+            WHERE T.DT_TRANS >=  add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), -1) 
+            AND T.DT_TRANS < to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND CD_TP_PESSOA = 'F'    
+            AND FL_ANALISADO = 1
+            GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE  
+            HAVING COUNT(*) >= (:pm_QtdeMesAnteriorPF)  
+            AND ((MAX(VL_RENDA_FAT) IS NOT NULL  
+                  AND (SUM(VL_OPER) >= (:pm_ValorMesAnteriorPF)) 
+                  AND (SUM(VL_OPER) >= (MAX(VL_RENDA_FAT) * (:pm_percRenda/100))))  
+                  OR  
+                 (MAX(VL_RENDA_FAT) IS NULL  
+                  AND (SUM(VL_OPER) >= (:pm_vlMesAnterior_SRendaPF)))  
+                )  
+           ) T  
+           WHERE NOT EXISTS (SELECT 1 FROM TB_TRANS A  
+                             WHERE A.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE  
+                             AND A.CD_TP_IDENTF_CLIE  = T.CD_TP_IDENTF_CLIE  
+                             AND A.CD_MES_ANO = :cd_lote   
+                            )  
+      ) T1  
+  
+UNION ALL  
+  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 57 – Ausência repentina de movimentação |' ||    
+'Objetivo: F) Ausência repentina de movimentação financeira em conta que anteriormente apresentava grande movimentação.C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Ausência repentina de movimentação |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Valor do Faturamento: ' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não cadastrado') ||  '|' ||  
+'Valor de movimentação no mês anterior (' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) || '): ' || TO_CHAR(VL_MES_ANTERIOR, 'L999G999G999G990D99') ||  '|' ||  
+'Quantidade de movimentação no mês anterior (' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) || '): ' || TO_CHAR(QT_MES_ANTERIOR) ||  '|' ||  
+'Parâmetro de valor que indica conta com grande movimentação (pm_ValorMesAnteriorPJ):' || COALESCE((SELECT TO_CHAR(:pm_ValorMesAnteriorPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de quantidade que indica conta com grande movimentação (pm_QtdeMesAnteriorPJ):' || COALESCE((':pm_QtdeMesAnteriorPF'),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de valor que indica conta com grande movimentação para clientes sem Faturamento (pm_vlMesAnterior_SFatPJ):' || COALESCE((SELECT TO_CHAR(:pm_vlMesAnterior_SFatPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual de flexibilização do Faturamento (pm_percFaturamento):' || COALESCE((':pm_percFaturamento'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE   
+FROM (SELECT CD_MES_ANO, NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, VL_MES_ANTERIOR, QT_MES_ANTERIOR, VL_RENDA_FAT  
+      FROM (SELECT CD_MES_ANO, MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) VL_MES_ANTERIOR, COUNT(*) QT_MES_ANTERIOR, MAX(VL_RENDA_FAT) VL_RENDA_FAT  
+            FROM TB_TRANS  
+            WHERE T.DT_TRANS >=  add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), -1) 
+            AND T.DT_TRANS < to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND CD_TP_PESSOA = 'J'    
+            AND FL_ANALISADO = 1
+            GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE  
+            HAVING COUNT(*) >= (:pm_QtdeMesAnteriorPJ)  
+            AND ((MAX(VL_RENDA_FAT) IS NOT NULL  
+                  AND (SUM(VL_OPER) >= (:pm_ValorMesAnteriorPJ)) 
+                  AND (SUM(VL_OPER) >= (MAX(VL_RENDA_FAT) * (:pm_percFaturamento/100))))  
+                  OR  
+                 (MAX(VL_RENDA_FAT) IS NULL  
+                  AND (SUM(VL_OPER) >= (:pm_vlMesAnterior_SFatPJ)))  
+                )  
+          ) T  
+          WHERE NOT EXISTS (SELECT 1 FROM TB_TRANS A  
+                            WHERE A.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE  
+                            AND A.CD_TP_IDENTF_CLIE  = T.CD_TP_IDENTF_CLIE  
+                            AND A.CD_MES_ANO = :cd_lote     
+                           )  
+     ) T1  
+ 

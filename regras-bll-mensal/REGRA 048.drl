@@ -1,0 +1,84 @@
+/* i) incompatibilidade da atividade econômica ou faturamento informado com o padrão apresentado por clientes com o mesmo perfil;*/  
+/* considerando que todos os clientes que transacionaram no lote, tem seu cadastro atualizado, para o lote em processamento*/
+  
+SELECT DISTINCT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 48 - Faturamento informado está acima do limite para o porte declarado |' ||   
+'Objetivo: i) Incompatibilidade da atividade econômica ou faturamento informado com o padrão apresentado por clientes com o mesmo perfil. C.C. Bacen n.3.542/2012, Art. 1º, Inciso III |' ||   
+'Conclusão: Movimentação do cliente apresentou incompatibilidade com a atividade econômica ou faturamento informados com o padrão apresentado por clientes com o mesmo perfil |' ||   
+'Cliente: ' ||  C.NM_CLIE || '|' ||  
+CASE C.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE C.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Valor Faturamento: ' || COALESCE(TO_CHAR(C.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||    
+'Porte: Microempresa' || '|' ||   
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Parâmetro que indica o valor limite de faturamento para empresas ME (pm_valorLimiteME): ' || COALESCE((SELECT TO_CHAR(:pm_valorLimiteME, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_CAD_CLIE C   
+WHERE EXISTS (SELECT 1 FROM TB_TRANS T WHERE CD_MES_ANO = :cd_lote AND T.FL_ANALISADO = 1 AND T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE)
+  AND CD_TP_PESSOA = 'J'   
+  AND C.CD_PORTE = 4   
+  AND (C.VL_RENDA_FAT > (:pm_valorLimiteME/12))   
+ 
+UNION ALL   
+SELECT DISTINCT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 48 - Faturamento informado está acima do limite para o porte declarado |' ||   
+'Objetivo: i) Incompatibilidade da atividade econômica ou faturamento informado com o padrão apresentado por clientes com o mesmo perfil. C.C. Bacen n.3.542/2012, Art. 1º, Inciso III |' ||   
+'Conclusão: Movimentação do cliente apresentou incompatibilidade com a atividade econômica ou faturamento informados com o padrão apresentado por clientes com o mesmo perfil |' ||   
+'Cliente: ' ||  C.NM_CLIE || '|' ||  
+CASE C.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE C.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||     
+'Valor Faturamento: ' || COALESCE(TO_CHAR(C.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||    
+'Porte: Pequeno Porte' || '|' ||   
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Parâmetro que indica o valor limite de faturamento para empresas de pequeno porte (pm_valorLimiteEPP): ' || COALESCE((SELECT TO_CHAR(:pm_valorLimiteEPP, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_CAD_CLIE C   
+WHERE EXISTS 
+  (SELECT 1 FROM TB_TRANS T 
+  WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+  AND T.FL_ANALISADO = 1 
+  AND T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE
+  )        
+  AND C.CD_TP_PESSOA = 'J'   
+  AND C.CD_PORTE = 3  
+  AND (C.VL_RENDA_FAT > (:pm_valorLimiteEPP/12))   
+ 
+UNION ALL     
+SELECT DISTINCT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 48 - Faturamento informado está acima do limite para o porte declarado |' ||   
+'Objetivo: i) Incompatibilidade da atividade econômica ou faturamento informado com o padrão apresentado por clientes com o mesmo perfil. C.C. Bacen n.3.542/2012, Art. 1º, Inciso III |' ||   
+'Conclusão: Movimentação do cliente apresentou incompatibilidade com a atividade econômica ou faturamento informados com o padrão apresentado por clientes com o mesmo perfil |' ||   
+'Cliente: ' ||  C.NM_CLIE || '|' ||  
+CASE C.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE C.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||      
+'Valor Faturamento: ' || COALESCE(TO_CHAR(C.VL_RENDA_FAT, 'L9999G999G990D99'), 'Valor não cadastrado') || '|' ||    
+'Porte: Médio Porte' || '|' ||   
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Parâmetro que indica o valor limite de faturamento para empresas de médio porte (pm_valorLimiteEPM): ' || COALESCE((SELECT TO_CHAR(:pm_valorLimiteEPM, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_CAD_CLIE C   
+WHERE EXISTS 
+(SELECT 1 FROM TB_TRANS T 
+WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+   AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+AND T.FL_ANALISADO = 1 
+AND T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE
+)        
+  AND C.CD_TP_PESSOA = 'J'   
+  AND C.CD_PORTE = 2 
+  AND (C.VL_RENDA_FAT > (:pm_valorLimiteEPM/12))   
+
+  

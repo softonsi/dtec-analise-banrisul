@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>TB_TRANS</name>
+    <description/>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>&#x2f;</directory>
+    <parameters>
+    </parameters>
+    <log>
+<trans-log-table><connection/>
+<schema/>
+<table/>
+<size_limit_lines/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name></field><field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name></field><field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name></field><field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name></field><field><id>EXECUTING_SERVER</id><enabled>N</enabled><name>EXECUTING_SERVER</name></field><field><id>EXECUTING_USER</id><enabled>N</enabled><name>EXECUTING_USER</name></field><field><id>CLIENT</id><enabled>N</enabled><name>CLIENT</name></field></trans-log-table>
+<perf-log-table><connection/>
+<schema/>
+<table/>
+<interval/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>SEQ_NR</id><enabled>Y</enabled><name>SEQ_NR</name></field><field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>INPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>INPUT_BUFFER_ROWS</name></field><field><id>OUTPUT_BUFFER_ROWS</id><enabled>Y</enabled><name>OUTPUT_BUFFER_ROWS</name></field></perf-log-table>
+<channel-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>LOGGING_OBJECT_TYPE</id><enabled>Y</enabled><name>LOGGING_OBJECT_TYPE</name></field><field><id>OBJECT_NAME</id><enabled>Y</enabled><name>OBJECT_NAME</name></field><field><id>OBJECT_COPY</id><enabled>Y</enabled><name>OBJECT_COPY</name></field><field><id>REPOSITORY_DIRECTORY</id><enabled>Y</enabled><name>REPOSITORY_DIRECTORY</name></field><field><id>FILENAME</id><enabled>Y</enabled><name>FILENAME</name></field><field><id>OBJECT_ID</id><enabled>Y</enabled><name>OBJECT_ID</name></field><field><id>OBJECT_REVISION</id><enabled>Y</enabled><name>OBJECT_REVISION</name></field><field><id>PARENT_CHANNEL_ID</id><enabled>Y</enabled><name>PARENT_CHANNEL_ID</name></field><field><id>ROOT_CHANNEL_ID</id><enabled>Y</enabled><name>ROOT_CHANNEL_ID</name></field></channel-log-table>
+<step-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field><field><id>STEPNAME</id><enabled>Y</enabled><name>STEPNAME</name></field><field><id>STEP_COPY</id><enabled>Y</enabled><name>STEP_COPY</name></field><field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name></field><field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name></field><field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name></field><field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name></field><field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name></field><field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name></field><field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name></field><field><id>LOG_FIELD</id><enabled>N</enabled><name>LOG_FIELD</name></field></step-log-table>
+<metrics-log-table><connection/>
+<schema/>
+<table/>
+<timeout_days/>
+<field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field><field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field><field><id>LOG_DATE</id><enabled>Y</enabled><name>LOG_DATE</name></field><field><id>METRICS_DATE</id><enabled>Y</enabled><name>METRICS_DATE</name></field><field><id>METRICS_CODE</id><enabled>Y</enabled><name>METRICS_CODE</name></field><field><id>METRICS_DESCRIPTION</id><enabled>Y</enabled><name>METRICS_DESCRIPTION</name></field><field><id>METRICS_SUBJECT</id><enabled>Y</enabled><name>METRICS_SUBJECT</name></field><field><id>METRICS_TYPE</id><enabled>Y</enabled><name>METRICS_TYPE</name></field><field><id>METRICS_VALUE</id><enabled>Y</enabled><name>METRICS_VALUE</name></field></metrics-log-table>
+    </log>
+    <maxdate>
+      <connection/>
+      <table/>
+      <field/>
+      <offset>0.0</offset>
+      <maxdiff>0.0</maxdiff>
+    </maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit>10</step_performance_capturing_size_limit>
+    <dependencies>
+    </dependencies>
+    <partitionschemas>
+    </partitionschemas>
+    <slaveservers>
+    </slaveservers>
+    <clusterschemas>
+    </clusterschemas>
+  <created_user>-</created_user>
+  <created_date>2014&#x2f;09&#x2f;24 09&#x3a;29&#x3a;29.666</created_date>
+  <modified_user>-</modified_user>
+  <modified_date>2014&#x2f;09&#x2f;24 09&#x3a;29&#x3a;29.666</modified_date>
+  </info>
+  <notepads>
+    <notepad>
+      <note>ALTERADO DIA 02&#x2f;05&#x2f;2017 &#xd;&#xa;AP&#xd3;S SOLICITA&#xc7;&#xc3;O ENVIADA POR E-MAIL PELA SHEILA NO DIA 27&#x2f;04&#x2f;2017 &#xc0;S 14&#x3a;57&#xd;&#xa;&#xd;&#xa;INCLUS&#xc3;O DOS CAMPOS&#x3a;&#xd;&#xa;&#xd;&#xa;TB_TRANS_RU&#xd;&#xa;-CD_TP_CTA_DESTORIG&#xd;&#xa;-FL_CS_DESTORIG&#xd;&#xa;-NM_CID_OPER&#xd;&#xa;-NU_IP_OPER&#xd;&#xa;-NU_FP_OPER&#xd;&#xa;-CD_TP_RETORNO&#xd;&#xa;-CD_CATEGORIA_CTA_DESTORIG&#xd;&#xa;&#xd;&#xa;TB_TRANS&#xd;&#xa;-CD_TP_CTA_DESTORIG&#xd;&#xa;-FL_CS_DESTORIG&#xd;&#xa;-NM_CID_OPER&#xd;&#xa;-NU_IP_OPER&#xd;&#xa;-NU_FP_OPER&#xd;&#xa;-CD_TP_RETORNO&#xd;&#xa;-CD_CATEGORIA_CTA_DESTORIG&#xd;&#xa;-NU_CNPJ_VINCULADO&#xd;&#xa;-NU_FILIAL_CNPJ_VINCULADO&#xd;&#xa;-NU_CNPJ_CTR_VINCULADO&#xd;&#xa;-SG_UF_ABERT_CTA&#xd;&#xa;-NM_CID_ABERT_CTA&#xd;&#xa;-CD_CATEGORIA_CTA&#xd;&#xa;&#xd;&#xa;TB_TRANS_INCONS&#xd;&#xa;-CD_TP_CTA_DESTORIG&#xd;&#xa;-FL_CS_DESTORIG&#xd;&#xa;-NM_CID_OPER&#xd;&#xa;-NU_IP_OPER&#xd;&#xa;-NU_FP_OPER&#xd;&#xa;-CD_TP_RETORNO&#xd;&#xa;-CD_CATEGORIA_CTA_DESTORIG&#xd;&#xa;-NU_CNPJ_VINCULADO&#xd;&#xa;-NU_FILIAL_CNPJ_VINCULADO&#xd;&#xa;-NU_CNPJ_CTR_VINCULADO&#xd;&#xa;-SG_UF_ABERT_CTA&#xd;&#xa;-NM_CID_ABERT_CTA&#xd;&#xa;-CD_CATEGORIA_CTA</note>
+      <xloc>604</xloc>
+      <yloc>574</yloc>
+      <width>460</width>
+      <heigth>694</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>205</backgroundcolorgreen>
+      <backgroundcolorblue>112</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>Y</drawshadow>
+    </notepad>
+    <notepad>
+      <note>ALTERADO DIA 02&#x2f;06&#x2f;2017&#xd;&#xa;AP&#xd3;S CONVERSA COM A SHEILA.&#xd;&#xa;&#xd;&#xa;ALTERADO&#xd;&#xa;DE&#x3a;&#xd;&#xa;  CASE D.CD_FORMA_OPER WHEN 1 THEN 2  &#xd;&#xa;                       WHEN 13 THEN 1&#xd;&#xa;                       WHEN 11 THEN 3&#xd;&#xa;                       WHEN 12 THEN 3&#xd;&#xa;  END AS CD_TP_CARTAO,&#xd;&#xa;&#xd;&#xa;PARA&#x3a;&#xd;&#xa;	  CASE &#xd;&#xa;	    WHEN cpp.CD_CARTAO_PRE_PAGO IS NOT NULL  THEN 3  &#xd;&#xa;	    WHEN ca.CD_CARTAO IS NOT NULL            THEN ca.CD_TP_CARTAO&#xd;&#xa;	    ELSE NULL&#xd;&#xa;	  END AS CD_TP_CARTAO,&#xd;&#xa;	  -- C&#xf3;digo do tipo do cart&#xe3;o, sendo 1-Cart&#xe3;o de Cr&#xe9;dito, 2-Cart&#xe3;o de D&#xe9;bito, 3-Cart&#xe3;o Pr&#xe9;-Pago. &#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;ALTERADO&#xd;&#xa;DE&#x3a;&#xd;&#xa;	  CASE d.CD_FORMA_OPER WHEN 30 THEN f.DT_VENCTO_FATURA&#xd;&#xa;	                       ELSE ct.DT_VENCTO_CONTRATO&#xd;&#xa;	  END AS DT_VENCTO,&#xd;&#xa;&#xd;&#xa;PARA&#x3a;  &#xd;&#xa;	  CASE &#xd;&#xa;	    WHEN t.DT_VENCTO_FATURA IS NOT NULL THEN t.DT_VENCTO_FATURA&#xd;&#xa;	    WHEN ct.DT_VENCTO_CONTRATO IS NOT NULL THEN ct.DT_VENCTO_CONTRATO&#xd;&#xa;	    ELSE NULL&#xd;&#xa;	  END AS DT_VENCTO,</note>
+      <xloc>15</xloc>
+      <yloc>573</yloc>
+      <width>572</width>
+      <heigth>547</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>205</backgroundcolorgreen>
+      <backgroundcolorblue>112</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>Y</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>dtec_ld_rc_oracle</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>dtec_ld_rc_oracle</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ld_rc_oracle_encrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_ldpf_sqlserver</name>
+    <server/>
+    <type>MSSQL</type>
+    <access>JNDI</access>
+    <database>dtec_ldpf_sqlserver</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>MSSQL_DOUBLE_DECIMAL_SEPARATOR</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle</name>
+    <server/>
+    <type>ORACLE</type>
+    <access>JNDI</access>
+    <database>dtec_v3_oracle</database>
+    <port>1521</port>
+    <username/>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>dtec_v3_oracle_ecrypt</name>
+    <server>&#x24;&#x7b;db_host&#x7d;</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;db_name&#x7d;</database>
+    <port>&#x24;&#x7b;db_port&#x7d;</port>
+    <username>&#x24;&#x7b;db_user&#x7d;</username>
+    <password>&#x24;&#x7b;db_pass&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;db_port&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+  <hop> <from>CD_LOTE</from><to>INSERT - TB_TRANS</to><enabled>Y</enabled> </hop>
+  <hop> <from>CD_LOTE</from><to>INSERT - TB_TRANS_INCONS</to><enabled>Y</enabled> </hop>
+  <hop> <from>CD_LOTE</from><to>INSERT - TB_INCONS</to><enabled>Y</enabled> </hop>
+  </order>
+  <step>
+    <name>CD_LOTE</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+      <field>
+        <name>CD_LOTE</name>
+        <variable>&#x24;&#x7b;LOTE&#x7d;</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>126</xloc>
+      <yloc>124</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>INSERT - TB_INCONS</name>
+    <type>ExecSQL</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <execute_each_row>Y</execute_each_row>
+    <single_statement>Y</single_statement>
+    <replace_variables>Y</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>INSERT INTO TB_INCONS &#x28;CD_SEQ_INCONS, CD_INCONS,DS_CONTEUDO_CAMPO,TX_DETAL_OCOR,DT_OCORRENCIA,CD_LOTE,DS_SQL_ERRO&#x29;&#xd;&#xa;SELECT &#xd;&#xa;SQ_INCONS.nextval AS CD_SEQ_INCONS,&#xd;&#xa;&#x27;1&#x27; AS CD_INCONS, &#xd;&#xa;LPAD&#x28;TRIM&#x28;t.CD_DOC_IDENTF_CLIE&#x29;, 20, &#x27;0&#x27;&#x29; &#x7c;&#x7c;  to_char&#x28;t.DT_TRANS, &#x27;yyyymmddhhmmss&#x27;&#x29; &#x7c;&#x7c; LPAD&#x28;to_char&#x28;t.cd_seq_trans&#x29;, 7, &#x27;0&#x27;&#x29; AS DS_CONTEUDO_CAMPO,&#xd;&#xa;&#x27;Transa&#xe7;&#xe3;o sem Cliente&#x27; AS TX_DETAL_OCOR,&#xd;&#xa;SYSTIMESTAMP AS DT_OCORRENCIA,&#xd;&#xa;t.CD_LOTE,&#xd;&#xa;&#x27;ERRO - TB_TRANS - FkCadClie_Trans&#x27; AS DS_SQL_ERRO&#xd;&#xa;FROM TB_TRANS_RU t&#xd;&#xa;WHERE t.CD_LOTE &#x3d; &#x24;&#x7b;LOTE&#x7d; AND NOT EXISTS &#x28;SELECT 1 FROM TB_CAD_CLIE WHERE CD_DOC_IDENTF_CLIE &#x3d; t.CD_DOC_IDENTF_CLIE AND CD_TP_IDENTF_CLIE &#x3d; t.CD_TP_IDENTF_CLIE&#x29;</sql>
+    <set_params>N</set_params>
+    <insert_field/>
+    <update_field/>
+    <delete_field/>
+    <read_field/>
+    <arguments>
+    </arguments>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>375</xloc>
+      <yloc>231</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>INSERT - TB_TRANS</name>
+    <type>ExecSQL</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <execute_each_row>Y</execute_each_row>
+    <single_statement>Y</single_statement>
+    <replace_variables>Y</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>INSERT &#x2f;&#x2a;&#x2b; IGNORE_ROW_ON_DUPKEY_INDEX &#x28;TB_TRANS, &#x22;PkTransacao&#x22;&#x29; &#x2a;&#x2f; INTO TB_TRANS &#x28;&#xd;&#xa;CD_TRANSACAO,&#xd;&#xa;CD_AG,&#xd;&#xa;CD_AG_DESTORIG,&#xd;&#xa;CD_AG_OPER,&#xd;&#xa;CD_ALINEA, &#xd;&#xa;CD_ANO_FABRIC,&#xd;&#xa;CD_ANO_MODELO,&#xd;&#xa;CD_ASSESSORIA,&#xd;&#xa;CD_BANCO,&#xd;&#xa;CD_BANCO_OPER,&#xd;&#xa;CD_BAND_CARTAO,&#xd;&#xa;CD_BCO_DESTORIG,&#xd;&#xa;CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;CD_CARTAO,&#xd;&#xa;CD_CATEGORIA_CTA,&#xd;&#xa;CD_CATEGORIA_CTA_DESTORIG,&#xd;&#xa;CD_CEP_AG_CLIE,&#xd;&#xa;CD_CEP_AG_OPER,&#xd;&#xa;CD_CEP_RESID,&#xd;&#xa;CD_COLIGADA,&#xd;&#xa;CD_COMPE_INST,&#xd;&#xa;CD_CONTRATO,&#xd;&#xa;CD_CONVENIO,&#xd;&#xa;CD_CPF_CNTAT,&#xd;&#xa;CD_CPF_CTR_CNTAT,&#xd;&#xa;CD_CPF_OFFICER,&#xd;&#xa;CD_CTA,&#xd;&#xa;CD_CTA_DESTORIG,&#xd;&#xa;CD_DOC_IDENTF_BNEFC, &#xd;&#xa;CD_DOC_IDENTF_CLIE,&#xd;&#xa;CD_DOC_IDENTF_CONJUGE,&#xd;&#xa;CD_DOC_IDENTF_DESTORIG,&#xd;&#xa;CD_DOC_IDENTF_MOVD,&#xd;&#xa;CD_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;CD_DOC_IDENTF_RESP_CTA,&#xd;&#xa;CD_DOC_TRANSACAO,&#xd;&#xa;CD_ESTAB,&#xd;&#xa;CD_EST_CIVIL,&#xd;&#xa;CD_FILIAL_BCO,&#xd;&#xa;CD_FOCO_GERENTE,&#xd;&#xa;CD_FONE_CEL_CLIE,&#xd;&#xa;CD_FONE_CLIE,&#xd;&#xa;CD_FONTE_INF,&#xd;&#xa;CD_FORMA_CONSTTCAO,&#xd;&#xa;CD_FORMA_OPER,&#xd;&#xa;CD_FUNC_RESP_CTA,&#xd;&#xa;CD_GRP_CONSORCIO,&#xd;&#xa;CD_GRP_FINANC,&#xd;&#xa;CD_GRP_PRODUTO,&#xd;&#xa;CD_IBGE_CID_EMISS_CARTAO,&#xd;&#xa;CD_IBGE_CID_OPER,&#xd;&#xa;CD_IBGE_RESID,&#xd;&#xa;CD_IDENTF_REF,&#xd;&#xa;CD_IDENTF_REF_CONJG,&#xd;&#xa;CD_IDENTF_SIT_CEDULA,&#xd;&#xa;CD_JUST_TRANSACAO,&#xd;&#xa;CD_LOTE,&#xd;&#xa;CD_LOTE_INSERT,&#xd;&#xa;CD_MARCA,&#xd;&#xa;CD_MES_ANO,&#xd;&#xa;CD_MODELO,&#xd;&#xa;CD_MOEDA,&#xd;&#xa;CD_NATUR_DECLR_OPER,&#xd;&#xa;CD_NATUR_OPER,&#xd;&#xa;CD_NATUR_SALDO,&#xd;&#xa;CD_OFFICER,&#xd;&#xa;CD_ORGAO,&#xd;&#xa;CD_ORGAO_EXPDD_DESTORIG,&#xd;&#xa;CD_ORGAO_EXPDD_DOC_IDENTF,&#xd;&#xa;CD_ORGAO_EXPDD_REALZ_TRANS,&#xd;&#xa;CD_ORIG_CONTRATO,&#xd;&#xa;CD_PAIS_DESTORIG,&#xd;&#xa;CD_PAIS_EMIS_PASSRTE,&#xd;&#xa;CD_PAIS_NACION,&#xd;&#xa;CD_PAIS_OPER,&#xd;&#xa;CD_PAIS_PASSRTE_BNEFC,&#xd;&#xa;CD_PAIS_PASSRTE_DESTORIG,&#xd;&#xa;CD_PAIS_PASSRTE_REALZ_TRANS,&#xd;&#xa;CD_PAIS_RESID,&#xd;&#xa;CD_PERFIL_INVST,&#xd;&#xa;CD_PORTE,&#xd;&#xa;CD_PPSTA,&#xd;&#xa;CD_PRODUTO,&#xd;&#xa;CD_RAMO_ATIVID,&#xd;&#xa;CD_RG,&#xd;&#xa;CD_RISCO_AGRUP_ANTERIOR,&#xd;&#xa;CD_RISCO_AGRUP_ATUAL,&#xd;&#xa;CD_RISCO_ANTERIOR,&#xd;&#xa;CD_RISCO_ATUAL,&#xd;&#xa;CD_SETOR,&#xd;&#xa;CD_SEXO,&#xd;&#xa;CD_SGMTO_CLIE,&#xd;&#xa;CD_SGMTO_CONTRATO,&#xd;&#xa;CD_STTUS_CONTRATO,&#xd;&#xa;CD_STTUS_CTA,&#xd;&#xa;CD_SUREG,&#xd;&#xa;CD_TERMINAL,&#xd;&#xa;CD_TP_CARTAO,&#xd;&#xa;CD_TP_CARTAO_PRE_PAGO,&#xd;&#xa;CD_TP_CLIE,&#xd;&#xa;CD_TP_CONVENIO,&#xd;&#xa;CD_TP_CTA,&#xd;&#xa;CD_TP_CTA_DESTORIG,&#xd;&#xa;CD_TP_DOC_EMTDO,&#xd;&#xa;CD_TP_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;CD_TP_DOC_IDENTF_RESP_CTA,&#xd;&#xa;CD_TP_IDENTF_BNEFC,&#xd;&#xa;CD_TP_IDENTF_CLIE,&#xd;&#xa;CD_TP_IDENTF_DESTORIG,&#xd;&#xa;CD_TP_IDENTF_MOVD,&#xd;&#xa;CD_TP_MOVD,&#xd;&#xa;CD_TP_OPER,&#xd;&#xa;CD_TP_PESSOA,&#xd;&#xa;CD_TP_PLANO,&#xd;&#xa;CD_TP_RETORNO,&#xd;&#xa;CD_TP_TITULAR_CTA,&#xd;&#xa;CD_TRANS_ORIG,&#xd;&#xa;CD_VIA_OPER,&#xd;&#xa;DS_CAIXA,&#xd;&#xa;DS_DECLR_PROPSTO,&#xd;&#xa;DS_FAIXA_PDD,&#xd;&#xa;DS_INIBICAO,&#xd;&#xa;DS_PPE_GRAU_ENVOLV,&#xd;&#xa;DT_ABERT_CTA,&#xd;&#xa;DT_ATUALZ_CADSTRL_ANTERIOR,&#xd;&#xa;DT_BASE_CONTRATO,&#xd;&#xa;DT_CAD_CONTRATO,&#xd;&#xa;DT_CANCEL_CONTRATO,&#xd;&#xa;DT_EMIS_DOC_IDENTF,&#xd;&#xa;DT_EMIS_IDENTF_DESTORIG,&#xd;&#xa;DT_EMIS_IDENTF_REALZ_TRANS,&#xd;&#xa;DT_EMISS_CARTAO,&#xd;&#xa;DT_EXCLUSAO_MOVD,&#xd;&#xa;DT_FECHA_FATURA,&#xd;&#xa;DT_FIM_CTA,&#xd;&#xa;DT_INCLUSAO_CLIE,&#xd;&#xa;DT_INIC_APLICACAO,&#xd;&#xa;DT_LIB_CONTRATO,&#xd;&#xa;DT_LIQUID,&#xd;&#xa;DT_NASCTO_FUND,&#xd;&#xa;DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;DT_TRANS,&#xd;&#xa;DT_ULTM_ATULZ_CADSTRL,&#xd;&#xa;DT_ULTM_ATULZ_CTA,&#xd;&#xa;DT_ULTM_ATULZ_EMPR,&#xd;&#xa;DT_ULTM_MOV_CTA,&#xd;&#xa;DT_ULTM_VERIF_CADSTRL,&#xd;&#xa;DT_VALIDD_CARTAO,&#xd;&#xa;DT_VENCTO,&#xd;&#xa;DT_VENCTO_FATURA,&#xd;&#xa;DT_VENCTO_PCELA,&#xd;&#xa;FL_AGENTE_PUBLICO,&#xd;&#xa;FL_ASS,&#xd;&#xa;FL_AVERB,&#xd;&#xa;FL_BEM_ALIENADO,&#xd;&#xa;FL_BEM_APREENDD,&#xd;&#xa;FL_BNEFC_FINAL,&#xd;&#xa;FL_BNEFC_INSS,&#xd;&#xa;FL_BX_RISCO_LD,&#xd;&#xa;FL_CADSTR_COMPL,&#xd;&#xa;FL_CADSTR_DESATULZ,&#xd;&#xa;FL_CANCEL_CONTRATO,&#xd;&#xa;FL_CARTAO_ENVD,&#xd;&#xa;FL_CHEQUE_ENDOSSO,&#xd;&#xa;FL_CLIE_PRIVATE,&#xd;&#xa;FL_CNSTT_TRUST,&#xd;&#xa;FL_CS_DESTORIG,&#xd;&#xa;FL_DECLR_PROPST_NATUR,&#xd;&#xa;FL_DOC_MOVD,&#xd;&#xa;FL_DUT,&#xd;&#xa;FL_FONTE_REF_CTA,&#xd;&#xa;FL_FORNEC_INFORMACAO,&#xd;&#xa;FL_FUNCIONARIO,&#xd;&#xa;FL_GARNT_ALIEN,&#xd;&#xa;FL_INFO_COAF,&#xd;&#xa;FL_ISENTO_CPFCNPJ,&#xd;&#xa;FL_LICITACAO,&#xd;&#xa;FL_MODO_DIVERSO,&#xd;&#xa;FL_MOEDA_ESTRG,&#xd;&#xa;FL_MOVTA_JURIDICA,&#xd;&#xa;FL_MOVTA_PROC,&#xd;&#xa;FL_OPER_ESPECIE,&#xd;&#xa;FL_OPER_ITEM_LUXO,&#xd;&#xa;FL_ORGNZ_SLUCRO,&#xd;&#xa;FL_PATROCINIO,&#xd;&#xa;FL_PPE,&#xd;&#xa;FL_PROPSTO_EMISS_CARTAO,&#xd;&#xa;FL_RAMO_SUSP,&#xd;&#xa;FL_RECUSA_ATULZ_CADSTR,&#xd;&#xa;FL_RFINAN,&#xd;&#xa;FL_SETOR_PUBLICO,&#xd;&#xa;FL_TAR_CAD_FINCD,&#xd;&#xa;NM_ASSESSORIA,&#xd;&#xa;NM_BAIRRO_RESID,&#xd;&#xa;NM_BNEFC_CARTAO,&#xd;&#xa;NM_CHEQUE_ENDOSSO,&#xd;&#xa;NM_CID_ABERT_CTA,&#xd;&#xa;NM_CID_AG_DESTORIG,&#xd;&#xa;NM_CID_EMISS_CARTAO,&#xd;&#xa;NM_CID_NASCTO,&#xd;&#xa;NM_CID_OPER,&#xd;&#xa;NM_CID_RESID,&#xd;&#xa;NM_CLIE,&#xd;&#xa;NM_COLIGADA,&#xd;&#xa;NM_CONJUGE,&#xd;&#xa;NM_DESTORIG,&#xd;&#xa;NM_EMPRESA_ORIG,&#xd;&#xa;NM_ENDER_RESID,&#xd;&#xa;NM_FANT,&#xd;&#xa;NM_GRP_FINANC,&#xd;&#xa;NM_LOCAL_EMIS_DOC_IDENTF,&#xd;&#xa;NM_LOCAL_EMIS_RG,&#xd;&#xa;NM_MAE,&#xd;&#xa;NM_MOVD,&#xd;&#xa;NM_OFFICER,&#xd;&#xa;NM_OPERD_CONTRATO,&#xd;&#xa;NM_PAI,&#xd;&#xa;NM_PROCURADOR,&#xd;&#xa;NM_PSSOA_REALZ_TRANS,&#xd;&#xa;NM_RESP_CTA,&#xd;&#xa;NM_SGMTO_CLIE,&#xd;&#xa;NM_SIST_ORIG,&#xd;&#xa;NU_CHEQUE,&#xd;&#xa;NU_CNPJ_CTR_VINCULADO,&#xd;&#xa;NU_CNPJ_VINCULADO,&#xd;&#xa;NU_DDD_CELULAR,&#xd;&#xa;NU_DDD_TELEFONE,&#xd;&#xa;NU_DIGIT_IDENTF_REF,&#xd;&#xa;NU_DIGIT_IDENTF_REF_CONJG,&#xd;&#xa;NU_FILIAL_CNPJ_VINCULADO,&#xd;&#xa;NU_FP_OPER,&#xd;&#xa;NU_IP_OPER,&#xd;&#xa;NU_PARCELA,&#xd;&#xa;NU_PASSRTE,&#xd;&#xa;NU_RESID,&#xd;&#xa;PC_POSSE_PRODUTO,&#xd;&#xa;QT_COTA_CONSORCIO,&#xd;&#xa;QT_CTA_CLIE,&#xd;&#xa;QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;QT_MED_MOV_CLIE,&#xd;&#xa;QT_MES_CONTT,&#xd;&#xa;QT_MES_PAGO,&#xd;&#xa;SG_ORG_INTERNL,&#xd;&#xa;SG_ORG_INTERNL_DESTORIG,&#xd;&#xa;SG_ORG_INTERNL_REALZ_TRANS,&#xd;&#xa;SG_UF_ABERT_CTA,&#xd;&#xa;SG_UF_AG_CTA,&#xd;&#xa;SG_UF_AG_DESTORIG,&#xd;&#xa;SG_UF_AG_OPER,&#xd;&#xa;SG_UF_EMIS_DOC_IDENTF,&#xd;&#xa;SG_UF_EMIS_RG,&#xd;&#xa;SG_UF_EMISS_CARTAO,&#xd;&#xa;SG_UF_NASCTO,&#xd;&#xa;SG_UF_RESID,&#xd;&#xa;VL_CARGA_INIC_CARTAO,&#xd;&#xa;VL_COMPROMET,&#xd;&#xa;VL_DESCTO_PARCELA,&#xd;&#xa;VL_FAT_MED_MENSAL,&#xd;&#xa;VL_FATURA,&#xd;&#xa;VL_FINCD_CONTRATO,&#xd;&#xa;VL_IOF_CONTRATO,&#xd;&#xa;VL_JUROS_PARCELA,&#xd;&#xa;VL_LIM_CARTAO,&#xd;&#xa;VL_LIQUID,&#xd;&#xa;VL_MED_CREDT,&#xd;&#xa;VL_MED_DEBT,&#xd;&#xa;VL_MED_INVEST_PRODUTO,&#xd;&#xa;VL_MERCADO_PRODUTO,&#xd;&#xa;VL_MOEDA,&#xd;&#xa;VL_MORA_PARCELA,&#xd;&#xa;VL_MULTA_PARCELA,&#xd;&#xa;VL_OPER,&#xd;&#xa;VL_OPER_CONTRATO,&#xd;&#xa;VL_PATRIM,&#xd;&#xa;VL_PCELA_CONTRATO,&#xd;&#xa;VL_PRINC_CONTRATO,&#xd;&#xa;VL_REBATE_PGTO,&#xd;&#xa;VL_RENDA_FAT,&#xd;&#xa;VL_SALDO_CARTAO,&#xd;&#xa;VL_SEGURO_CONTRATO,&#xd;&#xa;VL_SLD_CREDOR,&#xd;&#xa;VL_SLD_CUSTODIA_ANTERIOR,&#xd;&#xa;VL_SLD_CUSTODIA_ATUAL,&#xd;&#xa;VL_SLD_INIC,&#xd;&#xa;VL_SLD_MEDIO,&#xd;&#xa;VL_SLD_VINC,&#xd;&#xa;VL_TAR_CAD_CONTRATO,&#xd;&#xa;VL_TAXA_CONTRATO,&#xd;&#xa;VL_TAXA_EFETIVO,&#xd;&#xa;VL_TAXA_OPER_CONTRATO,&#xd;&#xa;VL_TAXA_REBATE,&#xd;&#xa;VL_SALDO_CONTRATO,&#xd;&#xa;DT_CONTEMPLADO,&#xd;&#xa;CD_TITULO,&#xd;&#xa;VL_ABERT_MERCADO,&#xd;&#xa;VL_FECHA_MERCADO&#xd;&#xa;&#x29;&#xd;&#xa;SELECT&#xd;&#xa;LPAD&#x28;TRIM&#x28;t.CD_DOC_IDENTF_CLIE&#x29;, 20, &#x27;0&#x27;&#x29; &#x7c;&#x7c;  to_char&#x28;t.DT_TRANS, &#x27;yyyymmddhhmmss&#x27;&#x29; &#x7c;&#x7c; LPAD&#x28;to_char&#x28;t.cd_seq_trans&#x29;, 7, &#x27;0&#x27;&#x29; AS CD_TRANSACAO,&#xd;&#xa;t.CD_AG,&#xd;&#xa;t.CD_AG_DESTORIG,&#xd;&#xa;t.CD_AG_OPER,&#xd;&#xa;t.CD_ALINEA, &#xd;&#xa;ct.CD_ANO_FABRIC,&#xd;&#xa;ct.CD_ANO_MODELO,&#xd;&#xa;t.CD_ASSESSORIA,&#xd;&#xa;t.CD_BANCO,&#xd;&#xa;t.CD_BANCO_OPER,&#xd;&#xa;ca.CD_BAND_CARTAO,&#xd;&#xa;t.CD_BCO_DESTORIG,&#xd;&#xa;ct.CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;t.CD_CARTAO,&#xd;&#xa;cta.CD_CATEGORIA_CTA,&#xd;&#xa;t.CD_CATEGORIA_CTA_DESTORIG,&#xd;&#xa;t.CD_CEP_AG_CLIE,&#xd;&#xa;t.CD_CEP_AG_OPER,&#xd;&#xa;c.CD_CEP_RESID,&#xd;&#xa;t.CD_COLIGADA,&#xd;&#xa;t.CD_COMPE_INST,&#xd;&#xa;t.CD_CONTRATO,&#xd;&#xa;ct.CD_CONVENIO,&#xd;&#xa;ct.CD_CPF_CNTAT,&#xd;&#xa;ct.CD_CPF_CTR_CNTAT,&#xd;&#xa;ct.CD_CPF_OFFICER,&#xd;&#xa;t.CD_CTA,&#xd;&#xa;t.CD_CTA_DESTORIG,&#xd;&#xa;CASE WHEN t.CD_CONTRATO IS NULL THEN cpp.CD_DOC_IDENTF_BNEFC ELSE ct.CD_DOC_IDENTF_BNEFC END AS CD_DOC_IDENTF_BNEFC, &#xd;&#xa;t.CD_DOC_IDENTF_CLIE,&#xd;&#xa;c.CD_DOC_IDENTF_CONJUGE,&#xd;&#xa;t.CD_DOC_IDENTF_DESTORIG,&#xd;&#xa;m.CD_DOC_IDENTF_MOVD,&#xd;&#xa;t.CD_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;t.CD_DOC_IDENTF_RESP_CTA,&#xd;&#xa;t.CD_DOC_TRANSACAO,&#xd;&#xa;t.CD_ESTAB,&#xd;&#xa;c.CD_EST_CIVIL,&#xd;&#xa;ct.CD_FILIAL_BCO,&#xd;&#xa;cta.CD_FOCO_GERENTE,&#xd;&#xa;c.CD_FONE_CEL_CLIE,&#xd;&#xa;c.CD_FONE_CLIE,&#xd;&#xa;ppe.CD_FONTE_INF,&#xd;&#xa;c.CD_FORMA_CONSTTCAO,&#xd;&#xa;d.CD_FORMA_OPER,&#xd;&#xa;cta.CD_FUNC_RESP_CTA,&#xd;&#xa;ct.CD_GRP_CONSORCIO,&#xd;&#xa;c.CD_GRP_FINANC,&#xd;&#xa;p.CD_GRP_PRODUTO,&#xd;&#xa;cpp.CD_IBGE_CID_EMISS_CARTAO,&#xd;&#xa;t.CD_IBGE_CID_OPER,&#xd;&#xa;c.CD_IBGE_RESID,&#xd;&#xa;c.CD_IDENTF_REF,&#xd;&#xa;c.CD_IDENTF_REF_CONJG,&#xd;&#xa;t.CD_IDENTF_SIT_CEDULA,&#xd;&#xa;t.CD_JUST_TRANSACAO,&#xd;&#xa;t.CD_LOTE AS LOTE,&#xd;&#xa;c.CD_LOTE_INSERT,&#xd;&#xa;ct.CD_MARCA,&#xd;&#xa;to_char&#x28;t.DT_TRANS, &#x27;YYYYMM&#x27;&#x29; as CD_MES_ANO,&#xd;&#xa;ct.CD_MODELO,&#xd;&#xa;t.CD_MOEDA,&#xd;&#xa;t.CD_NATUR_DECLR_OPER,&#xd;&#xa;d.CD_NATUR_OPER,&#xd;&#xa;ca.CD_NATUR_SALDO,&#xd;&#xa;ct.CD_OFFICER,&#xd;&#xa;ct.CD_ORGAO,&#xd;&#xa;t.CD_ORGAO_EXPDD_DESTORIG,&#xd;&#xa;c.CD_ORGAO_EXPDD_DOC_IDENTF,&#xd;&#xa;t.CD_ORGAO_EXPDD_REALZ_TRANS,&#xd;&#xa;ct.CD_ORIG_CONTRATO,&#xd;&#xa;t.CD_PAIS_DESTORIG,&#xd;&#xa;c.CD_PAIS_EMIS_PASSRTE,&#xd;&#xa;c.CD_PAIS_NACION,&#xd;&#xa;t.CD_PAIS_OPER,&#xd;&#xa;cpp.CD_PAIS_PASSRTE_BNEFC,&#xd;&#xa;t.CD_PAIS_PASSRTE_DESTORIG,&#xd;&#xa;t.CD_PAIS_PASSRTE_REALZ_TRANS,&#xd;&#xa;c.CD_PAIS_RESID,&#xd;&#xa;c.CD_PERFIL_INVST,&#xd;&#xa;c.CD_PORTE,&#xd;&#xa;ct.CD_PPSTA,&#xd;&#xa;CASE ct.CD_PRODUTO WHEN NULL THEN T.CD_PRODUTO END AS CD_PRODUTO,&#xd;&#xa;c.CD_RAMO_ATIVID,&#xd;&#xa;c.CD_RG,&#xd;&#xa;c.CD_RISCO_AGRUP_ANTERIOR,&#xd;&#xa;c.CD_RISCO_AGRUP_ATUAL,&#xd;&#xa;c.CD_RISCO_ANTERIOR,&#xd;&#xa;c.CD_RISCO_ATUAL,&#xd;&#xa;r.CD_SETOR,&#xd;&#xa;c.CD_SEXO,&#xd;&#xa;c.CD_SGMTO_CLIE,&#xd;&#xa;ct.CD_SGMTO_CONTRATO,&#xd;&#xa;ct.CD_STTUS_CONTRATO,&#xd;&#xa;cta.CD_STTUS_CTA,&#xd;&#xa;a.CD_SUREG,&#xd;&#xa;t.CD_TERMINAL,&#xd;&#xa;CASE WHEN cpp.CD_CARTAO_PRE_PAGO IS NOT NULL THEN 3 WHEN ca.CD_CARTAO IS NOT NULL THEN ca.CD_TP_CARTAO ELSE NULL END AS CD_TP_CARTAO,&#xd;&#xa;cpp.CD_TP_CARTAO_PRE_PAGO,&#xd;&#xa;c.CD_TP_CLIE,&#xd;&#xa;ct.CD_TP_CONVENIO,&#xd;&#xa;cta.CD_TP_CTA,&#xd;&#xa;t.CD_TP_CTA_DESTORIG,&#xd;&#xa;t.CD_TP_DOC_EMTDO,&#xd;&#xa;t.CD_TP_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;t.CD_TP_DOC_IDENTF_RESP_CTA,&#xd;&#xa;CASE WHEN t.CD_CONTRATO IS NULL THEN cpp.CD_TP_IDENTF_BNEFC ELSE ct.CD_TP_IDENTF_BNEFC END AS CD_TP_IDENTF_BNEFC,&#xd;&#xa;t.CD_TP_IDENTF_CLIE,&#xd;&#xa;t.CD_TP_IDENTF_DESTORIG,&#xd;&#xa;m.CD_TP_IDENTF_MOVD,&#xd;&#xa;t.CD_TP_MOVD,&#xd;&#xa;d.CD_TP_OPER,&#xd;&#xa;c.CD_TP_PESSOA,&#xd;&#xa;ct.CD_TP_PLANO,&#xd;&#xa;t.CD_TP_RETORNO,&#xd;&#xa;cta.CD_TP_TITULAR_CTA,&#xd;&#xa;t.CD_TRANS_ORIG,&#xd;&#xa;d.CD_VIA_OPER,&#xd;&#xa;t.DS_CAIXA,&#xd;&#xa;c.DS_DECLR_PROPSTO,&#xd;&#xa;t.DS_FAIXA_PDD,&#xd;&#xa;t.DS_INIBICAO,&#xd;&#xa;c.DS_PPE_GRAU_ENVOLV,&#xd;&#xa;cta.DT_ABERT_CTA,&#xd;&#xa;c.DT_ATUALZ_CADSTRL_ANTERIOR,&#xd;&#xa;ct.DT_BASE_CONTRATO,&#xd;&#xa;ct.DT_CAD_CONTRATO,&#xd;&#xa;ct.DT_CANCEL_CONTRATO,&#xd;&#xa;c.DT_EMIS_DOC_IDENTF,&#xd;&#xa;t.DT_EMIS_IDENTF_DESTORIG,&#xd;&#xa;t.DT_EMIS_IDENTF_REALZ_TRANS,&#xd;&#xa;cpp.DT_EMISS_CARTAO,&#xd;&#xa;m.DT_EXCLUSAO_MOVD,&#xd;&#xa;ca.DT_FECHA_FATURA,&#xd;&#xa;cta.DT_FIM_CTA,&#xd;&#xa;c.DT_INCLUSAO_CLIE,&#xd;&#xa;t.DT_INIC_APLICACAO,&#xd;&#xa;ct.DT_LIB_CONTRATO,&#xd;&#xa;ct.DT_LIQUID_CONTRATO AS DT_LIQUID,&#xd;&#xa;c.DT_NASCTO_FUND,&#xd;&#xa;ct.DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;ct.DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;t.DT_TRANS,&#xd;&#xa;c.DT_ULTM_ATULZ_CADSTRL,&#xd;&#xa;cta.DT_ULTM_ATULZ_CTA,&#xd;&#xa;c.DT_ULTM_ATULZ_EMPR,&#xd;&#xa;cta.DT_ULTM_MOV_CTA,&#xd;&#xa;c.DT_ULTM_VERIF_CADSTRL,&#xd;&#xa;ca.DT_VALIDD_CARTAO,&#xd;&#xa;CASE WHEN t.DT_VENCTO_FATURA IS NOT NULL THEN t.DT_VENCTO_FATURA WHEN ct.DT_VENCTO_CONTRATO IS NOT NULL THEN ct.DT_VENCTO_CONTRATO ELSE NULL END AS DT_VENCTO,&#xd;&#xa;t.DT_VENCTO_FATURA,&#xd;&#xa;t.DT_VENCTO_PCELA,&#xd;&#xa;c.FL_AGENTE_PUBLICO,&#xd;&#xa;cta.FL_ASS,&#xd;&#xa;ct.FL_AVERB,&#xd;&#xa;ct.FL_BEM_ALIENADO,&#xd;&#xa;ct.FL_BEM_APREENDD,&#xd;&#xa;fc.FL_BNEFC_FINAL,&#xd;&#xa;c.FL_BNEFC_INSS,&#xd;&#xa;d.FL_BX_RISCO_LD,&#xd;&#xa;c.FL_CADSTR_COMPL,&#xd;&#xa;c.FL_CADSTR_DESATULZ,&#xd;&#xa;ct.FL_CANCEL_CONTRATO,&#xd;&#xa;ca.FL_CARTAO_ENVD,&#xd;&#xa;t.FL_CHEQUE_ENDOSSO,&#xd;&#xa;c.FL_CLIE_PRIVATE,&#xd;&#xa;g.FL_CNSTT_TRUST,&#xd;&#xa;t.FL_CS_DESTORIG,&#xd;&#xa;cta.FL_DECLR_PROPST_NATUR,&#xd;&#xa;t.FL_DOC_MOVD,&#xd;&#xa;ct.FL_DUT,&#xd;&#xa;cta.FL_FONTE_REF_CTA,&#xd;&#xa;c.FL_FORNEC_INFORMACAO,&#xd;&#xa;c.FL_FUNCIONARIO,&#xd;&#xa;ct.FL_GARNT_ALIEN,&#xd;&#xa;c.FL_INFO_COAF,&#xd;&#xa;c.FL_ISENTO_CPFCNPJ,&#xd;&#xa;c.FL_LICITACAO,&#xd;&#xa;t.FL_MODO_DIVERSO,&#xd;&#xa;r.FL_MOEDA_ESTRG,&#xd;&#xa;c.FL_MOVTA_JURIDICA,&#xd;&#xa;t.FL_MOVTA_PROC,&#xd;&#xa;r.FL_OPER_ESPECIE,&#xd;&#xa;r.FL_OPER_ITEM_LUXO,&#xd;&#xa;c.FL_ORGNZ_SLUCRO,&#xd;&#xa;c.FL_PATROCINIO,&#xd;&#xa;c.FL_PPE,&#xd;&#xa;cpp.FL_PROPSTO_EMISS_CARTAO,&#xd;&#xa;r.FL_RAMO_SUSP,&#xd;&#xa;c.FL_RECUSA_ATULZ_CADSTR,&#xd;&#xa;ct.FL_RFINAM,&#xd;&#xa;fc.FL_SETOR_PUBLICO,&#xd;&#xa;ct.FL_TAR_CAD_FINCD,&#xd;&#xa;t.NM_ASSESSORIA,&#xd;&#xa;c.NM_BAIRRO_RESID,&#xd;&#xa;cpp.NM_BNEFC_CARTAO,&#xd;&#xa;t.NM_CHEQUE_ENDOSSO,&#xd;&#xa;cta.NM_CID_ABERT_CTA,&#xd;&#xa;t.NM_CID_AG_DESTORIG,&#xd;&#xa;cpp.NM_CID_EMISS_CARTAO,&#xd;&#xa;c.NM_CID_NASCTO,&#xd;&#xa;t.NM_CID_OPER,&#xd;&#xa;c.NM_CID_RESID,&#xd;&#xa;c.NM_CLIE,&#xd;&#xa;t.NM_COLIGADA,&#xd;&#xa;c.NM_CONJUGE,&#xd;&#xa;t.NM_DESTORIG,&#xd;&#xa;c.NM_EMPRESA_ORIG,&#xd;&#xa;c.NM_ENDER_RESID,&#xd;&#xa;c.NM_FANT,&#xd;&#xa;g.NM_GRP_FINANC,&#xd;&#xa;c.NM_LOCAL_EMIS_DOC_IDENTF,&#xd;&#xa;c.NM_LOCAL_EMIS_RG,&#xd;&#xa;c.NM_MAE,&#xd;&#xa;t.NM_MOVD,&#xd;&#xa;ct.NM_OFFICER,&#xd;&#xa;ct.NM_OPERD_CONTRATO,&#xd;&#xa;c.NM_PAI,&#xd;&#xa;cta.NM_PROCURADOR,&#xd;&#xa;t.NM_PSSOA_REALZ_TRANS,&#xd;&#xa;t.NM_RESP_CTA,&#xd;&#xa;c.NM_SGMTO_CLIE,&#xd;&#xa;t.NM_SIST_ORIG,&#xd;&#xa;t.NU_CHEQUE,&#xd;&#xa;cta.NU_CNPJ_CTR_VINCULADO,&#xd;&#xa;cta.NU_CNPJ_VINCULADO,&#xd;&#xa;c.NU_DDD_CELULAR,&#xd;&#xa;c.NU_DDD_TELEFONE,&#xd;&#xa;c.NU_DIGIT_IDENTF_REF,&#xd;&#xa;c.NU_DIGIT_IDENTF_REF_CONJG,&#xd;&#xa;cta.NU_FILIAL_CNPJ_VINCULADO,&#xd;&#xa;t.NU_FP_OPER,&#xd;&#xa;t.NU_IP_OPER,&#xd;&#xa;t.NU_PARCELA,&#xd;&#xa;c.NU_PASSRTE,&#xd;&#xa;c.NU_RESID,&#xd;&#xa;c.PC_POSSE_PRODUTO,&#xd;&#xa;ct.QT_COTA_CONSORCIO,&#xd;&#xa;c.QT_CTA_CLIE,&#xd;&#xa;ct.QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;cta.QT_MED_MOV_CLIE,&#xd;&#xa;ct.QT_MES_CONTT,&#xd;&#xa;ct.QT_MES_PAGO,&#xd;&#xa;c.SG_ORG_INTERNL,&#xd;&#xa;t.SG_ORG_INTERNL_DESTORIG,&#xd;&#xa;t.SG_ORG_INTERNL_REALZ_TRANS,&#xd;&#xa;cta.SG_UF_ABERT_CTA,&#xd;&#xa;cta.SG_UF_AG_CTA,&#xd;&#xa;t.SG_UF_AG_DESTORIG,&#xd;&#xa;t.SG_UF_AG_OPER,&#xd;&#xa;c.SG_UF_EMIS_DOC_IDENTF,&#xd;&#xa;c.SG_UF_EMIS_RG,&#xd;&#xa;cpp.SG_UF_EMISS_CARTAO,&#xd;&#xa;c.SG_UF_NASCTO,&#xd;&#xa;c.SG_UF_RESID,&#xd;&#xa;cpp.VL_CARGA_INIC_CARTAO,&#xd;&#xa;f.VL_COMPROMET,&#xd;&#xa;t.VL_DESCTO_PARCELA,&#xd;&#xa;c.VL_FAT_MED_MENSAL,&#xd;&#xa;f.VL_FATURA,&#xd;&#xa;ct.VL_FINCD_CONTRATO,&#xd;&#xa;ct.VL_IOF_CONTRATO,&#xd;&#xa;t.VL_JUROS_PARCELA,&#xd;&#xa;ca.VL_LIM_CARTAO,&#xd;&#xa;ct.VL_LIQUID,&#xd;&#xa;c.VL_MED_CREDT,&#xd;&#xa;c.VL_MED_DEBT,&#xd;&#xa;p.VL_MED_INVEST AS VL_MED_INVEST_PRODUTO,&#xd;&#xa;p.VL_MERCADO AS VL_MERCADO_PRODUTO,&#xd;&#xa;t.VL_MOEDA,&#xd;&#xa;t.VL_MORA_PARCELA,&#xd;&#xa;t.VL_MULTA_PARCELA,&#xd;&#xa;t.VL_OPER,&#xd;&#xa;ct.VL_OPER_CONTRATO,&#xd;&#xa;c.VL_PATRIM,&#xd;&#xa;ct.VL_PCELA_CONTRATO,&#xd;&#xa;ct.VL_PRINC_CONTRATO,&#xd;&#xa;ct.VL_REBATE_PGTO,&#xd;&#xa;c.VL_RENDA_FAT,&#xd;&#xa;cpp.VL_SALDO_CARTAO,&#xd;&#xa;ct.VL_SEGURO_CONTRATO,&#xd;&#xa;f.VL_SLD_CREDOR,&#xd;&#xa;c.VL_SLD_CUSTODIA_ANTERIOR,&#xd;&#xa;c.VL_SLD_CUSTODIA_ATUAL,&#xd;&#xa;cta.VL_SLD_INIC,&#xd;&#xa;cta.VL_SLD_MEDIO,&#xd;&#xa;cta.VL_SLD_VINC,&#xd;&#xa;ct.VL_TAR_CAD_CONTRATO,&#xd;&#xa;ct.VL_TAXA_CONTRATO,&#xd;&#xa;ct.VL_TAXA_EFETIVO,&#xd;&#xa;ct.VL_TAXA_OPER_CONTRATO,&#xd;&#xa;ct.VL_TAXA_REBATE,&#xd;&#xa;ct.VL_SALDO_CONTRATO,&#xd;&#xa;ct.DT_CONTEMPLADO,&#xd;&#xa;tt.CD_TITULO,&#xd;&#xa;p.VL_ABERT_MERCADO,&#xd;&#xa;p.VL_FECHA_MERCADO&#xd;&#xa;FROM TB_TRANS_RU t &#xd;&#xa;JOIN TB_CAD_CLIE c 			 		ON t.CD_DOC_IDENTF_CLIE &#x3d; c.CD_DOC_IDENTF_CLIE AND t.CD_TP_IDENTF_CLIE &#x3d; c.CD_TP_IDENTF_CLIE&#xd;&#xa;LEFT JOIN TB_FORMA_CONSTTCAO fc		ON fc.CD_FORMA_CONSTTCAO &#x3d; c.CD_FORMA_CONSTTCAO&#xd;&#xa;LEFT JOIN TB_MOVD m 				ON t.CD_BANCO &#x3d; m.CD_BANCO AND t.CD_AG &#x3d; m.CD_AG AND t.CD_CTA &#x3d; m.CD_CTA AND t.CD_TP_MOVD &#x3d; m.CD_TP_MOVD AND t.NM_MOVD &#x3d; m.NM_MOVD&#xd;&#xa;LEFT JOIN TB_CTA cta 				ON t.CD_BANCO &#x3d; cta.CD_BANCO AND t.CD_AG &#x3d; cta.CD_AG AND t.CD_CTA &#x3d; cta.CD_CTA&#xd;&#xa;LEFT JOIN TB_CONTRATO ct 			ON t.CD_CONTRATO &#x3d; ct.CD_CONTRATO AND t.NM_SIST_ORIG &#x3d; ct.NM_SIST_ORIG&#xd;&#xa;LEFT JOIN TB_CARTAO ca 				ON t.CD_CARTAO &#x3d; ca.CD_CARTAO&#xd;&#xa;LEFT JOIN TB_FATURA_CARTAO f 		ON f.CD_CARTAO &#x3d; t.CD_CARTAO AND t.DT_VENCTO_FATURA &#x3d; f.DT_VENCTO_FATURA&#xd;&#xa;LEFT JOIN TB_CARTAO_PRE_PAGO cpp 	ON t.CD_CARTAO &#x3d; cpp.CD_CARTAO_PRE_PAGO AND t.CD_DOC_IDENTF_CLIE &#x3d; cpp.CD_DOC_IDENTF_CLIE AND t.CD_TP_IDENTF_CLIE &#x3d; cpp.CD_TP_IDENTF_CLIE&#xd;&#xa;LEFT JOIN TB_RAMO_ATIVID r 			ON c.CD_RAMO_ATIVID &#x3d; r.CD_RAMO_ATIVID&#xd;&#xa;LEFT JOIN TB_AGENCIA a 				ON a.CD_AG &#x3d; t.CD_AG AND a.CD_BANCO &#x3d; t.CD_BANCO&#xd;&#xa;LEFT JOIN TB_GRP_FINANC g 			ON c.CD_GRP_FINANC &#x3d; g.CD_GRP_FINANC&#xd;&#xa;LEFT JOIN TB_PRODUTO p 				ON ct.CD_PRODUTO &#x3d; p.CD_PRODUTO&#xd;&#xa;LEFT JOIN TB_TITULO tt 				ON tt.CD_TITULO &#x3d; p.CD_TITULO&#xd;&#xa;LEFT JOIN TB_DECODE d 				ON t.CD_TRANS_ORIG &#x3d; d.CD_TRANS_ORIG&#xd;&#xa;LEFT JOIN TB_PPE ppe 				ON ppe.CD_DOC_IDENTF &#x3d; t.CD_DOC_IDENTF_CLIE and ppe.CD_TP_IDENTF &#x3d; t.CD_TP_IDENTF_CLIE&#xd;&#xa;WHERE t.CD_LOTE &#x3d; &#x24;&#x7b;LOTE&#x7d;</sql>
+    <set_params>N</set_params>
+    <insert_field/>
+    <update_field/>
+    <delete_field/>
+    <read_field/>
+    <arguments>
+    </arguments>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>375</xloc>
+      <yloc>19</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>INSERT - TB_TRANS_INCONS</name>
+    <type>ExecSQL</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>dtec_ld_rc_oracle_encrypt</connection>
+    <execute_each_row>Y</execute_each_row>
+    <single_statement>Y</single_statement>
+    <replace_variables>Y</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>INSERT &#x2f;&#x2a;&#x2b; IGNORE_ROW_ON_DUPKEY_INDEX &#x28;TB_TRANS_INCONS, &#x22;PkTransIncons&#x22;&#x29; &#x2a;&#x2f; INTO TB_TRANS_INCONS &#x28;&#xd;&#xa;CD_TRANSACAO,&#xd;&#xa;CD_AG,&#xd;&#xa;CD_AG_DESTORIG,&#xd;&#xa;CD_AG_OPER,&#xd;&#xa;CD_ALINEA, &#xd;&#xa;CD_ANO_FABRIC,&#xd;&#xa;CD_ANO_MODELO,&#xd;&#xa;CD_ASSESSORIA,&#xd;&#xa;CD_BANCO,&#xd;&#xa;CD_BANCO_OPER,&#xd;&#xa;CD_BAND_CARTAO,&#xd;&#xa;CD_BCO_DESTORIG,&#xd;&#xa;CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;CD_CARTAO,&#xd;&#xa;CD_CATEGORIA_CTA,&#xd;&#xa;CD_CATEGORIA_CTA_DESTORIG,&#xd;&#xa;CD_CEP_AG_CLIE,&#xd;&#xa;CD_CEP_AG_OPER,&#xd;&#xa;CD_CEP_RESID,&#xd;&#xa;CD_COLIGADA,&#xd;&#xa;CD_COMPE_INST,&#xd;&#xa;CD_CONTRATO,&#xd;&#xa;CD_CONVENIO,&#xd;&#xa;CD_CPF_CNTAT,&#xd;&#xa;CD_CPF_CTR_CNTAT,&#xd;&#xa;CD_CPF_OFFICER,&#xd;&#xa;CD_CTA,&#xd;&#xa;CD_CTA_DESTORIG,&#xd;&#xa;CD_DOC_IDENTF_BNEFC, &#xd;&#xa;CD_DOC_IDENTF_CLIE,&#xd;&#xa;CD_DOC_IDENTF_CONJUGE,&#xd;&#xa;CD_DOC_IDENTF_DESTORIG,&#xd;&#xa;CD_DOC_IDENTF_MOVD,&#xd;&#xa;CD_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;CD_DOC_IDENTF_RESP_CTA,&#xd;&#xa;CD_DOC_TRANSACAO,&#xd;&#xa;CD_ESTAB,&#xd;&#xa;CD_EST_CIVIL,&#xd;&#xa;CD_FILIAL_BCO,&#xd;&#xa;CD_FONE_CEL_CLIE,&#xd;&#xa;CD_FONE_CLIE,&#xd;&#xa;CD_FONTE_INF,&#xd;&#xa;CD_FORMA_CONSTTCAO,&#xd;&#xa;CD_FORMA_OPER,&#xd;&#xa;CD_FUNC_RESP_CTA,&#xd;&#xa;CD_GRP_CONSORCIO,&#xd;&#xa;CD_GRP_FINANC,&#xd;&#xa;CD_GRP_PRODUTO,&#xd;&#xa;CD_IBGE_CID_EMISS_CARTAO,&#xd;&#xa;CD_IBGE_CID_OPER,&#xd;&#xa;CD_IBGE_RESID,&#xd;&#xa;CD_IDENTF_REF,&#xd;&#xa;CD_IDENTF_REF_CONJG,&#xd;&#xa;CD_IDENTF_SIT_CEDULA,&#xd;&#xa;CD_JUST_TRANSACAO,&#xd;&#xa;CD_LOTE,&#xd;&#xa;CD_LOTE_INSERT,&#xd;&#xa;CD_MARCA,&#xd;&#xa;CD_MES_ANO,&#xd;&#xa;CD_MODELO,&#xd;&#xa;CD_MOEDA,&#xd;&#xa;CD_NATUR_DECLR_OPER,&#xd;&#xa;CD_NATUR_OPER,&#xd;&#xa;CD_NATUR_SALDO,&#xd;&#xa;CD_OFFICER,&#xd;&#xa;CD_ORGAO,&#xd;&#xa;CD_ORGAO_EXPDD_DESTORIG,&#xd;&#xa;CD_ORGAO_EXPDD_DOC_IDENTF,&#xd;&#xa;CD_ORGAO_EXPDD_REALZ_TRANS,&#xd;&#xa;CD_ORIG_CONTRATO,&#xd;&#xa;CD_PAIS_DESTORIG,&#xd;&#xa;CD_PAIS_EMIS_PASSRTE,&#xd;&#xa;CD_PAIS_NACION,&#xd;&#xa;CD_PAIS_OPER,&#xd;&#xa;CD_PAIS_PASSRTE_BNEFC,&#xd;&#xa;CD_PAIS_PASSRTE_DESTORIG,&#xd;&#xa;CD_PAIS_PASSRTE_REALZ_TRANS,&#xd;&#xa;CD_PAIS_RESID,&#xd;&#xa;CD_PERFIL_INVST,&#xd;&#xa;CD_PORTE,&#xd;&#xa;CD_PPSTA,&#xd;&#xa;CD_PRODUTO,&#xd;&#xa;CD_RAMO_ATIVID,&#xd;&#xa;CD_RG,&#xd;&#xa;CD_RISCO_AGRUP_ANTERIOR,&#xd;&#xa;CD_RISCO_AGRUP_ATUAL,&#xd;&#xa;CD_RISCO_ANTERIOR,&#xd;&#xa;CD_RISCO_ATUAL,&#xd;&#xa;CD_SETOR,&#xd;&#xa;CD_SEXO,&#xd;&#xa;CD_SGMTO_CLIE,&#xd;&#xa;CD_SGMTO_CONTRATO,&#xd;&#xa;CD_STTUS_CONTRATO,&#xd;&#xa;CD_STTUS_CTA,&#xd;&#xa;CD_SUREG,&#xd;&#xa;CD_TERMINAL,&#xd;&#xa;CD_TP_CARTAO,&#xd;&#xa;CD_TP_CARTAO_PRE_PAGO,&#xd;&#xa;CD_TP_CLIE,&#xd;&#xa;CD_TP_CONVENIO,&#xd;&#xa;CD_TP_CTA,&#xd;&#xa;CD_TP_CTA_DESTORIG,&#xd;&#xa;CD_TP_DOC_EMTDO,&#xd;&#xa;CD_TP_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;CD_TP_DOC_IDENTF_RESP_CTA,&#xd;&#xa;CD_TP_IDENTF_BNEFC,&#xd;&#xa;CD_TP_IDENTF_CLIE,&#xd;&#xa;CD_TP_IDENTF_DESTORIG,&#xd;&#xa;CD_TP_IDENTF_MOVD,&#xd;&#xa;CD_TP_MOVD,&#xd;&#xa;CD_TP_OPER,&#xd;&#xa;CD_TP_PESSOA,&#xd;&#xa;CD_TP_PLANO,&#xd;&#xa;CD_TP_RETORNO,&#xd;&#xa;CD_TP_TITULAR_CTA,&#xd;&#xa;CD_TRANS_ORIG,&#xd;&#xa;CD_VIA_OPER,&#xd;&#xa;DS_CAIXA,&#xd;&#xa;DS_DECLR_PROPSTO,&#xd;&#xa;DS_FAIXA_PDD,&#xd;&#xa;DS_INIBICAO,&#xd;&#xa;DS_PPE_GRAU_ENVOLV,&#xd;&#xa;DT_ABERT_CTA,&#xd;&#xa;DT_ATUALZ_CADSTRL_ANTERIOR,&#xd;&#xa;DT_BASE_CONTRATO,&#xd;&#xa;DT_CAD_CONTRATO,&#xd;&#xa;DT_CANCEL_CONTRATO,&#xd;&#xa;DT_EMIS_DOC_IDENTF,&#xd;&#xa;DT_EMIS_IDENTF_DESTORIG,&#xd;&#xa;DT_EMIS_IDENTF_REALZ_TRANS,&#xd;&#xa;DT_EMISS_CARTAO,&#xd;&#xa;DT_EXCLUSAO_MOVD,&#xd;&#xa;DT_FECHA_FATURA,&#xd;&#xa;DT_FIM_CTA,&#xd;&#xa;DT_INCLUSAO_CLIE,&#xd;&#xa;DT_INIC_APLICACAO,&#xd;&#xa;DT_LIB_CONTRATO,&#xd;&#xa;DT_LIQUID,&#xd;&#xa;DT_NASCTO_FUND,&#xd;&#xa;DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;DT_TRANS,&#xd;&#xa;DT_ULTM_ATULZ_CADSTRL,&#xd;&#xa;DT_ULTM_ATULZ_CTA,&#xd;&#xa;DT_ULTM_ATULZ_EMPR,&#xd;&#xa;DT_ULTM_MOV_CTA,&#xd;&#xa;DT_ULTM_VERIF_CADSTRL,&#xd;&#xa;DT_VALIDD_CARTAO,&#xd;&#xa;DT_VENCTO,&#xd;&#xa;DT_VENCTO_FATURA,&#xd;&#xa;DT_VENCTO_PCELA,&#xd;&#xa;FL_AGENTE_PUBLICO,&#xd;&#xa;FL_ASS,&#xd;&#xa;FL_AVERB,&#xd;&#xa;FL_BEM_ALIENADO,&#xd;&#xa;FL_BEM_APREENDD,&#xd;&#xa;FL_BNEFC_FINAL,&#xd;&#xa;FL_BNEFC_INSS,&#xd;&#xa;FL_BX_RISCO_LD,&#xd;&#xa;FL_CADSTR_COMPL,&#xd;&#xa;FL_CADSTR_DESATULZ,&#xd;&#xa;FL_CANCEL_CONTRATO,&#xd;&#xa;FL_CARTAO_ENVD,&#xd;&#xa;FL_CHEQUE_ENDOSSO,&#xd;&#xa;FL_CLIE_PRIVATE,&#xd;&#xa;FL_CNSTT_TRUST,&#xd;&#xa;FL_CS_DESTORIG,&#xd;&#xa;FL_DECLR_PROPST_NATUR,&#xd;&#xa;FL_DOC_MOVD,&#xd;&#xa;FL_DUT,&#xd;&#xa;FL_FONTE_REF_CTA,&#xd;&#xa;FL_FORNEC_INFORMACAO,&#xd;&#xa;FL_FUNCIONARIO,&#xd;&#xa;FL_GARNT_ALIEN,&#xd;&#xa;FL_INFO_COAF,&#xd;&#xa;FL_ISENTO_CPFCNPJ,&#xd;&#xa;FL_LICITACAO,&#xd;&#xa;FL_MODO_DIVERSO,&#xd;&#xa;FL_MOEDA_ESTRG,&#xd;&#xa;FL_MOVTA_JURIDICA,&#xd;&#xa;FL_MOVTA_PROC,&#xd;&#xa;FL_OPER_ESPECIE,&#xd;&#xa;FL_OPER_ITEM_LUXO,&#xd;&#xa;FL_ORGNZ_SLUCRO,&#xd;&#xa;FL_PATROCINIO,&#xd;&#xa;FL_PPE,&#xd;&#xa;FL_PROPSTO_EMISS_CARTAO,&#xd;&#xa;FL_RAMO_SUSP,&#xd;&#xa;FL_RECUSA_ATULZ_CADSTR,&#xd;&#xa;FL_RFINAN,&#xd;&#xa;FL_SETOR_PUBLICO,&#xd;&#xa;FL_TAR_CAD_FINCD,&#xd;&#xa;NM_ASSESSORIA,&#xd;&#xa;NM_BAIRRO_RESID,&#xd;&#xa;NM_BNEFC_CARTAO,&#xd;&#xa;NM_CHEQUE_ENDOSSO,&#xd;&#xa;NM_CID_ABERT_CTA,&#xd;&#xa;NM_CID_AG_DESTORIG,&#xd;&#xa;NM_CID_EMISS_CARTAO,&#xd;&#xa;NM_CID_NASCTO,&#xd;&#xa;NM_CID_OPER,&#xd;&#xa;NM_CID_RESID,&#xd;&#xa;NM_CLIE,&#xd;&#xa;NM_COLIGADA,&#xd;&#xa;NM_CONJUGE,&#xd;&#xa;NM_DESTORIG,&#xd;&#xa;NM_EMPRESA_ORIG,&#xd;&#xa;NM_ENDER_RESID,&#xd;&#xa;NM_FANT,&#xd;&#xa;NM_GRP_FINANC,&#xd;&#xa;NM_LOCAL_EMIS_DOC_IDENTF,&#xd;&#xa;NM_LOCAL_EMIS_RG,&#xd;&#xa;NM_MAE,&#xd;&#xa;NM_MOVD,&#xd;&#xa;NM_OFFICER,&#xd;&#xa;NM_OPERD_CONTRATO,&#xd;&#xa;NM_PAI,&#xd;&#xa;NM_PROCURADOR,&#xd;&#xa;NM_PSSOA_REALZ_TRANS,&#xd;&#xa;NM_RESP_CTA,&#xd;&#xa;NM_SGMTO_CLIE,&#xd;&#xa;NM_SIST_ORIG,&#xd;&#xa;NU_CHEQUE,&#xd;&#xa;NU_CNPJ_CTR_VINCULADO,&#xd;&#xa;NU_CNPJ_VINCULADO,&#xd;&#xa;NU_DDD_CELULAR,&#xd;&#xa;NU_DDD_TELEFONE,&#xd;&#xa;NU_DIGIT_IDENTF_REF,&#xd;&#xa;NU_DIGIT_IDENTF_REF_CONJG,&#xd;&#xa;NU_FILIAL_CNPJ_VINCULADO,&#xd;&#xa;NU_FP_OPER,&#xd;&#xa;NU_IP_OPER,&#xd;&#xa;NU_PARCELA,&#xd;&#xa;NU_PASSRTE,&#xd;&#xa;NU_RESID,&#xd;&#xa;PC_POSSE_PRODUTO,&#xd;&#xa;QT_COTA_CONSORCIO,&#xd;&#xa;QT_CTA_CLIE,&#xd;&#xa;QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;QT_MED_MOV_CLIE,&#xd;&#xa;QT_MES_CONTT,&#xd;&#xa;QT_MES_PAGO,&#xd;&#xa;SG_ORG_INTERNL,&#xd;&#xa;SG_ORG_INTERNL_DESTORIG,&#xd;&#xa;SG_ORG_INTERNL_REALZ_TRANS,&#xd;&#xa;SG_UF_ABERT_CTA,&#xd;&#xa;SG_UF_AG_CTA,&#xd;&#xa;SG_UF_AG_DESTORIG,&#xd;&#xa;SG_UF_AG_OPER,&#xd;&#xa;SG_UF_EMIS_DOC_IDENTF,&#xd;&#xa;SG_UF_EMIS_RG,&#xd;&#xa;SG_UF_EMISS_CARTAO,&#xd;&#xa;SG_UF_NASCTO,&#xd;&#xa;SG_UF_RESID,&#xd;&#xa;VL_CARGA_INIC_CARTAO,&#xd;&#xa;VL_COMPROMET,&#xd;&#xa;VL_DESCTO_PARCELA,&#xd;&#xa;VL_FAT_MED_MENSAL,&#xd;&#xa;VL_FATURA,&#xd;&#xa;VL_FINCD_CONTRATO,&#xd;&#xa;VL_IOF_CONTRATO,&#xd;&#xa;VL_JUROS_PARCELA,&#xd;&#xa;VL_LIM_CARTAO,&#xd;&#xa;VL_LIQUID,&#xd;&#xa;VL_MED_CREDT,&#xd;&#xa;VL_MED_DEBT,&#xd;&#xa;VL_MED_INVEST_PRODUTO,&#xd;&#xa;VL_MERCADO_PRODUTO,&#xd;&#xa;VL_MOEDA,&#xd;&#xa;VL_MORA_PARCELA,&#xd;&#xa;VL_MULTA_PARCELA,&#xd;&#xa;VL_OPER,&#xd;&#xa;VL_OPER_CONTRATO,&#xd;&#xa;VL_PATRIM,&#xd;&#xa;VL_PCELA_CONTRATO,&#xd;&#xa;VL_PRINC_CONTRATO,&#xd;&#xa;VL_REBATE_PGTO,&#xd;&#xa;VL_RENDA_FAT,&#xd;&#xa;VL_SALDO_CARTAO,&#xd;&#xa;VL_SEGURO_CONTRATO,&#xd;&#xa;VL_SLD_CREDOR,&#xd;&#xa;VL_SLD_CUSTODIA_ANTERIOR,&#xd;&#xa;VL_SLD_CUSTODIA_ATUAL,&#xd;&#xa;VL_SLD_INIC,&#xd;&#xa;VL_SLD_MEDIO,&#xd;&#xa;VL_SLD_VINC,&#xd;&#xa;VL_TAR_CAD_CONTRATO,&#xd;&#xa;VL_TAXA_CONTRATO,&#xd;&#xa;VL_TAXA_EFETIVO,&#xd;&#xa;VL_TAXA_OPER_CONTRATO,&#xd;&#xa;VL_TAXA_REBATE,&#xd;&#xa;VL_SALDO_CONTRATO,&#xd;&#xa;DT_CONTEMPLADO,&#xd;&#xa;CD_TITULO,&#xd;&#xa;VL_ABERT_MERCADO,&#xd;&#xa;VL_FECHA_MERCADO&#xd;&#xa;&#x29;&#xd;&#xa;SELECT&#xd;&#xa;LPAD&#x28;TRIM&#x28;t.CD_DOC_IDENTF_CLIE&#x29;, 20, &#x27;0&#x27;&#x29; &#x7c;&#x7c;  to_char&#x28;t.DT_TRANS, &#x27;yyyymmddhhmmss&#x27;&#x29; &#x7c;&#x7c; LPAD&#x28;to_char&#x28;t.cd_seq_trans&#x29;, 7, &#x27;0&#x27;&#x29; AS CD_TRANSACAO,&#xd;&#xa;t.CD_AG,&#xd;&#xa;t.CD_AG_DESTORIG,&#xd;&#xa;t.CD_AG_OPER,&#xd;&#xa;t.CD_ALINEA, &#xd;&#xa;ct.CD_ANO_FABRIC,&#xd;&#xa;ct.CD_ANO_MODELO,&#xd;&#xa;t.CD_ASSESSORIA,&#xd;&#xa;t.CD_BANCO,&#xd;&#xa;t.CD_BANCO_OPER,&#xd;&#xa;ca.CD_BAND_CARTAO,&#xd;&#xa;t.CD_BCO_DESTORIG,&#xd;&#xa;ct.CD_CANAL_VENDA_CONTRATO,&#xd;&#xa;t.CD_CARTAO,&#xd;&#xa;cta.CD_CATEGORIA_CTA,&#xd;&#xa;t.CD_CATEGORIA_CTA_DESTORIG,&#xd;&#xa;t.CD_CEP_AG_CLIE,&#xd;&#xa;t.CD_CEP_AG_OPER,&#xd;&#xa;c.CD_CEP_RESID,&#xd;&#xa;t.CD_COLIGADA,&#xd;&#xa;t.CD_COMPE_INST,&#xd;&#xa;t.CD_CONTRATO,&#xd;&#xa;ct.CD_CONVENIO,&#xd;&#xa;ct.CD_CPF_CNTAT,&#xd;&#xa;ct.CD_CPF_CTR_CNTAT,&#xd;&#xa;ct.CD_CPF_OFFICER,&#xd;&#xa;t.CD_CTA,&#xd;&#xa;t.CD_CTA_DESTORIG,&#xd;&#xa;CASE WHEN t.CD_CONTRATO IS NULL THEN cpp.CD_DOC_IDENTF_BNEFC ELSE ct.CD_DOC_IDENTF_BNEFC END AS CD_DOC_IDENTF_BNEFC, &#xd;&#xa;t.CD_DOC_IDENTF_CLIE,&#xd;&#xa;c.CD_DOC_IDENTF_CONJUGE,&#xd;&#xa;t.CD_DOC_IDENTF_DESTORIG,&#xd;&#xa;m.CD_DOC_IDENTF_MOVD,&#xd;&#xa;t.CD_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;t.CD_DOC_IDENTF_RESP_CTA,&#xd;&#xa;t.CD_DOC_TRANSACAO,&#xd;&#xa;t.CD_ESTAB,&#xd;&#xa;c.CD_EST_CIVIL,&#xd;&#xa;ct.CD_FILIAL_BCO,&#xd;&#xa;c.CD_FONE_CEL_CLIE,&#xd;&#xa;c.CD_FONE_CLIE,&#xd;&#xa;ppe.CD_FONTE_INF,&#xd;&#xa;c.CD_FORMA_CONSTTCAO,&#xd;&#xa;d.CD_FORMA_OPER,&#xd;&#xa;cta.CD_FUNC_RESP_CTA,&#xd;&#xa;ct.CD_GRP_CONSORCIO,&#xd;&#xa;c.CD_GRP_FINANC,&#xd;&#xa;p.CD_GRP_PRODUTO,&#xd;&#xa;cpp.CD_IBGE_CID_EMISS_CARTAO,&#xd;&#xa;t.CD_IBGE_CID_OPER,&#xd;&#xa;c.CD_IBGE_RESID,&#xd;&#xa;c.CD_IDENTF_REF,&#xd;&#xa;c.CD_IDENTF_REF_CONJG,&#xd;&#xa;t.CD_IDENTF_SIT_CEDULA,&#xd;&#xa;t.CD_JUST_TRANSACAO,&#xd;&#xa;t.CD_LOTE AS LOTE,&#xd;&#xa;c.CD_LOTE_INSERT,&#xd;&#xa;ct.CD_MARCA,&#xd;&#xa;to_char&#x28;t.DT_TRANS, &#x27;YYYYMM&#x27;&#x29; as CD_MES_ANO,&#xd;&#xa;ct.CD_MODELO,&#xd;&#xa;t.CD_MOEDA,&#xd;&#xa;t.CD_NATUR_DECLR_OPER,&#xd;&#xa;d.CD_NATUR_OPER,&#xd;&#xa;ca.CD_NATUR_SALDO,&#xd;&#xa;ct.CD_OFFICER,&#xd;&#xa;ct.CD_ORGAO,&#xd;&#xa;t.CD_ORGAO_EXPDD_DESTORIG,&#xd;&#xa;c.CD_ORGAO_EXPDD_DOC_IDENTF,&#xd;&#xa;t.CD_ORGAO_EXPDD_REALZ_TRANS,&#xd;&#xa;ct.CD_ORIG_CONTRATO,&#xd;&#xa;t.CD_PAIS_DESTORIG,&#xd;&#xa;c.CD_PAIS_EMIS_PASSRTE,&#xd;&#xa;c.CD_PAIS_NACION,&#xd;&#xa;t.CD_PAIS_OPER,&#xd;&#xa;cpp.CD_PAIS_PASSRTE_BNEFC,&#xd;&#xa;t.CD_PAIS_PASSRTE_DESTORIG,&#xd;&#xa;t.CD_PAIS_PASSRTE_REALZ_TRANS,&#xd;&#xa;c.CD_PAIS_RESID,&#xd;&#xa;c.CD_PERFIL_INVST,&#xd;&#xa;c.CD_PORTE,&#xd;&#xa;ct.CD_PPSTA,&#xd;&#xa;CASE ct.CD_PRODUTO WHEN NULL THEN T.CD_PRODUTO END AS CD_PRODUTO,&#xd;&#xa;c.CD_RAMO_ATIVID,&#xd;&#xa;c.CD_RG,&#xd;&#xa;c.CD_RISCO_AGRUP_ANTERIOR,&#xd;&#xa;c.CD_RISCO_AGRUP_ATUAL,&#xd;&#xa;c.CD_RISCO_ANTERIOR,&#xd;&#xa;c.CD_RISCO_ATUAL,&#xd;&#xa;r.CD_SETOR,&#xd;&#xa;c.CD_SEXO,&#xd;&#xa;c.CD_SGMTO_CLIE,&#xd;&#xa;ct.CD_SGMTO_CONTRATO,&#xd;&#xa;ct.CD_STTUS_CONTRATO,&#xd;&#xa;cta.CD_STTUS_CTA,&#xd;&#xa;a.CD_SUREG,&#xd;&#xa;t.CD_TERMINAL,&#xd;&#xa;CASE WHEN cpp.CD_CARTAO_PRE_PAGO IS NOT NULL THEN 3 WHEN ca.CD_CARTAO IS NOT NULL THEN ca.CD_TP_CARTAO ELSE NULL END AS CD_TP_CARTAO,&#xd;&#xa;cpp.CD_TP_CARTAO_PRE_PAGO,&#xd;&#xa;c.CD_TP_CLIE,&#xd;&#xa;ct.CD_TP_CONVENIO,&#xd;&#xa;cta.CD_TP_CTA,&#xd;&#xa;t.CD_TP_CTA_DESTORIG,&#xd;&#xa;t.CD_TP_DOC_EMTDO,&#xd;&#xa;t.CD_TP_DOC_IDENTF_REALZ_TRANS,&#xd;&#xa;t.CD_TP_DOC_IDENTF_RESP_CTA,&#xd;&#xa;CASE WHEN t.CD_CONTRATO IS NULL THEN cpp.CD_TP_IDENTF_BNEFC ELSE ct.CD_TP_IDENTF_BNEFC END AS CD_TP_IDENTF_BNEFC,&#xd;&#xa;t.CD_TP_IDENTF_CLIE,&#xd;&#xa;t.CD_TP_IDENTF_DESTORIG,&#xd;&#xa;m.CD_TP_IDENTF_MOVD,&#xd;&#xa;t.CD_TP_MOVD,&#xd;&#xa;d.CD_TP_OPER,&#xd;&#xa;c.CD_TP_PESSOA,&#xd;&#xa;ct.CD_TP_PLANO,&#xd;&#xa;t.CD_TP_RETORNO,&#xd;&#xa;cta.CD_TP_TITULAR_CTA,&#xd;&#xa;t.CD_TRANS_ORIG,&#xd;&#xa;d.CD_VIA_OPER,&#xd;&#xa;t.DS_CAIXA,&#xd;&#xa;c.DS_DECLR_PROPSTO,&#xd;&#xa;t.DS_FAIXA_PDD,&#xd;&#xa;t.DS_INIBICAO,&#xd;&#xa;c.DS_PPE_GRAU_ENVOLV,&#xd;&#xa;cta.DT_ABERT_CTA,&#xd;&#xa;c.DT_ATUALZ_CADSTRL_ANTERIOR,&#xd;&#xa;ct.DT_BASE_CONTRATO,&#xd;&#xa;ct.DT_CAD_CONTRATO,&#xd;&#xa;ct.DT_CANCEL_CONTRATO,&#xd;&#xa;c.DT_EMIS_DOC_IDENTF,&#xd;&#xa;t.DT_EMIS_IDENTF_DESTORIG,&#xd;&#xa;t.DT_EMIS_IDENTF_REALZ_TRANS,&#xd;&#xa;cpp.DT_EMISS_CARTAO,&#xd;&#xa;m.DT_EXCLUSAO_MOVD,&#xd;&#xa;ca.DT_FECHA_FATURA,&#xd;&#xa;cta.DT_FIM_CTA,&#xd;&#xa;c.DT_INCLUSAO_CLIE,&#xd;&#xa;t.DT_INIC_APLICACAO,&#xd;&#xa;ct.DT_LIB_CONTRATO,&#xd;&#xa;ct.DT_LIQUID_CONTRATO AS DT_LIQUID,&#xd;&#xa;c.DT_NASCTO_FUND,&#xd;&#xa;ct.DT_PRIM_PGTO_CONTRATO,&#xd;&#xa;ct.DT_PRIM_VCTO_CONTRATO,&#xd;&#xa;t.DT_TRANS,&#xd;&#xa;c.DT_ULTM_ATULZ_CADSTRL,&#xd;&#xa;cta.DT_ULTM_ATULZ_CTA,&#xd;&#xa;c.DT_ULTM_ATULZ_EMPR,&#xd;&#xa;cta.DT_ULTM_MOV_CTA,&#xd;&#xa;c.DT_ULTM_VERIF_CADSTRL,&#xd;&#xa;ca.DT_VALIDD_CARTAO,&#xd;&#xa;CASE WHEN t.DT_VENCTO_FATURA IS NOT NULL THEN t.DT_VENCTO_FATURA WHEN ct.DT_VENCTO_CONTRATO IS NOT NULL THEN ct.DT_VENCTO_CONTRATO ELSE NULL END AS DT_VENCTO,&#xd;&#xa;t.DT_VENCTO_FATURA,&#xd;&#xa;t.DT_VENCTO_PCELA,&#xd;&#xa;c.FL_AGENTE_PUBLICO,&#xd;&#xa;cta.FL_ASS,&#xd;&#xa;ct.FL_AVERB,&#xd;&#xa;ct.FL_BEM_ALIENADO,&#xd;&#xa;ct.FL_BEM_APREENDD,&#xd;&#xa;fc.FL_BNEFC_FINAL,&#xd;&#xa;c.FL_BNEFC_INSS,&#xd;&#xa;d.FL_BX_RISCO_LD,&#xd;&#xa;c.FL_CADSTR_COMPL,&#xd;&#xa;c.FL_CADSTR_DESATULZ,&#xd;&#xa;ct.FL_CANCEL_CONTRATO,&#xd;&#xa;ca.FL_CARTAO_ENVD,&#xd;&#xa;t.FL_CHEQUE_ENDOSSO,&#xd;&#xa;c.FL_CLIE_PRIVATE,&#xd;&#xa;g.FL_CNSTT_TRUST,&#xd;&#xa;t.FL_CS_DESTORIG,&#xd;&#xa;cta.FL_DECLR_PROPST_NATUR,&#xd;&#xa;t.FL_DOC_MOVD,&#xd;&#xa;ct.FL_DUT,&#xd;&#xa;cta.FL_FONTE_REF_CTA,&#xd;&#xa;c.FL_FORNEC_INFORMACAO,&#xd;&#xa;c.FL_FUNCIONARIO,&#xd;&#xa;ct.FL_GARNT_ALIEN,&#xd;&#xa;c.FL_INFO_COAF,&#xd;&#xa;c.FL_ISENTO_CPFCNPJ,&#xd;&#xa;c.FL_LICITACAO,&#xd;&#xa;t.FL_MODO_DIVERSO,&#xd;&#xa;r.FL_MOEDA_ESTRG,&#xd;&#xa;c.FL_MOVTA_JURIDICA,&#xd;&#xa;t.FL_MOVTA_PROC,&#xd;&#xa;r.FL_OPER_ESPECIE,&#xd;&#xa;r.FL_OPER_ITEM_LUXO,&#xd;&#xa;c.FL_ORGNZ_SLUCRO,&#xd;&#xa;c.FL_PATROCINIO,&#xd;&#xa;c.FL_PPE,&#xd;&#xa;cpp.FL_PROPSTO_EMISS_CARTAO,&#xd;&#xa;r.FL_RAMO_SUSP,&#xd;&#xa;c.FL_RECUSA_ATULZ_CADSTR,&#xd;&#xa;ct.FL_RFINAM,&#xd;&#xa;fc.FL_SETOR_PUBLICO,&#xd;&#xa;ct.FL_TAR_CAD_FINCD,&#xd;&#xa;t.NM_ASSESSORIA,&#xd;&#xa;c.NM_BAIRRO_RESID,&#xd;&#xa;cpp.NM_BNEFC_CARTAO,&#xd;&#xa;t.NM_CHEQUE_ENDOSSO,&#xd;&#xa;cta.NM_CID_ABERT_CTA,&#xd;&#xa;t.NM_CID_AG_DESTORIG,&#xd;&#xa;cpp.NM_CID_EMISS_CARTAO,&#xd;&#xa;c.NM_CID_NASCTO,&#xd;&#xa;t.NM_CID_OPER,&#xd;&#xa;c.NM_CID_RESID,&#xd;&#xa;c.NM_CLIE,&#xd;&#xa;t.NM_COLIGADA,&#xd;&#xa;c.NM_CONJUGE,&#xd;&#xa;t.NM_DESTORIG,&#xd;&#xa;c.NM_EMPRESA_ORIG,&#xd;&#xa;c.NM_ENDER_RESID,&#xd;&#xa;c.NM_FANT,&#xd;&#xa;g.NM_GRP_FINANC,&#xd;&#xa;c.NM_LOCAL_EMIS_DOC_IDENTF,&#xd;&#xa;c.NM_LOCAL_EMIS_RG,&#xd;&#xa;c.NM_MAE,&#xd;&#xa;t.NM_MOVD,&#xd;&#xa;ct.NM_OFFICER,&#xd;&#xa;ct.NM_OPERD_CONTRATO,&#xd;&#xa;c.NM_PAI,&#xd;&#xa;cta.NM_PROCURADOR,&#xd;&#xa;t.NM_PSSOA_REALZ_TRANS,&#xd;&#xa;t.NM_RESP_CTA,&#xd;&#xa;c.NM_SGMTO_CLIE,&#xd;&#xa;t.NM_SIST_ORIG,&#xd;&#xa;t.NU_CHEQUE,&#xd;&#xa;cta.NU_CNPJ_CTR_VINCULADO,&#xd;&#xa;cta.NU_CNPJ_VINCULADO,&#xd;&#xa;c.NU_DDD_CELULAR,&#xd;&#xa;c.NU_DDD_TELEFONE,&#xd;&#xa;c.NU_DIGIT_IDENTF_REF,&#xd;&#xa;c.NU_DIGIT_IDENTF_REF_CONJG,&#xd;&#xa;cta.NU_FILIAL_CNPJ_VINCULADO,&#xd;&#xa;t.NU_FP_OPER,&#xd;&#xa;t.NU_IP_OPER,&#xd;&#xa;t.NU_PARCELA,&#xd;&#xa;c.NU_PASSRTE,&#xd;&#xa;c.NU_RESID,&#xd;&#xa;c.PC_POSSE_PRODUTO,&#xd;&#xa;ct.QT_COTA_CONSORCIO,&#xd;&#xa;c.QT_CTA_CLIE,&#xd;&#xa;ct.QT_DIA_CARENCIA_CONTRATO,&#xd;&#xa;cta.QT_MED_MOV_CLIE,&#xd;&#xa;ct.QT_MES_CONTT,&#xd;&#xa;ct.QT_MES_PAGO,&#xd;&#xa;c.SG_ORG_INTERNL,&#xd;&#xa;t.SG_ORG_INTERNL_DESTORIG,&#xd;&#xa;t.SG_ORG_INTERNL_REALZ_TRANS,&#xd;&#xa;cta.SG_UF_ABERT_CTA,&#xd;&#xa;cta.SG_UF_AG_CTA,&#xd;&#xa;t.SG_UF_AG_DESTORIG,&#xd;&#xa;t.SG_UF_AG_OPER,&#xd;&#xa;c.SG_UF_EMIS_DOC_IDENTF,&#xd;&#xa;c.SG_UF_EMIS_RG,&#xd;&#xa;cpp.SG_UF_EMISS_CARTAO,&#xd;&#xa;c.SG_UF_NASCTO,&#xd;&#xa;c.SG_UF_RESID,&#xd;&#xa;cpp.VL_CARGA_INIC_CARTAO,&#xd;&#xa;f.VL_COMPROMET,&#xd;&#xa;t.VL_DESCTO_PARCELA,&#xd;&#xa;c.VL_FAT_MED_MENSAL,&#xd;&#xa;f.VL_FATURA,&#xd;&#xa;ct.VL_FINCD_CONTRATO,&#xd;&#xa;ct.VL_IOF_CONTRATO,&#xd;&#xa;t.VL_JUROS_PARCELA,&#xd;&#xa;ca.VL_LIM_CARTAO,&#xd;&#xa;ct.VL_LIQUID,&#xd;&#xa;c.VL_MED_CREDT,&#xd;&#xa;c.VL_MED_DEBT,&#xd;&#xa;p.VL_MED_INVEST AS VL_MED_INVEST_PRODUTO,&#xd;&#xa;p.VL_MERCADO AS VL_MERCADO_PRODUTO,&#xd;&#xa;t.VL_MOEDA,&#xd;&#xa;t.VL_MORA_PARCELA,&#xd;&#xa;t.VL_MULTA_PARCELA,&#xd;&#xa;t.VL_OPER,&#xd;&#xa;ct.VL_OPER_CONTRATO,&#xd;&#xa;c.VL_PATRIM,&#xd;&#xa;ct.VL_PCELA_CONTRATO,&#xd;&#xa;ct.VL_PRINC_CONTRATO,&#xd;&#xa;ct.VL_REBATE_PGTO,&#xd;&#xa;c.VL_RENDA_FAT,&#xd;&#xa;cpp.VL_SALDO_CARTAO,&#xd;&#xa;ct.VL_SEGURO_CONTRATO,&#xd;&#xa;f.VL_SLD_CREDOR,&#xd;&#xa;c.VL_SLD_CUSTODIA_ANTERIOR,&#xd;&#xa;c.VL_SLD_CUSTODIA_ATUAL,&#xd;&#xa;cta.VL_SLD_INIC,&#xd;&#xa;cta.VL_SLD_MEDIO,&#xd;&#xa;cta.VL_SLD_VINC,&#xd;&#xa;ct.VL_TAR_CAD_CONTRATO,&#xd;&#xa;ct.VL_TAXA_CONTRATO,&#xd;&#xa;ct.VL_TAXA_EFETIVO,&#xd;&#xa;ct.VL_TAXA_OPER_CONTRATO,&#xd;&#xa;ct.VL_TAXA_REBATE,&#xd;&#xa;ct.VL_SALDO_CONTRATO,&#xd;&#xa;ct.DT_CONTEMPLADO,&#xd;&#xa;tt.CD_TITULO,&#xd;&#xa;p.VL_ABERT_MERCADO,&#xd;&#xa;p.VL_FECHA_MERCADO&#xd;&#xa;FROM TB_TRANS_RU t &#xd;&#xa;LEFT JOIN TB_CAD_CLIE c 			ON t.CD_DOC_IDENTF_CLIE &#x3d; c.CD_DOC_IDENTF_CLIE AND t.CD_TP_IDENTF_CLIE &#x3d; c.CD_TP_IDENTF_CLIE&#xd;&#xa;LEFT JOIN TB_FORMA_CONSTTCAO fc		ON fc.CD_FORMA_CONSTTCAO &#x3d; c.CD_FORMA_CONSTTCAO&#xd;&#xa;LEFT JOIN TB_MOVD m 				ON t.CD_BANCO &#x3d; m.CD_BANCO AND t.CD_AG &#x3d; m.CD_AG AND t.CD_CTA &#x3d; m.CD_CTA AND t.CD_TP_MOVD &#x3d; m.CD_TP_MOVD AND t.NM_MOVD &#x3d; m.NM_MOVD&#xd;&#xa;LEFT JOIN TB_CTA cta 				ON t.CD_BANCO &#x3d; cta.CD_BANCO AND t.CD_AG &#x3d; cta.CD_AG AND t.CD_CTA &#x3d; cta.CD_CTA&#xd;&#xa;LEFT JOIN TB_CONTRATO ct 			ON t.CD_CONTRATO &#x3d; ct.CD_CONTRATO AND t.NM_SIST_ORIG &#x3d; ct.NM_SIST_ORIG&#xd;&#xa;LEFT JOIN TB_CARTAO ca 				ON t.CD_CARTAO &#x3d; ca.CD_CARTAO&#xd;&#xa;LEFT JOIN TB_FATURA_CARTAO f 		ON f.CD_CARTAO &#x3d; t.CD_CARTAO AND t.DT_VENCTO_FATURA &#x3d; f.DT_VENCTO_FATURA&#xd;&#xa;LEFT JOIN TB_CARTAO_PRE_PAGO cpp 	ON t.CD_CARTAO &#x3d; cpp.CD_CARTAO_PRE_PAGO AND t.CD_DOC_IDENTF_CLIE &#x3d; cpp.CD_DOC_IDENTF_CLIE AND t.CD_TP_IDENTF_CLIE &#x3d; cpp.CD_TP_IDENTF_CLIE&#xd;&#xa;LEFT JOIN TB_RAMO_ATIVID r 			ON c.CD_RAMO_ATIVID &#x3d; r.CD_RAMO_ATIVID&#xd;&#xa;LEFT JOIN TB_AGENCIA a 				ON a.CD_AG &#x3d; t.CD_AG AND a.CD_BANCO &#x3d; t.CD_BANCO&#xd;&#xa;LEFT JOIN TB_GRP_FINANC g 			ON c.CD_GRP_FINANC &#x3d; g.CD_GRP_FINANC&#xd;&#xa;LEFT JOIN TB_PRODUTO p 				ON ct.CD_PRODUTO &#x3d; p.CD_PRODUTO&#xd;&#xa;LEFT JOIN TB_TITULO tt 				ON tt.CD_TITULO &#x3d; p.CD_TITULO&#xd;&#xa;LEFT JOIN TB_DECODE d 				ON t.CD_TRANS_ORIG &#x3d; d.CD_TRANS_ORIG&#xd;&#xa;LEFT JOIN TB_PPE ppe 				ON ppe.CD_DOC_IDENTF &#x3d; t.CD_DOC_IDENTF_CLIE and ppe.CD_TP_IDENTF &#x3d; t.CD_TP_IDENTF_CLIE&#xd;&#xa;WHERE t.CD_LOTE &#x3d; &#x24;&#x7b;LOTE&#x7d; AND c.CD_DOC_IDENTF_CLIE IS NULL</sql>
+    <set_params>N</set_params>
+    <insert_field/>
+    <update_field/>
+    <delete_field/>
+    <read_field/>
+    <arguments>
+    </arguments>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>375</xloc>
+      <yloc>124</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step_error_handling>
+  </step_error_handling>
+   <slave-step-copy-partition-distribution>
+</slave-step-copy-partition-distribution>
+   <slave_transformation>N</slave_transformation>
+
+</transformation>

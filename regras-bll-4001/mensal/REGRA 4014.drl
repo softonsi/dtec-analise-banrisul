@@ -1,0 +1,241 @@
+/* 4014 - FINAL */ 
+SELECT DISTINCT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,        
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4014 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Mês/Ano Calendário: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||   
+CASE WHEN T.FL_CRED = 1 THEN 
+'Conclusão: Servidores Públicos/PEP|' || 
+'Valor Consolidado de Depósito em Espécie (Crédito): ' || COALESCE(TO_CHAR(T.TOTAL_CRED, 'L999G999G999G990D99'),'Não existente') || '|'  || 
+'É servidor público? :' || CASE FL_SERVIDOR_PUBLICO WHEN 1 THEN 'Sim |' ELSE 'Não |' END  || 
+'É PEP? :'  || CASE WHEN (FL_PEP_DTEC_FLEX = 1 OR FL_PEP = 1) THEN 'Sim |' ELSE 'Não |' END  || 
+COALESCE((':DS-pm_ValorRelevanteCred' || ' (' || ':NM-pm_ValorRelevanteCred' || '):' || TO_CHAR(:pm_ValorRelevanteCred, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'   
+END 
+|| 
+CASE WHEN T.FL_DEP = 1 THEN 
+'Conclusão: Deputados  - Suspeita de Rachadinha|' || 
+'Valor Consolidado Depósito em Espécie (Crédito): ' || COALESCE(TO_CHAR(T.TOTAL_CRED, 'L999G999G999G990D99'),'Não existente') || '|'  || 
+'Quantidade de transações de Depósito em Espécie (Crédito): ' || COALESCE(TO_CHAR(T.QTDE_CRED, '999G999G999G990'),'Não existente') || '|'  || 
+COALESCE((':DS-pm_ValorRelevanteDep' || ' (' || ':NM-pm_ValorRelevanteDep' || '):' || TO_CHAR(:pm_ValorRelevanteDep, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'  ||   
+COALESCE((':DS-pm_QtdeRelevanteDep' || ' (' || ':NM-pm_QtdeRelevanteDep' || '):' || TO_CHAR(:pm_QtdeRelevanteDep, '999G999G999G990')),'Parâmetro não cadastrado') || '|'   
+END 
+|| 
+CASE WHEN T.FL_TRANSF = 1 THEN 
+'Conclusão: Deputados  - Suspeito de Rachadinha|' || 
+'Valor Consolidado Transferências (Crédito): ' || COALESCE(TO_CHAR(T.TOTAL_TRANSF, 'L999G999G999G990D99'),'Não existente') || '|'  || 
+'Quantidade de transações de Transferências (Crédito): ' || COALESCE(TO_CHAR(T.QTDE_TRANSF, '999G999G999G990'),'Não existente') || '|'  || 
+COALESCE((':DS-pm_ValorMinimoTransf' || ' (' || ':NM-pm_ValorMinimoTransf' || '):' || TO_CHAR(:pm_ValorMinimoTransf, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'  ||   
+COALESCE((':DS-pm_QtdeRelevanteTransf' || ' (' || ':NM-pm_QtdeRelevanteTransf' || '):' || TO_CHAR(:pm_QtdeRelevanteTransf, '999G999G999G990')),'Parâmetro não cadastrado') || '|'   
+END 
+|| 
+CASE WHEN T.FL_SAQ = 1 THEN 
+'Conclusão: Funcionários de órgãos públicos - Suspeito de Rachadinha|' || 
+'Valor Consolidado Saques em Espécie (Débito): ' || COALESCE(TO_CHAR(T.TOTAL_SAQ, 'L999G999G999G990D99'),'Não existente') || '|'  || 
+'Valor Renda: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'),'Não informada') || '|'  || 
+COALESCE((':DS-pm_ValorMinimoSaq' || ' (' || ':NM-pm_ValorMinimoSaq' || '):' || TO_CHAR(:pm_ValorMinimoSaq, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'  ||   
+COALESCE((':DS-pm_PercRenda' || ' (' || ':NM-pm_PercRenda' || '):' || TO_CHAR(:pm_PercRenda, '999G999G999G990D99') || '%'),'Parâmetro não cadastrado') || '|'    
+END 
+AS DS_INF_ANLSE  
+FROM (SELECT A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.VL_RENDA_FAT, A.FL_SERVIDOR_PUBLICO, A.FL_PEP_DTEC_FLEX, 
+      A.FL_PEP, A.TOTAL_CRED, A.QTDE_CRED, A.QTDE_TRANSF, A.TOTAL_TRANSF, A.TOTAL_SAQ, 
+      CASE WHEN ((A.FL_SERVIDOR_PUBLICO = 1 OR A.FL_PEP_DTEC_FLEX = 1 OR A.FL_PEP = 1) AND A.TOTAL_CRED >= (:pm_ValorRelevanteCred)) THEN 1 ELSE 0 END FL_CRED,      
+      CASE WHEN (A.FL_TRAB_CON = 1 AND A.TOTAL_CRED >= (:pm_ValorRelevanteDep) AND A.QTDE_CRED >= (:pm_QtdeRelevanteDep)) THEN 1 ELSE 0 END FL_DEP,  
+      CASE WHEN (A.FL_TRAB_CON = 1 AND A.TOTAL_TRANSF >= (:pm_ValorMinimoTransf) AND A.QTDE_TRANSF >= (:pm_QtdeRelevanteTransf)) THEN 1 ELSE 0 END FL_TRANSF,  
+      CASE WHEN (A.FL_TRAB_DES = 1 AND A.TOTAL_SAQ > (:pm_ValorMinimoSaq) AND ((A.VL_RENDA_FAT IS NOT NULL AND A.TOTAL_SAQ > (A.VL_RENDA_FAT * (:pm_PercRenda/100))) OR A.VL_RENDA_FAT IS NULL)) THEN 1 ELSE 0 END FL_SAQ   
+      FROM (SELECT A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, MAX(A.NM_CLIE) NM_CLIE, MAX(A.VL_RENDA_FAT) VL_RENDA_FAT, MAX(A.FL_SERVIDOR_PUBLICO) FL_SERVIDOR_PUBLICO, 
+            MAX(A.FL_PEP_DTEC_FLEX) FL_PEP_DTEC_FLEX, MAX(A.FL_PEP) FL_PEP, MAX(A.FL_TRAB_CON) FL_TRAB_CON, MAX(A.FL_TRAB_DES) FL_TRAB_DES,  
+            SUM(A.TOTAL_CRED) TOTAL_CRED, SUM(A.QTDE_CRED) QTDE_CRED, SUM(A.TOTAL_TRANSF) TOTAL_TRANSF, 
+            SUM(A.QTDE_TRANSF) QTDE_TRANSF, SUM(A.TOTAL_SAQ) TOTAL_SAQ   
+            FROM (SELECT A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, MAX(A.NM_CLIE) NM_CLIE, MAX(A.VL_RENDA_FAT) VL_RENDA_FAT,  
+                  MAX(A.FL_SERVIDOR_PUBLICO) FL_SERVIDOR_PUBLICO, MAX(A.FL_PEP_DTEC_FLEX) FL_PEP_DTEC_FLEX, MAX(A.FL_PEP) FL_PEP, 
+                  MAX(A.FL_TRAB_CON) FL_TRAB_CON, MAX(A.FL_TRAB_DES) FL_TRAB_DES,   
+                  CASE WHEN (A.CD_NATUR_OPER = 1 AND A.CD_TP_OPER = 4 AND A.CD_FORMA_OPER = 7) THEN SUM(A.VL_OPER) END TOTAL_CRED,    
+                  CASE WHEN (A.CD_NATUR_OPER = 1 AND A.CD_TP_OPER = 4 AND A.CD_FORMA_OPER = 7) THEN COUNT(*) END QTDE_CRED,  
+                  CASE WHEN (A.CD_NATUR_OPER = 1 AND A.CD_TP_OPER IN (5, 8, 9)) THEN SUM(A.VL_OPER) END TOTAL_TRANSF, 
+                  CASE WHEN (A.CD_NATUR_OPER = 1 AND A.CD_TP_OPER IN (5, 8, 9)) THEN COUNT(*) END QTDE_TRANSF, 
+                  CASE WHEN (A.CD_NATUR_OPER = 2 AND A.CD_TP_OPER = 7 AND A.CD_FORMA_OPER = 7) THEN SUM(A.VL_OPER) END TOTAL_SAQ 
+                  FROM  (SELECT A.CD_TRANSACAO, A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.CD_TP_OPER, A.CD_FORMA_OPER, A.CD_NATUR_OPER, A.VL_OPER, A.VL_RENDA_FAT,  
+                         MAX(A.FL_SERVIDOR_PUBLICO) FL_SERVIDOR_PUBLICO, MAX(A.FL_PEP_DTEC_FLEX) FL_PEP_DTEC_FLEX, MAX(A.FL_PEP) FL_PEP, MAX(A.FL_TRAB_CON) FL_TRAB_CON, MAX(A.FL_TRAB_DES) FL_TRAB_DES      
+                         FROM (SELECT A.CD_TRANSACAO, A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.VL_RENDA_FAT,  A.CD_TP_OPER, A.CD_FORMA_OPER, A.CD_NATUR_OPER, CR.CD_DOC_IDENTF_TRAB, A.VL_OPER,       
+                               CASE O.FL_SERVIDOR_PUBLICO WHEN 1   THEN 1 ELSE 0 END FL_SERVIDOR_PUBLICO, 
+                               CASE N.FL_PEP              WHEN 'S' THEN 1 ELSE 0 END FL_PEP_DTEC_FLEX,  
+                               CASE P.CD_DOC_IDENTF       WHEN A.CD_DOC_IDENTF_CLIE  THEN 1 ELSE 0 END FL_PEP, 
+                               CASE WHEN (CR.CD_DOC_IDENTF_TRAB IS NOT NULL 
+                                          AND (EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR WHERE CD_LISTA_AUXILIAR = 120 AND DS_CONTEUDO LIKE '%' || CR.CD_DOC_IDENTF_TRAB || '%'))  
+                                          AND CR.CD_OCUP IN (:LS-pm_CodOcupacoesConsideradas)) THEN 1 ELSE 0 END FL_TRAB_CON,   
+                               CASE WHEN (CR.CD_DOC_IDENTF_TRAB IS NOT NULL 
+                                          AND (EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR WHERE CD_LISTA_AUXILIAR = 120 AND DS_CONTEUDO LIKE '%' || CR.CD_DOC_IDENTF_TRAB || '%'))  
+                                          AND CR.CD_OCUP NOT IN (:LS-pm_CodOcupacoesDesconsideradas)) THEN 1 ELSE 0 END FL_TRAB_DES      
+                               FROM TB_TRANS A
+                               LEFT JOIN TB_PPE P ON P.CD_DOC_IDENTF = A.CD_DOC_IDENTF_CLIE AND P.CD_TP_IDENTF = A.CD_TP_IDENTF_CLIE
+                               LEFT JOIN TB_NOTICIA_CLIE N ON FL_PEP = 'S' AND N.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE AND N.CD_TP_IDENTF_CLIE  = A.CD_TP_IDENTF_CLIE	
+                               LEFT JOIN TB_CLIE_RENDA CR ON CR.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE AND CR.CD_TP_IDENTF_CLIE = A.CD_TP_IDENTF_CLIE 
+                               LEFT JOIN TB_SITUACAO_ATIVID O ON O.CD_SITUACAO_ATIVID = CR.CD_SITUACAO_ATIVID  
+                               WHERE TRUNC(A.DT_TRANS) >= TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')  
+                               AND TRUNC(A.DT_TRANS) <= LAST_DAY(TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')) 
+                               AND A.CD_TP_PESSOA  = 'F'
+                               AND A.CD_NATUR_OPER IN (1,2) /* CREDITO OU DÉBITO */ 
+                               AND A.CD_TP_OPER IN (4, 5, 7, 8, 9 ) /* DEPÓSITO, DOC, SAQUE, TED, TEV */ 
+                               GROUP BY A.CD_TRANSACAO, A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE,  A.NM_CLIE, A.VL_RENDA_FAT, A.CD_TP_OPER, A.CD_FORMA_OPER, A.CD_NATUR_OPER, CR.CD_OCUP, O.FL_SERVIDOR_PUBLICO, N.FL_PEP, P.CD_DOC_IDENTF, CR.CD_DOC_IDENTF_TRAB, A.VL_OPER  
+                              ) A 
+                              GROUP BY A.CD_TRANSACAO, A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.CD_TP_OPER, A.CD_FORMA_OPER, A.CD_NATUR_OPER, A.VL_OPER, A.VL_RENDA_FAT    
+                       ) A
+                       GROUP BY A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.CD_NATUR_OPER, A.CD_TP_OPER, A.CD_FORMA_OPER   
+               ) A 
+               GROUP BY A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE 
+           ) A  
+        ) T  
+WHERE T.FL_CRED = 1 
+OR T.FL_DEP = 1
+OR T.FL_TRANSF = 1
+OR T.FL_SAQ = 1 
+
+UNION ALL
+
+SELECT DISTINCT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4014 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Mês/Ano Calendário: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||  
+'Conclusão: Relacionado com PEP|' || 
+CASE WHEN T.CD_DOC_IDENTF_CONJUGE IS NOT NULL THEN
+   '| Conjuge identificado como PEP: ' ||  COALESCE(T.NM_CONJUGE, 'Nome não informado') ||   
+   ' - CPF ' || SUBSTR(T.CD_DOC_IDENTF_CONJUGE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CONJUGE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CONJUGE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CONJUGE, 10, 2)   || '|' 
+END ||   
+CASE WHEN REPRESENTADOS IS NOT NULL THEN '| Cliente representa o(s) seguinte(s) PEP(s): ' || REPRESENTADOS END || '|' || 
+CASE WHEN COLABORADORES IS NOT NULL THEN '| Estreito(s) colaborador(es) do cliente é(são) PEP(s): ' || COLABORADORES END  || '|' ||
+CASE WHEN AMIGOS IS NOT NULL THEN '| Colaborador(es) do cliente é(são) PEP(s): ' || AMIGOS END || '|' ||    
+'Valor Consolidado de Depósito em Espécie (Crédito): ' || TO_CHAR(VL_TOTAL, 'L999G999G999G990D99') || '|' ||  
+COALESCE((':DS-pm_ValorRelevanteCred' || ' (' || ':NM-pm_ValorRelevanteCred' || '):' || TO_CHAR(:pm_ValorRelevanteCred, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|'  ||
+COALESCE((':DS-pm_QtdeEstreitoColaborador' || ' (' || ':NM-pm_QtdeEstreitoColaborador' || '):' || :pm_QtdeEstreitoColaborador),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE
+FROM
+(
+SELECT A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.NM_CONJUGE, A.CD_DOC_IDENTF_CONJUGE, A.REPRESENTADOS, A.COLABORADORES, A.AMIGOS, SUM(VL_OPER) VL_TOTAL, COUNT(*) QT_TOTAL
+FROM TB_TRANS T
+INNER JOIN
+(
+SELECT A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, CO.AMIGOS, R.REPRESENTADOS, EC.COLABORADORES,
+       MAX(A.NM_CONJUGE) NM_CONJUGE, MAX(A.CD_DOC_IDENTF_CONJUGE) CD_DOC_IDENTF_CONJUGE        
+ FROM TB_TRANS A
+ /* o cliente é o representante de um PEP?*/
+ LEFT JOIN 
+ (SELECT O.CD_DOC_IDENTF_REPRE, O.CD_TP_IDENTF_REPRE,
+  (LISTAGG(COALESCE(O.CD_DOC_IDENTF_REPRESTD,'Documento do Representado não encontrado') || '-' || COALESCE(O.NM_REPRESTD,'Nome do Representado não encontrado') , ', ') WITHIN GROUP (ORDER BY O.NM_REPRESTD ASC)) REPRESENTADOS    
+  FROM
+   (SELECT O.CD_DOC_IDENTF_REPRE, O.CD_TP_IDENTF_REPRE, O.CD_DOC_IDENTF_CLIE CD_DOC_IDENTF_REPRESTD, O.CD_TP_IDENTF_CLIE CD_TP_IDENTF_REPRESTD, O.NM_CLIE NM_REPRESTD
+    FROM TB_TRANSMISSAO_ORDEM  O
+    WHERE EXISTS 
+       (SELECT 1 FROM TB_TRANS A 
+       WHERE TRUNC(A.DT_TRANS) >= TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')  
+       AND TRUNC(A.DT_TRANS) <= LAST_DAY(TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')) 
+        AND A.CD_NATUR_OPER = 1  /*credito*/
+        AND A.CD_TP_OPER    = 4  /*depósito*/
+        AND A.CD_FORMA_OPER = 7  /*especie*/
+        AND O.CD_DOC_IDENTF_REPRE = A.CD_DOC_IDENTF_CLIE AND O.CD_TP_IDENTF_REPRE = A.CD_TP_IDENTF_CLIE) 
+    AND (
+         (EXISTS (SELECT 1 FROM TB_PPE C WHERE C.CD_DOC_IDENTF = O.CD_DOC_IDENTF_CLIE AND C.CD_TP_IDENTF = O.CD_TP_IDENTF_CLIE ))
+          OR
+         (EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N  
+                  WHERE FL_PEP = 'S' 
+                    AND N.CD_DOC_IDENTF_CLIE = O.CD_DOC_IDENTF_CLIE 
+                    AND N.CD_TP_IDENTF_CLIE  = O.CD_TP_IDENTF_CLIE	
+                  )
+              )
+          ) 
+  ) O GROUP BY O.CD_DOC_IDENTF_REPRE, O.CD_TP_IDENTF_REPRE          
+  ) R  ON (R.CD_DOC_IDENTF_REPRE = A.CD_DOC_IDENTF_CLIE AND R.CD_TP_IDENTF_REPRE = A.CD_TP_IDENTF_CLIE)  
+ LEFT JOIN /*amigo de trabalho PEP*/
+ (SELECT O.CD_DOC_IDENTF_CLIE, O.CD_TP_IDENTF_CLIE, 
+     LISTAGG('Empregador ' || CO.CD_DOC_IDENTF_TRAB || ' - Colaborador ' || CO.CD_DOC_IDENTF_CLIE , ', ') WITHIN GROUP (ORDER BY CO.CD_DOC_IDENTF_TRAB ASC) AMIGOS    
+  FROM TB_COLABORADOR CO
+  INNER JOIN
+  (SELECT O.CD_DOC_IDENTF_TRAB, O.CD_TP_IDENTF_TRAB, O.CD_DOC_IDENTF_CLIE, O.CD_TP_IDENTF_CLIE
+    FROM TB_COLABORADOR  O
+    WHERE EXISTS 
+       (SELECT 1 FROM TB_TRANS A 
+       WHERE TRUNC(A.DT_TRANS) >= TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')  
+       AND TRUNC(A.DT_TRANS) <= LAST_DAY(TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD'))  
+        AND A.CD_NATUR_OPER = 1  /*credito*/
+        AND A.CD_TP_OPER    = 4  /*depósito*/
+        AND A.CD_FORMA_OPER = 7  /*especie*/
+        AND O.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE AND O.CD_TP_IDENTF_CLIE = A.CD_TP_IDENTF_CLIE)
+    ) O
+    ON (O.CD_DOC_IDENTF_TRAB = CO.CD_DOC_IDENTF_TRAB AND O.CD_TP_IDENTF_TRAB = CO.CD_TP_IDENTF_TRAB)
+  WHERE         
+  (EXISTS (SELECT 1 FROM TB_PPE C WHERE C.CD_DOC_IDENTF = CO.CD_DOC_IDENTF_CLIE AND C.CD_TP_IDENTF = CO.CD_TP_IDENTF_CLIE ))
+   OR
+  (EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N WHERE FL_PEP = 'S' AND N.CD_DOC_IDENTF_CLIE = CO.CD_DOC_IDENTF_CLIE AND N.CD_TP_IDENTF_CLIE  = CO.CD_TP_IDENTF_CLIE))  
+  GROUP BY O.CD_DOC_IDENTF_CLIE, O.CD_TP_IDENTF_CLIE
+) CO ON (CO.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE AND CO.CD_TP_IDENTF_CLIE = A.CD_TP_IDENTF_CLIE)  
+  
+ LEFT JOIN /* o cliente tem um estreito colaborador que é PEP*/
+ (SELECT EC.CD_DOC_IDENTF_CLIE, EC.CD_TP_IDENTF_CLIE, 
+ CASE WHEN MAX(EC.CD_DOC_IDENTF_COLABORADOR) IS NOT NULL THEN LISTAGG(EC.CD_DOC_IDENTF_COLABORADOR || ' - ' || TO_CHAR(EC.QT_TOTAL)  || ' transações nos últimos 6 meses fechados', ', ') WITHIN GROUP (ORDER BY  EC.CD_DOC_IDENTF_COLABORADOR ASC) END COLABORADORES       
+ FROM (
+ SELECT CD_VARIAVEL_PRIMEIRA CD_DOC_IDENTF_CLIE, CD_VARIAVEL_SEGUNDA CD_TP_IDENTF_CLIE, CD_VARIAVEL_TERCEIRA CD_DOC_IDENTF_COLABORADOR, CD_VARIAVEL_QUARTA CD_TP_IDENTF_COLABORADOR, SUM(QT_TOTAL) QT_TOTAL, SUM(VL_TOTAL) VL_TOTAL 
+  FROM TB_PERFIL_MES_CALENDARIO M
+  WHERE CD_IDENTF_PERFIL = 101 
+    AND EXISTS
+      (SELECT 1 FROM TB_TRANS S
+        WHERE TRUNC(S.DT_TRANS) >= TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')  
+        AND TRUNC(S.DT_TRANS) <= LAST_DAY(TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')) 
+        AND S.CD_NATUR_OPER = 1  /*credito*/
+        AND S.CD_TP_OPER    = 4  /*depósito*/
+        AND S.CD_FORMA_OPER = 7  /*especie*/  
+        AND (S.CD_DOC_IDENTF_CLIE = M.CD_VARIAVEL_PRIMEIRA AND S.CD_TP_IDENTF_CLIE = M.CD_VARIAVEL_SEGUNDA)
+       )
+     AND (
+         (EXISTS (SELECT 1 FROM TB_PPE C WHERE C.CD_DOC_IDENTF = M.CD_VARIAVEL_TERCEIRA AND C.CD_TP_IDENTF = M.CD_VARIAVEL_QUARTA))
+          OR
+         (EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N WHERE FL_PEP = 'S' AND N.CD_DOC_IDENTF_CLIE = M.CD_VARIAVEL_TERCEIRA AND N.CD_TP_IDENTF_CLIE  = M.CD_VARIAVEL_QUARTA))
+          )         
+    GROUP BY CD_VARIAVEL_PRIMEIRA, CD_VARIAVEL_SEGUNDA, CD_VARIAVEL_TERCEIRA, CD_VARIAVEL_QUARTA 
+    HAVING SUM(QT_TOTAL) >= (:pm_QtdeEstreitoColaborador)  
+    ) EC
+    GROUP BY EC.CD_DOC_IDENTF_CLIE, EC.CD_TP_IDENTF_CLIE
+  ) EC ON A.CD_DOC_IDENTF_CLIE  = EC.CD_DOC_IDENTF_CLIE  AND A.CD_TP_IDENTF_CLIE = EC.CD_TP_IDENTF_CLIE
+    
+ WHERE TRUNC(A.DT_TRANS) >= TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')  
+    AND TRUNC(A.DT_TRANS) <= LAST_DAY(TO_DATE(TO_CHAR(:cd_lote) || '01', 'YYYY/MM/DD')) 
+    AND A.CD_NATUR_OPER = 1  /*credito*/
+    AND A.CD_TP_OPER    = 4  /*depósito*/
+    AND A.CD_FORMA_OPER = 7  /*especie*/  
+GROUP BY A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, CO.AMIGOS, R.REPRESENTADOS, EC.COLABORADORES
+) A
+ ON TRUNC(T.DT_TRANS) >= TO_DATE(TO_CHAR(A.CD_MES_ANO) || '01', 'YYYY/MM/DD')  
+ AND TRUNC(T.DT_TRANS) <= LAST_DAY(TO_DATE(TO_CHAR(A.CD_MES_ANO) || '01', 'YYYY/MM/DD'))   
+  AND T.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE 
+  AND T.CD_TP_IDENTF_CLIE  = A.CD_TP_IDENTF_CLIE 
+WHERE T.CD_NATUR_OPER = 1  /*credito*/ 
+  AND T.CD_TP_OPER    = 4  /*depósito*/ 
+  AND T.CD_FORMA_OPER = 7  /*especie*/ 
+  AND 
+     (A.REPRESENTADOS IS NOT NULL 
+      OR  
+      A.COLABORADORES IS NOT NULL 
+      OR 
+      A.AMIGOS IS NOT NULL 
+      OR 
+      (
+         (EXISTS (SELECT 1 FROM TB_PPE C WHERE C.CD_DOC_IDENTF = A.CD_DOC_IDENTF_CONJUGE ))
+          OR
+         (EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N 
+                  WHERE FL_PEP = 'S' 
+                  AND N.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CONJUGE))
+          )    
+      )
+ GROUP BY A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.NM_CONJUGE, A.CD_DOC_IDENTF_CONJUGE, A.REPRESENTADOS, A.COLABORADORES, A.AMIGOS  
+) T     
+WHERE VL_TOTAL >= (:pm_ValorRelevanteCred)
+

@@ -1,0 +1,153 @@
+/* c) aumentos substanciais no volume de depósitos em espécie de qualquer pessoa natural ou jurídica, */  
+/* sem causa aparente, nos casos em que tais depósitos forem posteriormente transferidos, dentro de */  
+/* curto período de tempo, a destino não relacionado com o cliente;*/  
+  
+SELECT D.DT_APONTAMENTO, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 22 - Aumento no Volume de Depósito em Espécie |' ||   
+'Objetivo: C) Aumentos substanciais no volume de depósitos em espécie de qualquer pessoa natural ou jurídica, sem causa aparente, nos casos em que tais depósitos forem posteriormente transferidos, dentro de curto período de tempo, a destino não relacionado com o cliente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||   
+'Conclusão: Aumentos substanciais no volume de depósitos em espécie do cliente, sem causa aparente, sendo que tais depósitos foram posteriormente transferidos, dentro de curto período de tempo, a destino não relacionado ao mesmo |' ||   
+'Cliente: ' ||  D.NM_CLIE || '|' ||   
+CASE D.CD_TP_IDENTF_CLIE    
+       WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 10, 2)    
+       WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(D.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(D.CD_DOC_IDENTF_CLIE, 13, 2)     
+       ELSE D.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Valor Consolidado de Débito: ' || COALESCE(TO_CHAR(ValorConsolidadoDebito, 'L999G999G999G990D99'), 'Valor não calculado') || '|' ||   
+'Valor Consolidado de Crédito: ' || COALESCE(TO_CHAR(ValorConsolidadoCredito, 'L999G999G999G990D99'), 'Valor não calculado') || '|' ||   
+'Parâmetro de quantidade de dias de Recuo para análise das transferências realizadas (pm_QtdeDiaRecuo): ' || COALESCE((':pm_QtdeDiaRecuo'), 'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual para flexibilização dos valores de transferências consolidados em curto período de tempo (pm_PercDepTransf_PF): ' || COALESCE((SELECT TO_CHAR(:pm_PercDepTransf_PF, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual para flexibilização da quantidade, que representa aumento substancial no mês calendário em relação aos últimos meses fechados (pm_PercQtdeDepEspecie_PF): ' || COALESCE((SELECT TO_CHAR(:pm_PercQtdeDepEspecie_PF, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual para flexibilização do valor, que representa aumento substancial no mês calendário em relação aos últimos meses fechados (pm_PercValorDepEspecie_PF): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorDepEspecie_PF, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM    
+(SELECT D.DT_APONTAMENTO, d.CD_DOC_IDENTF_CLIE, d.CD_TP_IDENTF_CLIE, NM_CLIE, sum(ValorConsolidadoDebito) ValorConsolidadoDebito, sum(ValorConsolidadoCredito) ValorConsolidadoCredito   
+ FROM (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO , SUM(VL_OPER) as ValorConsolidadoDebito, MAX(NM_CLIE) NM_CLIE   
+       FROM TB_TRANS_ANLSE   
+       WHERE CD_LOTE     = :cd_lote   
+       AND CD_SUBLOTE    = :cd_sublote   
+       AND CD_NATUR_OPER = 2   
+       AND CD_TP_PESSOA  = 'F'   
+       AND CD_DOC_IDENTF_DESTORIG IS NOT NULL   
+       AND CD_DOC_IDENTF_CLIE <> CD_DOC_IDENTF_DESTORIG   
+       GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, LAST_DAY(TRUNC(DT_TRANS)) ) D,    
+       
+       (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, SUM(VL_OPER) as ValorConsolidadoCredito, last_day(C.DT_REF) DT_APONTAMENTO 
+        FROM TB_TRANS T, 
+         (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, TRUNC(DT_TRANS) DT_REF FROM TB_TRANS_ANLSE WHERE CD_LOTE = :cd_lote  AND CD_SUBLOTE = :cd_sublote AND CD_NATUR_OPER = 2 AND CD_TP_PESSOA  = 'F' GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, TRUNC(DT_TRANS)) C   
+        WHERE T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE   
+          AND T.CD_TP_IDENTF_CLIE    = C.CD_TP_IDENTF_CLIE   
+          AND T.DT_TRANS    <=  C.DT_REF /*credito ocorreu antes da transferencia*/   
+          AND T.DT_TRANS    >= (C.DT_REF - (:pm_QtdeDiaRecuo))           
+          AND T.FL_ANALISADO = 1  
+          AND CD_NATUR_OPER  = 1 /*credito*/   
+          AND CD_FORMA_OPER  = 7 /*especie*/   
+          AND CD_TP_OPER     = 4 /*deposito*/   
+        GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, last_day(C.DT_REF)   
+       ) C   
+ WHERE D.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE   
+   AND D.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE   
+   AND D.DT_APONTAMENTO     = C.DT_APONTAMENTO 
+   AND C.ValorConsolidadoCredito > (D.ValorConsolidadoDebito * (1 - (SELECT :pm_PercDepTransf_PF/100 FROM DUAL )))   
+   AND C.ValorConsolidadoCredito <  ( D.ValorConsolidadoDebito * (1 + (SELECT :pm_PercDepTransf_PF/100 FROM DUAL )))         
+   AND EXISTS        /* Verifica se houve aumento substancial nos depositos em especie */   
+           (SELECT 1 FROM TB_PERFIL_MES_CALENDARIO MC   
+            WHERE CD_IDENTF_PERFIL     = 9   
+            AND   CD_VARIAVEL_PRIMEIRA = D.CD_DOC_IDENTF_CLIE   
+            AND   CD_VARIAVEL_SEGUNDA  = D.CD_TP_IDENTF_CLIE   
+            AND   CD_VARIAVEL_TERCEIRA = 4   
+            AND   CD_VARIAVEL_QUARTA   = 7   
+            AND   CD_ANO_MES           = TO_CHAR(C.DT_APONTAMENTO, 'YYYYMM')
+            AND EXISTS /*Aumento substancial no mes calendario, em relacao aos ultimos meses fechados*/   
+                (SELECT 1 FROM TB_PERFIL_MES_CALENDARIO P   
+                 WHERE CD_IDENTF_PERFIL     = 9   
+                 AND CD_VARIAVEL_PRIMEIRA = MC.CD_VARIAVEL_PRIMEIRA   
+                 AND CD_VARIAVEL_SEGUNDA  = MC.CD_VARIAVEL_SEGUNDA   
+                 AND CD_VARIAVEL_TERCEIRA = 4   
+                 AND CD_VARIAVEL_QUARTA   = 7   
+                 AND CD_ANO_MES           <> TO_CHAR(C.DT_APONTAMENTO, 'YYYYMM')  
+                 HAVING SUM(QT_TOTAL) < (MC.QT_TOTAL * (SELECT :pm_PercQtdeDepEspecie_PF/100 FROM DUAL))   
+                 AND SUM(VL_TOTAL) < (MC.VL_TOTAL * (SELECT :pm_PercValorDepEspecie_PF/100 FROM DUAL))   
+                )   
+           ) 
+ group by D.DT_APONTAMENTO, d.CD_DOC_IDENTF_CLIE, d.CD_TP_IDENTF_CLIE, NM_CLIE           
+) D   
+
+UNION ALL     
+SELECT D.DT_APONTAMENTO, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 22 - Aumento no Volume de Depósito em Espécie |' ||   
+'Objetivo: C) Aumentos substanciais no volume de depósitos em espécie de qualquer pessoa natural ou jurídica, sem causa aparente, nos casos em que tais depósitos forem posteriormente transferidos, dentro de curto período de tempo, a destino não relacionado com o cliente. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||   
+'Conclusão: Aumentos substanciais no volume de depósitos em espécie do cliente, sem causa aparente, sendo que tais depósitos foram posteriormente transferidos, dentro de curto período de tempo, a destino não relacionado ao mesmo |' ||   
+'Cliente: ' ||  D.NM_CLIE || '|' ||   
+CASE D.CD_TP_IDENTF_CLIE    
+       WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 10, 2)    
+       WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(D.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(D.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(D.CD_DOC_IDENTF_CLIE, 13, 2)     
+       ELSE D.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||   
+'Valor Consolidado de Débito: ' || COALESCE(TO_CHAR(ValorConsolidadoDebito, 'L999G999G999G990D99'), 'Valor não calculado') || '|' ||   
+'Valor Consolidado de Crédito: ' || COALESCE(TO_CHAR(ValorConsolidadoCredito, 'L999G999G999G990D99'), 'Valor não calculado') || '|' ||   
+'Parâmetro de quantidade de dias de Recuo para análise das transferências realizadas (pm_QtdeDiaRecuo): ' || COALESCE((':pm_QtdeDiaRecuo'), 'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual para flexibilização dos valores de transferências consolidados em curto período de tempo (pm_PercDepTransf_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercDepTransf_PJ, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual para flexibilização da quantidade, que representa aumento substancial no mês calendário em relação aos últimos meses fechados (pm_PercQtdeDepEspecie_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercQtdeDepEspecie_PJ, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual para flexibilização do valor, que representa aumento substancial no mês calendário em relação aos últimos meses fechados (pm_PercValorDepEspecie_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercValorDepEspecie_PJ, '999999990D99') FROM DUAL), 'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM    
+(SELECT D.DT_APONTAMENTO, d.CD_DOC_IDENTF_CLIE, d.CD_TP_IDENTF_CLIE,  SUM(ValorConsolidadoDebito) ValorConsolidadoDebito, SUM(ValorConsolidadoCredito) ValorConsolidadoCredito, NM_CLIE   
+ FROM (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, last_day(TRUNC(DT_TRANS)) DT_APONTAMENTO, SUM(VL_OPER) as ValorConsolidadoDebito, MAX(NM_CLIE) NM_CLIE   
+       FROM TB_TRANS_ANLSE   
+       WHERE CD_LOTE     = :cd_lote   
+       AND CD_SUBLOTE    = :cd_sublote   
+       AND CD_NATUR_OPER = 2   
+       AND CD_TP_PESSOA  = 'J'   
+       AND CD_DOC_IDENTF_DESTORIG IS NOT NULL   
+       AND CD_DOC_IDENTF_CLIE <> CD_DOC_IDENTF_DESTORIG   
+       GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, last_day(TRUNC(DT_TRANS))) D,  
+       
+       (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, last_day(C.DT_REF) DT_APONTAMENTO,  SUM(VL_OPER) as ValorConsolidadoCredito, ((EXTRACT (YEAR FROM MAX(C.DT_REF))) || LPAD(EXTRACT (MONTH FROM MAX(C.DT_REF)),2,'0')) DT_REF   
+        FROM TB_TRANS T, 
+        (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, trunc(DT_TRANS) DT_REF FROM TB_TRANS_ANLSE WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote AND CD_NATUR_OPER = 2 AND CD_TP_PESSOA  = 'J'  GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, trunc(DT_TRANS)) C   
+        WHERE T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE   
+          AND T.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE   
+          AND DT_TRANS      <= C.DT_REF /*credito ocorreu antes da transferencia*/   
+          AND DT_TRANS      >= (C.DT_REF - (:pm_QtdeDiaRecuo))             
+          AND T.FL_ANALISADO = 1  
+          AND CD_NATUR_OPER  = 1 /*credito*/   
+          AND CD_FORMA_OPER  = 7 /*especie*/   
+          AND CD_TP_OPER     = 4 /*deposito*/   
+        GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, last_day(C.DT_REF)   
+       ) C   
+ WHERE D.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE   
+ AND D.CD_TP_IDENTF_CLIE    = C.CD_TP_IDENTF_CLIE   
+ AND D.DT_APONTAMENTO       = C.DT_APONTAMENTO
+ AND C.ValorConsolidadoCredito > (D.ValorConsolidadoDebito * (1 - (SELECT :pm_PercDepTransf_PJ/100 FROM DUAL )))   
+ AND C.ValorConsolidadoCredito <  ( D.ValorConsolidadoDebito * (1 + (SELECT :pm_PercDepTransf_PJ/100 FROM DUAL )))         
+ AND EXISTS        /* Verifica se houve aumento substancial nos depositos em especie */   
+          (SELECT 1 FROM TB_PERFIL_MES_CALENDARIO MC   
+           WHERE CD_IDENTF_PERFIL     = 9   
+           AND   CD_VARIAVEL_PRIMEIRA = D.CD_DOC_IDENTF_CLIE   
+           AND   CD_VARIAVEL_SEGUNDA  = D.CD_TP_IDENTF_CLIE   
+           AND   CD_VARIAVEL_TERCEIRA = 4   
+           AND   CD_VARIAVEL_QUARTA   = 7   
+           AND   CD_ANO_MES           = TO_CHAR(C.DT_APONTAMENTO, 'YYYYMM')  
+           AND EXISTS /*Aumento substancial no mes calendario, em relacao aos ultimos meses fechados*/   
+                 (SELECT 1 FROM TB_PERFIL_MES_CALENDARIO P   
+                  WHERE CD_IDENTF_PERFIL     = 9   
+                  AND CD_VARIAVEL_PRIMEIRA = MC.CD_VARIAVEL_PRIMEIRA   
+                  AND CD_VARIAVEL_SEGUNDA  = MC.CD_VARIAVEL_SEGUNDA   
+                  AND CD_VARIAVEL_TERCEIRA = 4   
+                  AND CD_VARIAVEL_QUARTA   = 7   
+                  AND CD_ANO_MES           <> TO_CHAR(C.DT_APONTAMENTO, 'YYYYMM')  
+                  HAVING SUM(QT_TOTAL) < (MC.QT_TOTAL * (SELECT :pm_PercQtdeDepEspecie_PJ/100 FROM DUAL))   
+                  AND SUM(VL_TOTAL) < (MC.VL_TOTAL * (SELECT :pm_PercValorDepEspecie_PJ/100 FROM DUAL))   
+                 )   
+          )   
+ group by D.DT_APONTAMENTO, d.CD_DOC_IDENTF_CLIE, d.CD_TP_IDENTF_CLIE, NM_CLIE          
+) D   
+  
+
+
+ 
+    

@@ -1,0 +1,145 @@
+
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4004 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Valor Renda (Considerada Baixa): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||   
+COALESCE((':DS-pm_ValorRendaBaixa' || ' (' || ':NM-pm_ValorRendaBaixa' || '):' || TO_CHAR(:pm_ValorRendaBaixa, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_QtdeMovtoEspeciePF' || ' (' || ':NM-pm_QtdeMovtoEspeciePF' || '):' || :pm_QtdeMovtoEspeciePF),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_ValorMovtoEspecieRendaBx' || ' (' || ':NM-pm_ValorMovtoEspecieRendaBx' || '):' || TO_CHAR(:pm_ValorMovtoEspecieRendaBx, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' 
+AS DS_INF_ANLSE     
+FROM
+(SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+ FROM TB_TRANS T1
+ WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+   AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+   AND T1.CD_TP_PESSOA  = 'F'  
+   AND T1.CD_FORMA_OPER = 7  
+   AND CD_TP_OPER       = 4     
+   AND T1.FL_ANALISADO  = 1   
+GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+) T1    
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+AND T1.VL_RENDA_FAT <= (:pm_ValorRendaBaixa)                       
+AND T1.QT_ESPECIE >= (:pm_QtdeMovtoEspeciePF)    
+AND T1.VL_ESPECIE >= (:pm_ValorMovtoEspecieRendaBx)   
+     
+UNION ALL   
+  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4004 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor Renda (Considerada Alta): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||   
+
+COALESCE((':DS-pm_ValorRendaBaixa' || ' (' || ':NM-pm_ValorRendaBaixa' || '):' || TO_CHAR(:pm_ValorRendaBaixa, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_ValorMovtoEspeciePF' || ' (' || ':NM-pm_ValorMovtoEspeciePF' || '):' || TO_CHAR(:pm_ValorMovtoEspeciePF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_QtdeMovtoEspeciePF' || ' (' || ':NM-pm_QtdeMovtoEspeciePF' || '):' || :pm_QtdeMovtoEspeciePF),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercRendaAlta' || ' (' || ':NM-pm_PercRendaAlta' || '):' || :pm_PercRendaAlta || '%'),'Parâmetro não cadastrado') || '|' 
+
+AS DS_INF_ANLSE     
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+        AND T1.CD_TP_PESSOA = 'F'   
+        AND T1.CD_FORMA_OPER = 7  
+        AND CD_TP_OPER       = 4     
+        AND T1.FL_ANALISADO  = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1  
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+AND T1.VL_RENDA_FAT > (:pm_ValorRendaBaixa)                                   
+AND T1.QT_ESPECIE >= (:pm_QtdeMovtoEspeciePF)     
+AND T1.VL_ESPECIE >= (:pm_ValorMovtoEspeciePF)     
+AND T1.VL_ESPECIE >= (T1.VL_RENDA_FAT * (:pm_PercRendaAlta/100))    
+  
+UNION ALL  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,  
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4004 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor faturamento (Considerado Baixo): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||  
+
+COALESCE((':DS-pm_ValorFatmtBaixo' || ' (' || ':NM-pm_ValorFatmtBaixo' || '):' || TO_CHAR(:pm_ValorFatmtBaixo, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_QtdeMovtoEspeciePJ' || ' (' || ':NM-pm_QtdeMovtoEspeciePJ' || '):' || :pm_QtdeMovtoEspeciePJ),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_ValorMovtoEspecieFatmtoBx' || ' (' || ':NM-pm_ValorMovtoEspecieFatmtoBx' || '):' || TO_CHAR(:pm_ValorMovtoEspecieFatmtoBx, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' 
+
+AS DS_INF_ANLSE      
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1  
+      WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)        
+      AND T1.CD_TP_PESSOA = 'J'   
+      AND T1.CD_FORMA_OPER  = 7  
+      AND T1.CD_TP_OPER     = 4     
+      AND T1.FL_ANALISADO   = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1 
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+AND T1.VL_RENDA_FAT <= (:pm_ValorFatmtBaixo)                                  
+AND T1.QT_ESPECIE >= (:pm_QtdeMovtoEspeciePJ)     
+AND T1.VL_ESPECIE >= (:pm_ValorMovtoEspecieFatmtoBx)     
+     
+UNION ALL   
+  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4004 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Valor faturamento (Considerado Alto): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||   
+
+COALESCE((':DS-pm_ValorFatmtBaixo' || ' (' || ':NM-pm_ValorFatmtBaixo' || '):' || TO_CHAR(:pm_ValorFatmtBaixo, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_ValorMovtoEspeciePJ' || ' (' || ':NM-pm_ValorMovtoEspeciePJ' || '):' || TO_CHAR(:pm_ValorMovtoEspeciePJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_QtdeMovtoEspeciePJ' || ' (' || ':NM-pm_QtdeMovtoEspeciePJ' || '):' || :pm_QtdeMovtoEspeciePJ),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_PercFaturamento' || ' (' || ':NM-pm_PercFaturamento' || '):' || :pm_PercFaturamento || '%'),'Parâmetro não cadastrado') || '|' 
+
+AS DS_INF_ANLSE     
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)        
+        AND T1.CD_TP_PESSOA = 'J'   
+        AND T1.CD_FORMA_OPER  = 7  
+        AND T1.CD_TP_OPER     = 4     
+        AND T1.FL_ANALISADO   = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1 
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+  AND T1.VL_RENDA_FAT > (:pm_ValorFatmtBaixo)                                     
+  AND QT_ESPECIE >=  (:pm_QtdeMovtoEspeciePJ)      
+  AND VL_ESPECIE >= (:pm_ValorMovtoEspeciePJ)      
+  AND VL_ESPECIE >= (T1.VL_RENDA_FAT * (:pm_PercFaturamento/100))   
+

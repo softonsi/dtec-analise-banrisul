@@ -1,0 +1,34 @@
+From accumulate com mais de uma operação:
+
+	accumulate (				            				         
+		$p:  PerfilMesCalendario( 
+		     codIdentificacaoPerfil == "6" &&  
+			 eval( getCodAnoMesString() != getMesAnoCorrente("yyyyMM"))  /*desconsiderando mes corrente*/ &&
+		     codVariavelPrimeira    == $trans.codBanco && 		 
+		     codVariavelSegunda     == $trans.codAgencia && 
+		     codVariavelTerceira    == $trans.codConta
+		) from $listaPerfisMesCalendario,
+	  	$sum : sum($p.valorTotal),
+	  	$perfil : collectList($p);
+	  	$sum > $pm_VlCreditoMesCalendario
+     )
+     
+Regra que verifica um valor ou uma lista
+
+	$trans: TransacaoAnalise (		
+		codTipoPessoa == "F" 
+		&& valorOperacao != null
+	) and (
+		TransacaoAnalise(
+			valorRendaFaturamento == null
+			|| (valorRendaFaturamento != null
+			&& 
+			valorOperacao > (valorRendaFaturamento * ($pm_percRenda/100)))
+		) or
+		Number(this > 1) from accumulate (
+			$acimaMedia: MediaOcupacao(
+	          $trans.valorOperacao > (valorMedioCredito * ($pm_percOcupacao/100))
+			) from $listaMediaOcupacoes,
+			count($acimaMedia)
+		)
+	)

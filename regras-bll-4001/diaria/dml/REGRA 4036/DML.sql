@@ -1,0 +1,2 @@
+INSERT INTO TB_REGRA (CD_REGRA,CD_VERSAO_SISTEMA, DT_REGRA,NM_REGRA,DS_REGRA,CD_CLASSE_REGRA,FL_ACUM_REGRA,CD_SISCOAF,FL_REGRA_ATIVA,VL_PONTO,TX_REGRA_DINAMICA,DT_REGRA_DINAMICA,DS_ERRO_REGRA,CD_USU,CD_TP_REGRA,FL_APAGADO, CD_TP_PROCES)
+VALUES (4036,4,current_timestamp,	'Informações apresentadas conflitantes com informações públicas','l) registro de mesmo endereço de e-mail ou Internet Protocol (IP) por pessoas naturais, sem justificativa razoável para tal ocorrência',403,NULL,NULL,0,NULL,NULL,current_timestamp,NULL,0,1,0,1);

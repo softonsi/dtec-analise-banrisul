@@ -1,0 +1,98 @@
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 402 - Lances incompatíveis com a capacidade econômico-financeira |' ||  
+'Objetivo: C) Oferecimento de lances incompatíveis com a capacidade econômico-financeira do consorciado. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||  
+'Conclusão: Oferecimento de lances incompatíveis com a capacidade econômico-financeira do consorciado |' ||  
+'Cliente: ' ||  T.NM_CLIE || '|' ||
+CASE T.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' ||  
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, '999999990D99') || '|'  || 
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Natureza da Transação: ' ||   
+CASE T.CD_NATUR_OPER  
+	 WHEN 1 THEN 'Crédito'  
+	 WHEN 2 THEN 'Débito'  
+	 WHEN 3 THEN 'Evento'  
+	 ELSE 'Natureza não cadastrada'  
+END || '|' ||  
+'Tipo da Transação: ' || T.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), 'Tipo não cadastrado') || '|' ||  
+'Valor Renda: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro de flexibilização da renda (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica o valor mínimo para disparo da regra (pm_valorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Valor principal do contrato: ' || COALESCE(TO_CHAR(C.VL_PRINC_CONTRATO, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro de flexibilização do valor do lance em relação ao valor principal do consórcio (pm_percLancePF): ' || COALESCE((SELECT TO_CHAR(:pm_percLancePF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T, TB_CONTRATO C   
+WHERE T.CD_LOTE    = :cd_lote   
+  AND T.CD_SUBLOTE = :cd_sublote  
+  AND T.CD_TP_PESSOA = 'F'  
+  AND T.CD_TP_OPER = 16  
+  AND T.CD_CONTRATO = C.CD_CONTRATO  
+  AND T.NM_SIST_ORIG = C.NM_SIST_ORIG  
+  AND T.VL_OPER IS NOT NULL  
+  AND ((T.VL_RENDA_FAT IS NOT NULL AND  
+        T.VL_OPER > (T.VL_RENDA_FAT * (:pm_PercRenda/100)))  
+       OR                  
+       T.VL_RENDA_FAT IS NULL  
+      )      
+  AND ((T.VL_OPER / C.VL_PRINC_CONTRATO) > (:pm_percLancePF/100))  
+  AND T.VL_OPER > (:pm_valorMinimoPF)    
+UNION  ALL 
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 402 - Lances incompatíveis com a capacidade econômico-financeira |' ||  
+'Objetivo: C) Oferecimento de lances incompatíveis com a capacidade econômico-financeira do consorciado. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||  
+'Conclusão: Oferecimento de lances incompatíveis com a capacidade econômico-financeira do consorciado |' ||  
+'Cliente: ' ||   
+CASE T.CD_TP_IDENTF_CLIE  
+	 WHEN 2 THEN SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	 WHEN 3 THEN SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	 ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||  
+'Tipo de Pessoa: ' ||   
+CASE T.CD_TP_IDENTF_CLIE  
+	 WHEN 2 THEN 'Física (CPF)'  
+	 WHEN 3 THEN 'Jurídica (CNPJ)'  
+	 ELSE 'Tipo de pessoa não cadastrada'  
+END || '|' ||  
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Natureza da Transação: ' ||   
+CASE T.CD_NATUR_OPER  
+	 WHEN 1 THEN 'Crédito'  
+	 WHEN 2 THEN 'Débito'  
+	 WHEN 3 THEN 'Evento'  
+	 ELSE 'Natureza não cadastrada'  
+END || '|' ||  
+'Tipo da Transação: ' || T.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), 'Tipo não cadastrado') || '|' ||  
+'Valor Faturamento: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro de flexibilização do faturamento (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica o valor mínimo para disparo da regra (pm_valorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Valor principal do contrato: ' || COALESCE(TO_CHAR(C.VL_PRINC_CONTRATO, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Parâmetro de flexibilização do valor do lance em relação ao valor principal do consórcio (pm_percLancePJ): ' || COALESCE((SELECT TO_CHAR(:pm_percLancePJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T, TB_CONTRATO C   
+WHERE T.CD_LOTE    = :cd_lote   
+  AND T.CD_SUBLOTE = :cd_sublote  
+  AND T.CD_TP_PESSOA = 'J'  
+  AND T.CD_TP_OPER = 16  
+  AND T.CD_CONTRATO = C.CD_CONTRATO  
+  AND T.NM_SIST_ORIG = C.NM_SIST_ORIG  
+  AND T.VL_OPER IS NOT NULL  
+  AND ((T.VL_RENDA_FAT IS NOT NULL AND  
+        T.VL_OPER > (T.VL_RENDA_FAT * (:pm_PercFaturamento/100)))  
+       OR                  
+       T.VL_RENDA_FAT IS NULL  
+      )      
+  AND ((T.VL_OPER / C.VL_PRINC_CONTRATO) > (:pm_percLancePJ/100))  
+  AND T.VL_OPER > (:pm_valorMinimoPJ)    
+

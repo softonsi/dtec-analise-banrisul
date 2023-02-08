@@ -1,0 +1,30 @@
+SELECT LAST_DAY(T.DT_TRANS) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, 
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4063 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' || T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE 
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+ || '|' ||  
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||  
+'Data da transação: '  || TO_CHAR(DT_TRANS,'DD/MM/YY') || '|' || 
+'Valor da transação: ' || TO_CHAR(VL_OPER, 'L999G999G999G990D99')  || '|' || 
+'CEP do estabelecimento: '  || TO_CHAR(CD_CEP_RESID)  || '|' || 
+'CEP do POS: '         || TO_CHAR(CD_CEP_AG_OPER)  || '|' || 
+'Número do POS:'       || TO_CHAR(NU_POS) || '|' || 
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_nuDistancaoCEP4) FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4063 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_nuDistancaoCEP4'),'Parâmetro não cadastrado|' ) || '|'  
+AS DS_INF_ANLSE   
+FROM 
+ (SELECT  DT_TRANS, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, CD_TP_PESSOA, VL_OPER, CD_CEP_RESID, CD_CEP_AG_OPER, NU_POS 
+  FROM TB_TRANS_ANLSE A 
+  WHERE CD_TP_PESSOA  = 'J' 
+    AND CD_NATUR_OPER = 1 
+	AND CD_VIA_OPER   =  4 /*POS*/ 
+	AND ABS(CAST(SUBSTR(LPAD(TO_CHAR(CD_CEP_RESID), 8, '0'),1,4) AS NUMBER) - CAST(SUBSTR(LPAD(TO_CHAR(CD_CEP_AG_OPER), 8, '0'),1,4) AS NUMBER)) 
+	         >= (:pm_nuDistancaoCEP4) 
+    AND CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote 
+   ) T 
+ 
+ 
+ 

@@ -1,0 +1,310 @@
+/* BANRISUL - MENSAL */   
+/* CLIENTE */  
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||   
+'Fonte: Lista CSNU - DTEC-flex|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+      FROM TB_TRANS T      
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+        AND T.FL_ANALISADO = 1   
+      GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+     ) T   
+WHERE EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N      
+              WHERE N.FL_ARMAS_DESTRUICAO_MASSA = 1  
+		      AND N.NM_FONTE_NOTICIA LIKE '%LISTA - UN SECURITY COUNCIL SANCTIONS LIST%'  
+		      AND (N.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE AND N.CD_TP_IDENTF_CLIE  = T.CD_TP_IDENTF_CLIE)  
+		      )       
+AND NOT EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                WHERE CLA.DS_CONTEUDO LIKE '%' || T.CD_DOC_IDENTF_CLIE || '%'   
+                AND CLA.CD_LISTA_AUXILIAR = 100 /*Lista branca*/    
+               )    
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||  
+'Fonte: Listas auxiliares de Armas|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+      FROM TB_TRANS T      
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+        AND T.FL_ANALISADO = 1   
+      GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+     ) T   
+WHERE EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+              WHERE CLA.DS_CONTEUDO LIKE '%' || T.CD_DOC_IDENTF_CLIE || '%'   
+              AND CLA.CD_LISTA_AUXILIAR = 109 /*Lista Armas Identificacao*/    
+             )  
+OR (T.NM_CLIE IS NOT NULL 
+   AND
+   EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+           WHERE CLA.DS_CONTEUDO LIKE '%' || T.NM_CLIE || '%'   
+           AND CLA.CD_LISTA_AUXILIAR = 110 /*Lista Armas NOME*/    
+          ) 
+	)	  
+		  
+UNION ALL  
+/* ADMINISTRADOR */  
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||   
+'Administrador(es) envolvidos com crimes com de armas de destruição em massa: ' ||  T.LISTA_ADM || '|' ||     
+'Fonte: Lista CSNU - DTEC-flex|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, 
+      LISTAGG(C.CD_DOC_IDENTF_ADM || '-' || COALESCE(C.NM_ADM,'Nome não informado'), '/ ') WITHIN GROUP (ORDER BY C.CD_DOC_IDENTF_ADM desc) LISTA_ADM   
+      FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+            FROM TB_TRANS T      
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+              AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+              AND T.FL_ANALISADO = 1   
+            GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+           ) T   
+      INNER JOIN TB_CADEIA_ADMINISTRADOR C  
+      ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE    
+      AND C.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE   
+      WHERE EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N      
+                    WHERE N.FL_ARMAS_DESTRUICAO_MASSA = 1  
+		            AND N.NM_FONTE_NOTICIA LIKE '%LISTA - UN SECURITY COUNCIL SANCTIONS LIST%'  
+		            AND (N.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_ADM AND N.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_ADM)  
+                    )     
+      AND NOT EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                      WHERE CLA.DS_CONTEUDO LIKE '%' || C.CD_DOC_IDENTF_ADM || '%'   
+                      AND CLA.CD_LISTA_AUXILIAR = 100 /*Lista branca*/    
+                     )  
+     GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE  
+    ) T   
+	
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||  
+'Administrador(es) envolvido(s) com crime com de armas de destruição em massa: ' ||  T.LISTA_ADM || '|' ||     
+'Fonte: Listas auxiliares de Armas|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, 
+      LISTAGG(C.CD_DOC_IDENTF_ADM || '-' || COALESCE(C.NM_ADM,'Nome não informado'), '/ ') WITHIN GROUP (ORDER BY C.CD_DOC_IDENTF_ADM desc) LISTA_ADM   
+      FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+            FROM TB_TRANS T      
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+              AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+              AND T.FL_ANALISADO = 1   
+            GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+           ) T   
+      INNER JOIN TB_CADEIA_ADMINISTRADOR C  
+      ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE    
+      AND C.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE   
+      WHERE EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                    WHERE CLA.DS_CONTEUDO LIKE '%' || C.CD_DOC_IDENTF_ADM || '%'   
+                    AND CLA.CD_LISTA_AUXILIAR = 109 /*Lista Armas Identificacao*/    
+                   )  
+      OR 
+	  (C.NM_ADM IS NOT NULL 
+	   AND EXISTS 
+	      (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+           WHERE C.NM_ADM IS NOT NULL  
+             AND CLA.DS_CONTEUDO LIKE '%' || C.NM_ADM || '%'   
+             AND CLA.CD_LISTA_AUXILIAR = 110 /*Lista Armas NOME*/    
+           ) 
+		)
+     GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE  
+    ) T   
+	
+UNION ALL  
+/* SOCIO */  
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||   
+'Sócio(s) envolvido(s) com crime com de armas de destruição em massa: ' ||  T.LISTA_SOCIO || '|' ||     
+'Fonte: Lista CSNU - DTEC-flex|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, 
+      LISTAGG(C.CD_DOC_IDENTF_SOCIO || '-' || COALESCE(C.NM_SOCIO,'Nome não informado'), '/ ') WITHIN GROUP (ORDER BY C.CD_DOC_IDENTF_SOCIO desc) LISTA_SOCIO   
+      FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+            FROM TB_TRANS T      
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)     
+            AND T.FL_ANALISADO = 1   
+            AND T.CD_TP_PESSOA = 'J'  
+            GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+           ) T   
+      INNER JOIN TB_CADEIA_SOCTRIA C  
+      ON C.CD_DOC_IDENTF_SOCIEDD = T.CD_DOC_IDENTF_CLIE    
+      AND C.CD_TP_IDENTF_SOCIEDD = T.CD_TP_IDENTF_CLIE   
+      WHERE EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N      
+                    WHERE N.FL_ARMAS_DESTRUICAO_MASSA = 1  
+		            AND N.NM_FONTE_NOTICIA LIKE '%LISTA - UN SECURITY COUNCIL SANCTIONS LIST%'  
+		            AND (N.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_SOCIO AND N.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_SOCIO)  
+                    )     
+      AND NOT EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                      WHERE CLA.DS_CONTEUDO LIKE '%' || C.CD_DOC_IDENTF_SOCIO || '%'   
+                      AND CLA.CD_LISTA_AUXILIAR = 100 /*Lista branca*/    
+                     )  
+     GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE  
+    ) T   
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||  
+'Sócio(s) envolvido(s) com crime com de armas de destruição em massa: ' ||  T.LISTA_SOCIO || '|' ||    
+'Fonte: Listas auxiliares de Armas|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, 
+      LISTAGG(C.CD_DOC_IDENTF_SOCIO || '-' || COALESCE(C.NM_SOCIO,'Nome não informado'), '/ ') WITHIN GROUP (ORDER BY C.CD_DOC_IDENTF_SOCIO desc) LISTA_SOCIO    
+      FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+            FROM TB_TRANS T      
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+            AND T.FL_ANALISADO = 1   
+            AND T.CD_TP_PESSOA = 'J'  
+            GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+           ) T   
+      INNER JOIN TB_CADEIA_SOCTRIA C  
+      ON C.CD_DOC_IDENTF_SOCIEDD = T.CD_DOC_IDENTF_CLIE    
+      AND C.CD_TP_IDENTF_SOCIEDD = T.CD_TP_IDENTF_CLIE    
+      WHERE EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                    WHERE CLA.DS_CONTEUDO LIKE '%' || C.CD_DOC_IDENTF_SOCIO || '%'   
+                    AND CLA.CD_LISTA_AUXILIAR = 109 /*Lista Armas Identificacao*/    
+                   )  
+      OR 
+	  (C.NM_SOCIO IS NOT NULL
+	   AND EXISTS 
+	      (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+           WHERE C.NM_SOCIO IS NOT NULL  
+             AND CLA.DS_CONTEUDO LIKE '%' || C.NM_SOCIO || '%'   
+             AND CLA.CD_LISTA_AUXILIAR = 110 /*Lista Armas NOME*/    
+           )
+       )		   
+     GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE  
+    ) T   
+UNION ALL  
+/* SOCIEDADE */  
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||   
+'Sociedade(s) que o cliente participa, que está(ão) com envolvimento em crime com de armas de destruição em massa: ' ||  T.LISTA_SOCIEDADE || '|' ||    
+'Fonte: Lista CSNU - DTEC-flex|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, 
+      LISTAGG(C.CD_DOC_IDENTF_SOCIEDD || '-' || COALESCE(C.NM_SOCIEDD,'Nome não informado'), '/ ') WITHIN GROUP (ORDER BY C.CD_DOC_IDENTF_SOCIEDD desc) LISTA_SOCIEDADE     
+      FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+            FROM TB_TRANS T      
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+            AND T.FL_ANALISADO = 1   
+            AND T.CD_TP_PESSOA = 'F'  
+            GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+           ) T   
+      INNER JOIN TB_CADEIA_SOCTRIA C  
+      ON C.CD_DOC_IDENTF_SOCIO = T.CD_DOC_IDENTF_CLIE    
+      AND C.CD_TP_IDENTF_SOCIO = T.CD_TP_IDENTF_CLIE   
+      WHERE EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N      
+                    WHERE N.FL_ARMAS_DESTRUICAO_MASSA = 1  
+		            AND N.NM_FONTE_NOTICIA LIKE '%LISTA - UN SECURITY COUNCIL SANCTIONS LIST%'  
+		            AND (N.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_SOCIEDD AND N.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_SOCIEDD)  
+                     )     
+      AND NOT EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                      WHERE CLA.DS_CONTEUDO LIKE '%' || C.CD_DOC_IDENTF_SOCIEDD || '%'   
+                      AND CLA.CD_LISTA_AUXILIAR = 100 /*Lista branca*/    
+                     )  
+     GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE  
+    ) T   
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4101 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO, 5, 2) || '/' || SUBSTR(T.CD_MES_ANO, 1, 4) || '|' ||  
+'Sociedade(s) que o cliente participa, que está(ão) com envolvimento em crime com de armas de destruição em massa: ' ||  T.LISTA_SOCIEDADE || '|' ||    
+'Fonte: Listas auxiliares de Armas|'  
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, 
+      LISTAGG(C.CD_DOC_IDENTF_SOCIEDD || '-' || COALESCE(C.NM_SOCIEDD,'Nome não informado'), '/ ') WITHIN GROUP (ORDER BY C.CD_DOC_IDENTF_SOCIEDD desc) LISTA_SOCIEDADE     
+      FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE    
+            FROM TB_TRANS T      
+            WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+            AND T.FL_ANALISADO = 1   
+            AND T.CD_TP_PESSOA = 'F'  
+            GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO 
+           ) T   
+      INNER JOIN TB_CADEIA_SOCTRIA C  
+      ON C.CD_DOC_IDENTF_SOCIO = T.CD_DOC_IDENTF_CLIE    
+      AND C.CD_TP_IDENTF_SOCIO = T.CD_TP_IDENTF_CLIE    
+      WHERE EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+                    WHERE CLA.DS_CONTEUDO LIKE '%' || C.CD_DOC_IDENTF_SOCIEDD || '%'   
+                    AND CLA.CD_LISTA_AUXILIAR = 109 /*Lista Armas Identificacao*/    
+                   )  
+      OR 
+	  (C.NM_SOCIEDD IS NOT NULL
+	   AND EXISTS 
+	   (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA      
+         WHERE C.NM_SOCIO IS NOT NULL  
+           AND CLA.DS_CONTEUDO LIKE '%' || C.NM_SOCIEDD || '%'   
+           AND CLA.CD_LISTA_AUXILIAR = 110 /*Lista Armas NOME*/    
+        )
+       )		
+     GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE  
+    ) T   
+     
+     
+ 
+
+

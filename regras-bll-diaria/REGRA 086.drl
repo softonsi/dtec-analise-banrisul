@@ -1,0 +1,107 @@
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 86 - Operação expressiva com Cartão Pré-Pago |' ||  
+'Objetivo: 10. Permitir registro de emissão ou recarga de valores em um ou mais cartões pré-pagos, em montante acumulado ou superior a R$ 50.000,00 (cinquenta mil reais) ou equivalente em moeda estrangeira, no mês calendário ou ainda que apresente indícios de ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores. Circular 3.461/09, Art. 8º, § 1º, incisos I e II |' ||  
+'Conclusão: Valor da Emissão ou recarga de cartões pré-pagos, no mês calendário, superior ao estabelecido por lei, configurando ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||
+CASE T1.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T1.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' ||  
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Tipo da Transação: ' || T1.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T1.CD_TP_OPER), ' Tipo não cadastrado') || '|' ||  
+'Código do Cartão Pre Pago: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Parâmetro de valor mínimo para transações com cartão pré-pago para apontamento da regra (pm_ValorMinimoCartao_PF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoCartao_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T1  
+WHERE T1.CD_LOTE    = :cd_lote   
+  AND T1.CD_SUBLOTE = :cd_sublote  
+  AND T1.CD_TP_PESSOA = 'F'  
+  AND T1.CD_TP_OPER IN (25, 26)  
+  AND T1.VL_OPER > (:pm_ValorMinimoCartao_PF)  
+UNION  
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 86 - Operação expressiva com Cartão Pré-Pago |' ||  
+'Objetivo: 10. Permitir registro de emissão ou recarga de valores em um ou mais cartões pré-pagos, em montante acumulado ou superior a R$ 50.000,00 (cinquenta mil reais) ou equivalente em moeda estrangeira, no mês calendário ou ainda que apresente indícios de ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores. Circular 3.461/09, Art. 8º, § 1º, incisos I e II |' ||  
+'Conclusão: Valor da Emissão ou recarga de cartões pré-pagos, no mês calendário, superior ao estabelecido por lei, configurando ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||
+CASE T1.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T1.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||    
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Tipo da Transação: ' || T1.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T1.CD_TP_OPER), ' Tipo não cadastrado') || '|' ||  
+'Código do Voucher: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Voucher não cadastrado') || '|' ||   
+'Parâmetro de valor mínimo para transações com voucher para apontamento da regra (pm_ValorMinimoVoucher_PF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoVoucher_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T1   
+WHERE T1.CD_LOTE    = :cd_lote   
+  AND T1.CD_SUBLOTE = :cd_sublote  
+  AND T1.CD_TP_PESSOA = 'F'  
+  AND T1.CD_TP_OPER IN (64, 65)  
+  AND T1.VL_OPER > (:pm_ValorMinimoVoucher_PF)  
+UNION  
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 86 - Operação expressiva com Cartão Pré-Pago |' ||  
+'Objetivo: 10. Permitir registro de emissão ou recarga de valores em um ou mais cartões pré-pagos, em montante acumulado ou superior a R$ 50.000,00 (cinquenta mil reais) ou equivalente em moeda estrangeira, no mês calendário ou ainda que apresente indícios de ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores. Circular 3.461/09, Art. 8º, § 1º, incisos I e II |' ||  
+'Conclusão: Valor da Emissão ou recarga de cartões pré-pagos, no mês calendário, superior ao estabelecido por lei, configurando ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||
+CASE T1.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T1.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||    
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Tipo da Transação: ' || T1.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T1.CD_TP_OPER), ' Tipo não cadastrado') || '|' ||  
+'Código do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Parâmetro de valor mínimo para transações com cartão pré-pago para apontamento da regra (pm_ValorMinimoCartao_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoCartao_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T1   
+WHERE T1.CD_LOTE    = :cd_lote   
+  AND T1.CD_SUBLOTE = :cd_sublote  
+  AND T1.CD_TP_PESSOA = 'J'  
+  AND T1.CD_TP_OPER IN (25, 26)  
+  AND T1.VL_OPER > (:pm_ValorMinimoCartao_PJ)  
+UNION  
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 86 - Operação expressiva com Cartão Pré-Pago |' ||  
+'Objetivo: 10. Permitir registro de emissão ou recarga de valores em um ou mais cartões pré-pagos, em montante acumulado ou superior a R$ 50.000,00 (cinquenta mil reais) ou equivalente em moeda estrangeira, no mês calendário ou ainda que apresente indícios de ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores. Circular 3.461/09, Art. 8º, § 1º, incisos I e II |' ||  
+'Conclusão: Valor da Emissão ou recarga de cartões pré-pagos, no mês calendário, superior ao estabelecido por lei, configurando ocultação ou dissimulação da natureza, da origem, da localização, da disposição, da movimentação ou da propriedade de bens, direitos e valores |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||
+CASE T1.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T1.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||    
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  || 
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Tipo da Transação: ' || T1.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T1.CD_TP_OPER), ' Tipo não cadastrado') || '|' ||  
+'Código do Voucher: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Voucher não cadastrado') || '|' ||   
+'Parâmetro de valor mínimo para transações com voucher para apontamento da regra (pm_ValorMinimoVoucher_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoVoucher_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T1   
+WHERE T1.CD_LOTE    = :cd_lote   
+  AND T1.CD_SUBLOTE = :cd_sublote  
+  AND T1.CD_TP_PESSOA = 'J'  
+  AND T1.CD_TP_OPER IN (64, 65)  
+  AND T1.VL_OPER > (:pm_ValorMinimoVoucher_PJ)  

@@ -1,0 +1,81 @@
+/* n) recebimento de depósitos provenientes de diversas origens, sem fundamentação econômico-financeira, */   
+/* especialmente provenientes de regioes distantes do local de atuação da pessoa jurídica ou distantes */   
+/* do domicilio da pessoa natural;*/   
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 63 - Recebimento de depósitos de várias origens |' ||   
+'Objetivo: n) recebimento de depósitos provenientes de diversas origens, sem fundamentação econômico-financeira, especialmente provenientes de regiões distantes do local de atuação da pessoa jurídica ou distantes do domicílio da pessoa natural. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||   
+'Conclusão: Recebimento de depósitos provenientes de diversas origens, sem fundamentação econômico-financeira, especialmente provenientes de regiões distantes do local de atuação da pessoa jurídica ou distantes do domicílio da pessoa natural |' ||   
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Cidade Residência do Cliente: ' || COALESCE(MAX(T1.NM_CID_RESID), 'Agência não cadastrada') || '|' ||   
+'Quantidade de Cidades distintas de depósito: ' || TO_CHAR(COUNT(*)) || '|' ||   
+'Cidades da Agência de Origem dos depósitos: ' || 
+xmlcast(  xmlagg(xmlelement(outros,   
+          NM_CID_AG_DESTORIG  || ', ')    
+          order by T1.CD_DOC_IDENTF_CLIE) as clob) 
+|| '|' ||  
+'Parâmetro que indica quantidade expressiva de cidades distintas onde depósitos foram realizados para a mesma conta, para Pessoa Física (pm_QtdeCidadesDistintasPF): ' || COALESCE((':pm_QtdeCidadesDistintasPF'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE     
+FROM ( 
+SELECT CD_MES_ANO, MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CID_RESID, NM_CID_AG_DESTORIG 
+FROM TB_TRANS   
+WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)     
+  AND FL_ANALISADO       = 1 
+  AND CD_TP_PESSOA       = 'F' 
+  AND VL_OPER            IS NOT NULL   
+  AND NM_CID_AG_DESTORIG IS NOT NULL    
+  AND NM_CID_AG_DESTORIG <> NM_CID_RESID   
+  AND CD_NATUR_OPER      = 1   
+  AND CD_TP_OPER         = 4   
+GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CID_RESID, NM_CID_AG_DESTORIG  
+) T1 
+GROUP BY CD_MES_ANO, NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE 
+HAVING COUNT(*) > (:pm_QtdeCidadesDistintasPF)   
+ 
+UNION ALL 
+ 
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 63 - Recebimento de depósitos de várias origens |' ||   
+'Objetivo: n) recebimento de depósitos provenientes de diversas origens, sem fundamentação econômico-financeira, especialmente provenientes de regiões distantes do local de atuação da pessoa jurídica ou distantes do domicílio da pessoa natural. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||   
+'Conclusão: Recebimento de depósitos provenientes de diversas origens, sem fundamentação econômico-financeira, especialmente provenientes de regiões distantes do local de atuação da pessoa jurídica ou distantes do domicílio da pessoa natural |' ||   
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Cidade Residência do Cliente: ' || COALESCE(MAX(T1.NM_CID_RESID), 'Agência não cadastrada') || '|' ||   
+'Quantidade de Cidades distintas de depósito: ' || TO_CHAR(COUNT(*)) || '|' ||   
+'Cidades da Agência de Origem dos depósitos: ' || 
+xmlcast(  xmlagg(xmlelement(outros,   
+          NM_CID_AG_DESTORIG  || ', ')    
+          order by T1.CD_DOC_IDENTF_CLIE) as clob) 
+|| '|' ||  
+'Parâmetro que indica quantidade expressiva de cidades distintas onde depósitos foram realizados para a mesma conta, para Pessoa Jurídica (pm_QtdeCidadesDistintasPJ): ' || COALESCE((':pm_QtdeCidadesDistintasPJ'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE    
+FROM ( 
+SELECT CD_MES_ANO, MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CID_RESID, NM_CID_AG_DESTORIG 
+FROM TB_TRANS   
+WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+  AND FL_ANALISADO       = 1    
+  AND CD_TP_PESSOA       = 'J' 
+  AND VL_OPER            IS NOT NULL   
+  AND NM_CID_AG_DESTORIG IS NOT NULL    
+  AND NM_CID_AG_DESTORIG <> NM_CID_RESID   
+  AND CD_NATUR_OPER      = 1   
+  AND CD_TP_OPER         = 4   
+GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CID_RESID, NM_CID_AG_DESTORIG  
+) T1 
+GROUP BY CD_MES_ANO, NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE 
+HAVING COUNT(*) > (:pm_QtdeCidadesDistintasPJ)   
+ 

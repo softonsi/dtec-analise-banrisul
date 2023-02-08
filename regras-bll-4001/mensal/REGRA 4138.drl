@@ -1,0 +1,60 @@
+/* 4138 - MENSAL */   
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,      
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4138 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||    
+CASE T.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||  
+'Valor consolidado de saque em espécie no mês: ' || TO_CHAR(VL_SAQUE, 'L999G999G999G990D99') || '|' ||  
+'Quantidade de saques em especie no mês: ' || TO_CHAR(QT_SAQUE) || '|' ||  
+COALESCE((':DS-pm_ValorLimiteEspeciePartido' || ' (' || ':NM-pm_ValorLimiteEspeciePartido' || '):' || TO_CHAR(:pm_ValorLimiteEspeciePartido, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'    
+AS DS_INF_ANLSE    
+FROM (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(NM_CLIE) NM_CLIE, SUM(VL_OPER) VL_SAQUE, COUNT(*) QT_SAQUE 
+      FROM TB_TRANS A   
+      WHERE DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+      AND DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))    
+      AND CD_NATUR_OPER = 2   
+      AND CD_TP_OPER = 7 
+      AND CD_FORMA_OPER = 7 
+      AND FL_ANALISADO  = 1   
+      AND CD_TP_PESSOA  = 'J'    
+      AND EXISTS  (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR  PI  
+                   WHERE PI.CD_LISTA_AUXILIAR = 114 /*Partidos_identificacao*/ 
+                   AND TRIM(PI.DS_CONTEUDO) = A.CD_DOC_IDENTF_CLIE    
+                  )  
+      GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE  
+     ) T  
+WHERE VL_SAQUE > (:pm_ValorLimiteEspeciePartido) 
+UNION ALL    
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,      
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4138 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||    
+CASE T.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||      
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||  
+'Valor consolidado de débito no mês: ' || TO_CHAR(VL_MES, 'L999G999G999G990D99') || '|' ||  
+'Quantidade de transações no mês: ' || TO_CHAR(QT_MES) || '|' ||  
+COALESCE((':DS-pm_ValorLimitePartido' || ' (' || ':NM-pm_ValorLimitePartido' || '):' || TO_CHAR(:pm_ValorLimitePartido, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'    
+AS DS_INF_ANLSE    
+FROM (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, SUM(VL_OPER) VL_MES, COUNT(*) QT_MES 
+      FROM TB_TRANS A   
+      WHERE DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+      AND DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))   
+      AND CD_NATUR_OPER = 2  
+      AND FL_ANALISADO  = 1   
+      AND CD_TP_PESSOA  = 'J'    
+      AND EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR  PI  
+                  WHERE PI.CD_LISTA_AUXILIAR = 114 /*Partidos_identificacao*/ 
+                  AND TRIM(PI.DS_CONTEUDO) = A.CD_DOC_IDENTF_CLIE   
+                 )  
+      GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE  
+     ) T  
+WHERE VL_MES >= (:pm_ValorLimitePartido)  

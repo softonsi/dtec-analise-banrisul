@@ -1,0 +1,145 @@
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 23 - Fragmentação de Depósitos em Espécie |' ||     
+'Objetivo: d) Fragmentação de depósitos, em espécie, de forma a dissimular o valor total da movimentação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||     
+'Conclusão: Cliente fragmentou seus depósitos, em espécie, de forma a dissimular o valor total da movimentação |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Valor Renda (Considerada Baixa): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||   
+'Parâmetro que indica o limite para que uma renda possa ser considerada baixa (pm_ValorRendaBaixa): ' || COALESCE((SELECT TO_CHAR(:pm_ValorRendaBaixa, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||      
+'Parâmetro que indica quantidade expressiva de depósitos em espécie no último mês calendário fechado, para Pessoa Física (pm_QtdeMovtoEspeciePF): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeMovtoEspeciePF, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'	||     
+'Parâmetro que indica valor expressivo de depósitos em espécie no último mês calendário fechado, para pessoa física de baixa renda (pm_ValorMovtoEspecieRendaBx): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMovtoEspecieRendaBx, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'     
+AS DS_INF_ANLSE     
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.CD_TP_PESSOA = 'F'   
+      AND T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+      AND T1.CD_FORMA_OPER = 7  
+      AND CD_TP_OPER = 4     
+      AND T1.FL_ANALISADO = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1    
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+AND T1.VL_RENDA_FAT <= (:pm_ValorRendaBaixa)                       
+AND T1.QT_ESPECIE >= (:pm_QtdeMovtoEspeciePF)    
+AND T1.VL_ESPECIE >= (:pm_ValorMovtoEspecieRendaBx)   
+     
+UNION ALL   
+  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 23 - Fragmentação de Depósitos em Espécie |' ||     
+'Objetivo: d) Fragmentação de depósitos, em espécie, de forma a dissimular o valor total da movimentação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||     
+'Conclusão: Cliente fragmentou seus depósitos, em espécie, de forma a dissimular o valor total da movimentação |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor Renda (Considerada Alta): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||   
+'Parâmetro que indica o limite para que uma renda possa ser considerada baixa (pm_ValorRendaBaixa): ' || COALESCE((SELECT TO_CHAR(:pm_ValorRendaBaixa, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica valor expressivo de depósitos em espécie no último mês calendário fechado, para pessoa física de baixa renda (pm_ValorMovtoEspeciePF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMovtoEspeciePF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica quantidade expressiva de depósitos em espécie no último mês calendário fechado, para pessoa física (pm_QtdeMovtoEspeciePF): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeMovtoEspeciePF, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'	||     
+'Parâmetro percentual para flexibilização de renda alta (pm_PercRendaAlta): ' || COALESCE((SELECT TO_CHAR(:pm_PercRendaAlta, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'       
+AS DS_INF_ANLSE     
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.CD_TP_PESSOA = 'F'   
+      AND T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+      AND T1.CD_FORMA_OPER = 7  
+      AND CD_TP_OPER = 4     
+      AND T1.FL_ANALISADO = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1  
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+AND T1.VL_RENDA_FAT > (:pm_ValorRendaBaixa)                                   
+AND T1.QT_ESPECIE >= (:pm_QtdeMovtoEspeciePF)     
+AND T1.VL_ESPECIE >= (:pm_ValorMovtoEspeciePF)     
+AND T1.VL_ESPECIE >= (T1.VL_RENDA_FAT * (:pm_PercRendaAlta/100))    
+ 
+ 
+UNION ALL  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 23 - Fragmentação de Depósitos em Espécie |' ||     
+'Objetivo: d) Fragmentação de depósitos, em espécie, de forma a dissimular o valor total da movimentação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||     
+'Conclusão: Cliente fragmentou seus depósitos, em espécie, de forma a dissimular o valor total da movimentação |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor faturamento (Considerado Baixo): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||    
+'Parâmetro que indica o limite para que um faturamento possa ser considerado baixo (pm_ValorFatmtBaixo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorFatmtBaixo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica valor expressivo de depósitos em espécie no último mês calendário fechado, para pessoa jurídica com faturamento baixo (pm_ValorMovtoEspecieFatmtoBx): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMovtoEspecieFatmtoBx, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||      
+'Parâmetro que indica quantidade expressiva de depósitos em espécie no último mês calendário fechado, para pessoa jurídica (pm_QtdeMovtoEspeciePJ): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeMovtoEspeciePJ, '999999990') FROM DUAL),'Parâmetro não cadastrado') || '|'						               
+AS DS_INF_ANLSE      
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.CD_TP_PESSOA = 'J'   
+      AND T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+      AND T1.CD_FORMA_OPER = 7  
+      AND T1.CD_TP_OPER = 4     
+      AND T1.FL_ANALISADO = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1 
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+AND T1.VL_RENDA_FAT <= (:pm_ValorFatmtBaixo)                                  
+AND T1.QT_ESPECIE >= (:pm_QtdeMovtoEspeciePJ)     
+AND T1.VL_ESPECIE >= (:pm_ValorMovtoEspecieFatmtoBx)     
+     
+UNION ALL   
+  
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 23 - Fragmentação de Depósitos em Espécie |' ||     
+'Objetivo: d) Fragmentação de depósitos, em espécie, de forma a dissimular o valor total da movimentação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso I |' ||     
+'Conclusão: Cliente fragmentou seus depósitos, em espécie, de forma a dissimular o valor total da movimentação |' ||     
+'Cliente: ' ||  T1.NM_CLIE || '|' ||     
+CASE T1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano Calendário: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Valor faturamento (Considerado Alto): ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||      
+'Quantidade de Movimentação em espécie: ' || TO_CHAR(T1.QT_ESPECIE) || '|' ||   
+'Valor total de Movimentação em espécie: ' || (TO_CHAR(T1.VL_ESPECIE, 'L999G999G999G990D99')) || '|' ||   
+'Parâmetro que indica o limite para que um faturamento possa ser considerado baixo (pm_ValorFatmtBaixo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorFatmtBaixo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica quantidade expressiva de depósitos em espécie no último mês calendário fechado, para pessoa jurídica (pm_QtdeMovtoEspeciePJ): ' || COALESCE((SELECT TO_CHAR(:pm_QtdeMovtoEspeciePJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||					               
+'Parâmetro que indica valor expressivo de depósitos em espécie no último mês calendário fechado, para pessoa jurídica com faturamento alto (pm_ValorMovtoEspeciePJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMovtoEspeciePJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro percentual de flexibilização de faturamento alto (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'					               
+AS DS_INF_ANLSE     
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, SUM(T1.VL_OPER) VL_ESPECIE, COUNT(*) QT_ESPECIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.CD_TP_PESSOA = 'J'   
+      AND T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+      AND T1.CD_FORMA_OPER = 7  
+      AND T1.CD_TP_OPER = 4     
+      AND T1.FL_ANALISADO = 1   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+     ) T1 
+WHERE T1.VL_RENDA_FAT IS NOT NULL     
+  AND T1.VL_RENDA_FAT > (:pm_ValorFatmtBaixo)                                     
+  AND QT_ESPECIE >=  (:pm_QtdeMovtoEspeciePJ)      
+  AND VL_ESPECIE >= (:pm_ValorMovtoEspeciePJ)      
+  AND VL_ESPECIE >= (T1.VL_RENDA_FAT * (:pm_PercFaturamento/100))   

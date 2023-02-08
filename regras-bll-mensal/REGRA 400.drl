@@ -1,0 +1,93 @@
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 400 - Elevado número de cotas |' ||   
+'Objetivo: A) Existência de consorciados detentores de elevado número de cotas, incompatível com sua capacidade econômico-financeiro ou com o objeto da pessoa jurídica. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||   
+'Conclusão: Consorciado detentor de elevado número de cotas, incompatível com sua capacidade econômico-financeiro |' ||   
+'Cliente: ' ||  C.NM_CLIE || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||   
+'Mês/Ano: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||    
+'Status do Contrato: Ativo |' ||    
+'Quantidade de cotas: ' || TO_CHAR(count(*)) || '|' ||  
+'Valor totas de cotas: ' || COALESCE(TO_CHAR(SUM(VL_PCELA_CONTRATO), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Contratos: informações |' ||  
+xmlcast(  xmlagg(xmlelement(outros,   
+TO_CHAR(CD_CONTRATO) || ': valor principal-' || COALESCE(ltrim(TO_CHAR(VL_PRINC_CONTRATO, 'L999G999G999G990D99')), 'Valor não cadastrado') || 
+', qtde parcelas contratadas-' || COALESCE(TO_CHAR(QT_MES_CONTT),'não informado') || ', qtde parcelas pagas-' || COALESCE(TO_CHAR(QT_MES_PAGO),'não informado') 
+|| '|')    
+order by CD_CONTRATO) as clob)   
+|| '|' ||  
+'Parâmetro percentual de flexibilização da renda (pm_percRenda): ' || COALESCE((SELECT TO_CHAR(:pm_percRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica valor alto para clientes sem renda (pm_ValorTotalParcelaPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorTotalParcelaPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica número elevado de cotas (pm_QtdeCotasPF): ' || COALESCE((':pm_QtdeCotasPF'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_CONTRATO T   
+INNER JOIN (SELECT MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT FROM TB_TRANS  
+            WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+            AND CD_TP_PESSOA = 'F' 
+            AND FL_ANALISADO = 1
+            GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) C  
+            ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE 
+WHERE T.CD_STTUS_CONTRATO = 1   
+GROUP BY C.NM_CLIE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE 
+HAVING COUNT(*) > (:pm_QtdeCotasPF)   
+AND ((MAX(VL_RENDA_FAT) IS NOT NULL AND   
+        SUM(VL_PCELA_CONTRATO) > (MAX(VL_RENDA_FAT) * (:pm_percRenda/100))   
+        )   
+       	OR                   
+       	(MAX(VL_RENDA_FAT) IS NULL AND   
+       	 SUM(VL_PCELA_CONTRATO) > (:pm_ValorTotalParcelaPF)   
+       	 ))   
+         
+UNION ALL 
+ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 400 - Elevado número de cotas |' ||   
+'Objetivo: A) Existência de consorciados detentores de elevado número de cotas, incompatível com sua capacidade econômico-financeiro ou com o objeto da pessoa jurídica. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||   
+'Conclusão: Consorciado detentor de elevado número de cotas, incompatível com sua capacidade econômico-financeiro |' ||   
+'Cliente: ' ||  C.NM_CLIE || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||   
+'Mês/Ano: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||    
+'Status do Contrato: Ativo |' ||   
+'Quantidade de cotas: ' || TO_CHAR(count(*)) || '|' ||  
+'Valor totas de cotas: ' || COALESCE(TO_CHAR(SUM(VL_PCELA_CONTRATO), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Contratos: informações |' ||  
+xmlcast(  xmlagg(xmlelement(outros,   
+TO_CHAR(CD_CONTRATO) || ': valor principal-' || COALESCE(ltrim(TO_CHAR(VL_PRINC_CONTRATO, 'L999G999G999G990D99')), 'Valor não cadastrado') || 
+', qtde parcelas contratadas-' || COALESCE(TO_CHAR(QT_MES_CONTT),'não informado') || ', qtde parcelas pagas-' || COALESCE(TO_CHAR(QT_MES_PAGO),'não informado') 
+|| '|')    
+order by CD_CONTRATO) as clob)   
+|| '|' ||  
+'Parâmetro percentual de flexibilização da faturamento (pm_percFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_percFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica valor alto para clientes sem faturamento (pm_ValorTotalParcelaPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorTotalParcelaPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica número elevado de cotas (pm_QtdeCotasPJ): ' || COALESCE((':pm_QtdeCotasPJ'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE    
+FROM TB_CONTRATO T   
+INNER JOIN (SELECT MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT FROM TB_TRANS  
+            WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+            AND CD_TP_PESSOA = 'J' 
+            AND FL_ANALISADO = 1
+            GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) C  ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE 
+WHERE T.CD_STTUS_CONTRATO = 1   
+GROUP BY C.NM_CLIE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE 
+HAVING COUNT(*) > (:pm_QtdeCotasPJ)   
+AND ((MAX(VL_RENDA_FAT) IS NOT NULL AND   
+        SUM(VL_PCELA_CONTRATO) > (MAX(VL_RENDA_FAT) * (:pm_percFaturamento/100))   
+        )   
+       	OR                   
+       	(MAX(VL_RENDA_FAT) IS NULL AND   
+       	 SUM(VL_PCELA_CONTRATO) > (:pm_ValorTotalParcelaPJ)   
+       	 ))   
+          

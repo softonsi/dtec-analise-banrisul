@@ -1,0 +1,1 @@
+select cd_sttus_evento_atual, vl_apontamento, vl_ponto_corte, fl_carencia, fl_ponto_corte, fl_susp_ld from tb_apontamento where cd_doc_identf_clie = '9142310000000'

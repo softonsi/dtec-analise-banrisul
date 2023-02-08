@@ -1,0 +1,96 @@
+/* BANRISUL - MENSAL NÃO FOI POSSÍVEL TESTAR, FALTA DE CAMPOS */   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4147 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Forma da Transação: Moeda Estrangeira|' ||   
+'Modalidade da Conta: CCME (Contas Correntes em Moeda Estrangeira)|' ||   
+'Ocupações (Opera Câmbio): ' || COALESCE((SELECT LISTAGG(O.NM_OCUP, ', ') WITHIN GROUP (ORDER BY O.NM_OCUP desc)      
+                                          FROM TB_OCUP O, TB_CLIE_RENDA C       
+                                          WHERE T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE       
+                                          AND T.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE       
+                                          AND C.CD_OCUP            = O.CD_OCUP  
+                                          AND O.FL_OPERA_CAMBIO    = 1), 'Não cadastrada') || '|' ||   
+'Mês/Ano Calendário: ' || COALESCE(SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4), 'Não identificado') || '|' ||   
+'Quantidade de transações no mês calendário:' || COALESCE(TO_CHAR(T.QTDE_TRANS, '999G999G999G990D99'), 'Não cadastrado') || '|' ||    
+COALESCE((':DS-pm_QtdeTransacoes' || ' (' || ':NM-pm_QtdeTransacoes' || '):' || :pm_QtdeTransacoes),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_ValorLimite' || ' (' || ':NM-pm_ValorLimite' || '):' || TO_CHAR(:pm_ValorLimite, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'   
+AS DS_INF_ANLSE FROM   
+(SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE, COUNT(*) QTDE_TRANS   
+ FROM TB_TRANS T1     
+ INNER JOIN (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE     
+			 FROM TB_TRANS T      
+			 INNER JOIN TB_CLIE_RENDA C    
+			 ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE    
+			 AND C.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE   
+             WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+             AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+             AND T.FL_ANALISADO = 1   
+             AND T.CD_FORMA_OPER = 8 /* MOEDA ESTRANGEIRA */   
+			 AND T.CD_TP_PESSOA = 'F'   
+		     AND EXISTS (SELECT 1 FROM TB_OCUP O    
+			 		     WHERE C.CD_OCUP = O.CD_OCUP   
+				         AND O.FL_OPERA_CAMBIO = 1)   
+             AND T.CD_MODALIDADE_CTA = 1 /* CCME */   
+			 AND T.VL_OPER IS NOT NULL   
+			 AND T.VL_OPER >= (:pm_ValorLimite)   
+             GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO         
+            ) T    
+ ON T1.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE   
+ AND T1.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE   
+ AND T1.CD_MES_ANO = T.CD_MES_ANO    
+ WHERE T1.FL_ANALISADO = 1   
+ AND T1.VL_OPER >= (:pm_ValorLimite)    
+ GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.NM_CLIE   
+) T  
+WHERE T.QTDE_TRANS > (:pm_QtdeTransacoes)   
+UNION ALL   
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4147 AND CD_VERSAO_SISTEMA = 4) ||    
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||      
+'Forma da Transação: Moeda Estrangeira|' ||   
+'Modalidade da Conta: CCME (Contas Correntes em Moeda Estrangeira)|' ||   
+'Ramo de Atividade (com agente autorizado): ' || COALESCE((SELECT NM_RAMO_ATIVID FROM TB_RAMO_ATIVID WHERE CD_RAMO_ATIVID = T.CD_RAMO_ATIVID), 'Descrição não cadastrada') || '|' ||   
+'Mês/Ano Calendário: ' || COALESCE(SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4), 'Não identificado') || '|' ||   
+'Quantidade de transações no mês calendário:' || COALESCE(TO_CHAR(T.QTDE_TRANS, '999G999G999G990D99'), 'Não cadastrado') || '|' ||    
+COALESCE((':DS-pm_QtdeTransacoes' || ' (' || ':NM-pm_QtdeTransacoes' || '):' || :pm_QtdeTransacoes),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_ValorLimite' || ' (' || ':NM-pm_ValorLimite' || '):' || TO_CHAR(:pm_ValorLimite, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|'   
+AS DS_INF_ANLSE FROM   
+(SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.CD_RAMO_ATIVID, T.NM_CLIE, COUNT(*) QTDE_TRANS   
+ FROM TB_TRANS T1     
+ INNER JOIN (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_RAMO_ATIVID, T.CD_MES_ANO, MAX(T.NM_CLIE) NM_CLIE  
+             FROM TB_TRANS T      
+             WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+             AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+             AND T.FL_ANALISADO = 1    
+             AND T.CD_FORMA_OPER = 8 /* MOEDA ESTRANGEIRA */   
+			 AND T.CD_TP_PESSOA = 'J'   
+             AND T.CD_RAMO_ATIVID IS NOT NULL   
+			 AND EXISTS (SELECT 1 FROM TB_RAMO_ATIVID R    
+			             WHERE R.CD_RAMO_ATIVID = T.CD_RAMO_ATIVID  
+				         AND R.FL_OPERA_CAMBIO = 1)  
+			 AND T.CD_MODALIDADE_CTA = 1 /* CCME */   
+			 AND T.VL_OPER IS NOT NULL   
+			 AND T.VL_OPER >= (:pm_ValorLimite)   
+             GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_RAMO_ATIVID, T.CD_MES_ANO      
+            ) T    
+ ON T1.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE   
+ AND T1.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE   
+ AND T1.CD_MES_ANO = T.CD_MES_ANO    
+ AND T1.CD_RAMO_ATIVID = T.CD_RAMO_ATIVID   
+ WHERE T1.FL_ANALISADO = 1   
+ AND T1.VL_OPER >= (:pm_ValorLimite)    
+ GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_MES_ANO, T.CD_RAMO_ATIVID, T.NM_CLIE   
+) T  
+WHERE T.QTDE_TRANS > (:pm_QtdeTransacoes)   

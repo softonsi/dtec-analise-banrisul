@@ -1,0 +1,42 @@
+SELECT LAST_DAY(TRUNC(Q.DT_TRANS)) DT_APONTAMENTO, Q.CD_DOC_IDENTF_CLIE, Q.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 405 - Aquisição seguida de quitação |' ||    
+'Objetivo: F) Aquisição de cotas previamente contempladas, seguidas de quitação das prestações vincendas. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||    
+'Conclusão: Aquisição de cotas seguidas de quitação das prestações vincendas |' ||    
+'Cliente : ' ||  Q.NM_CLIE || '|' ||  
+CASE Q.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(Q.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(Q.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE Q.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Lote: ' || TO_CHAR(:cd_lote) || '|' ||  
+'Número do Contrato: ' || COALESCE(TO_CHAR(Q.CD_CONTRATO), 'Contrato não cadastrado') || '|' ||  
+'Compra de cotas: Detalhes das transações' || '|' || 
+'Data da compra: ' || TO_CHAR(C.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da compra: ' || TO_CHAR(C.VL_OPER, 'L999G999G999G990D99') || '|'  ||    
+'Data da contemplação : ' || TO_CHAR(C.DT_CONTEMPLADO,'DD/MM/YYYY') || '|' ||    
+'Nome do cliente contemplado: ' || COALESCE(C.NM_DESTORIG,'Nome não cadastrado') || '|' ||    
+CASE C.CD_TP_IDENTF_DESTORIG    
+	 WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' ||SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 10, 2)    
+	 WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_DESTORIG, 13, 2)     
+	 ELSE C.CD_DOC_IDENTF_DESTORIG    
+END    
+|| '|' ||  
+'Quitação: Detalhes da transação' || '|' || 
+'Data da transação : ' || TO_CHAR(Q.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da transação : ' || TO_CHAR(Q.VL_OPER, 'L999G999G999G990D99') || '|'  ||    
+'Data Liquidação do Contrato: ' || COALESCE(TO_CHAR(Q.DT_LIQUID,'DD/MM/YYYY'), 'Data não cadastrada') || '|'  
+AS DS_INF_ANLSE     
+FROM TB_TRANS_ANLSE C  
+INNER JOIN TB_TRANS_ANLSE Q ON Q.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND Q.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE AND Q.CD_CONTRATO = C.CD_CONTRATO 
+WHERE Q.CD_LOTE    = :cd_lote      
+  AND Q.CD_SUBLOTE = :cd_sublote   
+  AND Q.CD_TP_OPER = 66  /*Pagamento de parcela de consorcio*/  
+  AND Q.DT_LIQUID IS NOT NULL 
+  AND C.CD_TP_OPER = 21 /* Cotas de consórcio */ 
+  AND C.CD_DOC_IDENTF_DESTORIG IS NOT NULL 
+  AND C.CD_DOC_IDENTF_CLIE <> C.CD_DOC_IDENTF_DESTORIG /*comprou de alguém*/   
+  AND C.DT_CONTEMPLADO IS NOT NULL /*previamente contemplado*/ 
+  AND C.DT_TRANS < Q.DT_TRANS 
+   
+  

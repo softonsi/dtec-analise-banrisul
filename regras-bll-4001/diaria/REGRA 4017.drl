@@ -1,0 +1,95 @@
+
+/* d) negociações de moeda estrangeira em espécie ou cheques de viagem denominados em moeda estrangeira, */   
+/* realizadas por diferentes pessoas naturais, Não relacionadas entre si, que informem o mesmo endereço residencial; e*/   
+   
+SELECT DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4017 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(CD_LOTE) || '|' || 
+'Quantidade de Ocorrências: ' || TO_CHAR(qtdeocorrencia) || '|' ||  
+ 
+'Cliente-Nome do Pai: ' || COALESCE(T.NM_PAI, 'Informação não cadastrada') || '|' ||     
+'Cliente-Nome da Mãe: ' || COALESCE(T.NM_MAE, 'Informação não cadastrada') || '|' ||     
+'Cliente-Nome do Conjugue: ' || COALESCE(T.NM_CONJUGE, 'Informação não cadastrada') || '|' ||  
+'Cliente-Endereço Residencial: ' || COALESCE(TO_CHAR(T.NM_ENDER_RESID),'Endereço não cadastrado') || '|' ||  
+'Cliente-Número Residencial: ' || COALESCE(TO_CHAR(T.NU_RESID), 'Número não cadastrado') || '|' ||  
+'Cliente-CEP Residencial: ' || CASE LENGTH(TO_CHAR(T.CD_CEP_RESID))    
+                WHEN 7 THEN '0' || SUBSTR(TO_CHAR(T.CD_CEP_RESID),1,4) || '-' || SUBSTR(TO_CHAR(T.CD_CEP_RESID),5,3)    
+                WHEN 8 THEN SUBSTR(TO_CHAR(T.CD_CEP_RESID),1,5) || '-' || SUBSTR(TO_CHAR(T.CD_CEP_RESID),6,3)    
+                ELSE 'CEP não cadastrado'    
+           END || '|' ||    
+'Cliente-Quantidade de transações com moeda estrangeira no dia ' || to_char(dt_apontamento) || ': ' || to_char(qt_clie) || '|' ||   
+'Cliente-Valor total de transações com moeda estrangeira no dia ' || to_char(dt_apontamento) || ': ' || TO_CHAR(vl_clie, 'L999G999G999G990D99') || '|' ||   
+ 
+'Período de análise: de ' || to_char((DT_APONTAMENTO - (:pm_QDiasRecuo)),'dd/mm/yyyy') 
+|| ' até ' ||  to_char(DT_APONTAMENTO,'dd/mm/yyyy') || '|' || 
+'Clientes que transacionaram em moeda estrangeira, não relacionados entre sim, com mesmo endereço: ' || OUTROS || '|' ||   
+ 
+COALESCE((':DS-pm_ValorMinimoPF' || ' (' || ':NM-pm_ValorMinimoPF' || '):' || TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_QDiasRecuo' || ' (' || ':NM-pm_QDiasRecuo' || '):' || :pm_QDiasRecuo),'Parâmetro não cadastrado') || '|' ||
+COALESCE((':DS-pm_QtdeOcorrencia' || ' (' || ':NM-pm_QtdeOcorrencia' || '):' || :pm_QtdeOcorrencia),'Parâmetro não cadastrado') || '|' 
+ 
+AS DS_INF_ANLSE     
+FROM ( 
+
+SELECT C.DT_APONTAMENTO, C.CD_LOTE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NU_RESID, C.NM_ENDER_RESID, C.CD_CEP_RESID, C.NM_CLIE, C.NM_MAE, C.NM_PAI, C.NM_CONJUGE, C.QT_CLIE, C.VL_CLIE, 
+COUNT(*) QtdeOcorrencia,  
+xmlcast(  xmlagg(xmlelement(outros,  
+CASE C.CD_TP_IDENTF_CLIE_  
+	WHEN 2 THEN 'CPF- ' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 10, 2)  
+	WHEN 3 THEN 'CNPJ- ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE_, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE_, 13, 2)   
+	ELSE C.CD_DOC_IDENTF_CLIE_  
+END ||  ', ')   
+order by C.CD_DOC_IDENTF_CLIE_) as clob) OUTROS 
+
+FROM (
+SELECT C.DT_APONTAMENTO, C.CD_LOTE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NU_RESID, C.NM_ENDER_RESID, C.CD_CEP_RESID, C.NM_CLIE, C.NM_MAE, C.NM_PAI, C.NM_CONJUGE, C.QT_CLIE, C.VL_CLIE,
+O.CD_DOC_IDENTF_CLIE CD_DOC_IDENTF_CLIE_, O.CD_TP_IDENTF_CLIE CD_TP_IDENTF_CLIE_, O.NU_RESID NU_RESID_, O.NM_ENDER_RESID NM_ENDER_RESID_, O.CD_CEP_RESID CD_CEP_RESID_, O.NM_CLIE NM_CLIE_, 
+O.NM_MAE NM_MAE_, O.NM_PAI NM_PAI_, O.NM_CONJUGE NM_CONJUGE_
+FROM 
+(SELECT (TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, NU_RESID, NM_ENDER_RESID, CD_CEP_RESID, MAX(NM_CLIE) NM_CLIE, MAX(NM_MAE) NM_MAE, MAX(NM_PAI) NM_PAI, MAX(NM_CONJUGE) NM_CONJUGE, COUNT(*) QT_CLIE, SUM(VL_OPER) VL_CLIE
+ FROM TB_TRANS_ANLSE T1     
+ WHERE  T1.CD_LOTE   = :cd_lote     
+   AND T1.CD_SUBLOTE = :cd_sublote  
+   AND T1.CD_TP_PESSOA = 'F'    
+   AND T1.CD_FORMA_OPER = 8    
+   AND ((T1.NM_ENDER_RESID IS NOT NULL AND T1.CD_CEP_RESID IS NOT NULL)    
+        OR (T1.CD_CEP_RESID IS NOT NULL AND T1.NU_RESID IS NOT NULL))            
+   AND T1.NM_CLIE IS NOT NULL 
+ GROUP BY (TRUNC(T1.DT_TRANS)), T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,NU_RESID, NM_ENDER_RESID, CD_CEP_RESID 
+ HAVING SUM(T1.VL_OPER) > (:pm_ValorMinimoPF)
+ )  C 
+INNER JOIN  TB_TRANS O    
+    ON TRUNC(O.DT_TRANS) >= (C.DT_APONTAMENTO - (:pm_QDiasRecuo)) AND 
+       TRUNC(O.DT_TRANS) <= C.DT_APONTAMENTO AND
+       O.CD_DOC_IDENTF_CLIE <> C.CD_DOC_IDENTF_CLIE AND 
+       (((O.NM_ENDER_RESID IS NOT NULL AND O.CD_CEP_RESID IS NOT NULL) AND O.NM_ENDER_RESID = C.NM_ENDER_RESID AND O.CD_CEP_RESID = C.CD_CEP_RESID)    
+       OR  
+       ((O.CD_CEP_RESID IS NOT NULL AND O.NU_RESID IS NOT NULL) AND O.CD_CEP_RESID = C.CD_CEP_RESID AND O.NU_RESID = C.NU_RESID))  
+ WHERE O.CD_TP_PESSOA = 'F'    
+   AND O.CD_FORMA_OPER = 8     
+   AND O.NM_CLIE IS NOT NULL 
+ GROUP BY C.DT_APONTAMENTO, C.CD_LOTE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NU_RESID, C.NM_ENDER_RESID, C.CD_CEP_RESID, C.NM_CLIE, C.NM_MAE, C.NM_PAI, C.NM_CONJUGE, C.QT_CLIE, C.VL_CLIE,
+O.CD_DOC_IDENTF_CLIE, O.CD_TP_IDENTF_CLIE, O.NU_RESID, O.NM_ENDER_RESID, O.CD_CEP_RESID, O.NM_CLIE, O.NM_MAE, O.NM_PAI, O.NM_CONJUGE
+) C
+WHERE NOT 
+   ((NVL(C.NM_MAE_,CHR(0)) = NVL(C.NM_MAE,CHR(0)) AND (C.NM_MAE IS NOT NULL)) OR 
+    (NVL(C.NM_PAI_,CHR(0)) = NVL(C.NM_PAI,CHR(0)) AND (C.NM_PAI IS NOT NULL )) OR 
+    (NVL(C.NM_CLIE_,CHR(0)) = NVL(C.NM_CONJUGE,CHR(0)) AND (C.NM_CLIE IS NOT NULL )) OR 
+    (NVL(C.NM_CONJUGE_,CHR(0)) = NVL(C.NM_CLIE,CHR(0)) AND (C.NM_CONJUGE IS NOT NULL ))  
+    )      
+GROUP BY C.DT_APONTAMENTO, C.CD_LOTE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NU_RESID, C.NM_ENDER_RESID, C.CD_CEP_RESID, C.NM_CLIE, C.NM_MAE, C.NM_PAI, C.NM_CONJUGE, C.QT_CLIE, C.VL_CLIE       
+       
+HAVING COUNT(*) > (:pm_QtdeOcorrencia)        	  
+) T     
+
+
+
+  
+  

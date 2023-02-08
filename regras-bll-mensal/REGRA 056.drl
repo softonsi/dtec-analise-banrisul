@@ -1,0 +1,23 @@
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 56 – Cofre de Aluguel |' ||   
+'Objetivo: G) Utilização de Cofres de Aluguel de forma atípica em relação ao perfil do cliente. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||   
+'Conclusão: Cofre de Aluguel |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Quantidade de Transações de Tarifas de Cofre de Aluguel no mês: ' || TO_CHAR(COUNT(*)) || '|' ||   
+'Parâmetro que indica quantidade de tarifas de cofre de aluguel (pm_QTarifaCofreAluguel): ' || COALESCE((':pm_QTarifaCofreAluguel'),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE 
+FROM TB_TRANS T1   
+WHERE T1.CD_TRANS_ORIG IN ('BDY0175200602005','BDY3469200606005')   
+AND T1.FL_ANALISADO = 1
+AND T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE	       		      
+HAVING COUNT(*) >= (:pm_QTarifaCofreAluguel)    
+   

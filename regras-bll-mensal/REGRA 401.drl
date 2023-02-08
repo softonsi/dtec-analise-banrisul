@@ -1,0 +1,70 @@
+SELECT  C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 401 - Aumento expressivo do número de cotas |' ||  
+'Objetivo: B) Aumento expressivo do número de cotas pertencentes a um mesmo consorciado. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||  
+'Conclusão: Aumento expressivo do número de cotas pertencentes a um mesmo consorciado |' ||  
+'Cliente: ' ||  C.NM_CLIE || '|' ||  
+CASE C.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE C.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||  
+'Mês/Ano: ' || SUBSTR(CD_MES_ANO,5,2) || '/' || SUBSTR(CD_MES_ANO,1,4) ||  '|' ||   
+'Quantidade de contratos ativos, com situação normal, no mês calendário: ' || TO_CHAR(QT_CONTRATO_ATIVO) || '|' ||  
+'Quantidade de contratos ativos, com situação normal, mês anterior definido pelo parâmetro, não importando o período do intervalo: ' || TO_CHAR(QT_CONTRATO_ANTERIOR) || '|' ||  
+'Parâmetro quantidade de Meses para comparação com o mês calendário anterior (pm_QMesRecuoPF): ' || COALESCE((':pm_QMesRecuoPF'),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização utilizado na comparação entre contratos ativos e finalizados (pm_PercCotasPF): ' || COALESCE((SELECT TO_CHAR(:pm_PercCotasPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE  
+FROM  
+(SELECT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, NM_CLIE,CD_MES_ANO, QT_CONTRATO_ATIVO,  
+ (SELECT QT_CONTRATO_ATIVO FROM TB_POSICAO_CONTRATO WHERE TO_CHAR(CD_MES_ANO) = TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(T.CD_MES_ANO) || '01', 'YYYY-MM-DD'), (-1 * :pm_QMesRecuoPF)), 'yyyymm') 
+   AND CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE) QT_CONTRATO_ANTERIOR 
+ FROM TB_POSICAO_CONTRATO T  
+ INNER JOIN (SELECT MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT FROM TB_TRANS  
+            WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+            AND CD_TP_PESSOA = 'F' 
+            AND FL_ANALISADO = 1
+            GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) C ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE 
+ WHERE  T.CD_TP_CONTRATO = 1   
+ AND  T.CD_MES_ANO = :cd_lote  
+) C 
+WHERE QT_CONTRATO_ATIVO > (QT_CONTRATO_ANTERIOR * (:pm_PercCotasPF/100))  
+  			   
+UNION ALL 
+ 
+SELECT  C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 401 - Aumento expressivo do número de cotas |' ||  
+'Objetivo: B) Aumento expressivo do número de cotas pertencentes a um mesmo consorciado. C.C. Bacen n.3.542/2012, Art. 1º, Inciso IX |' ||  
+'Conclusão: Aumento expressivo do número de cotas pertencentes a um mesmo consorciado |' ||  
+'Cliente: ' ||  C.NM_CLIE || '|' ||  
+CASE C.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE C.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Mês/Ano: ' || SUBSTR(CD_MES_ANO,5,2) || '/' || SUBSTR(CD_MES_ANO,1,4) ||  '|' ||   
+'Quantidade de contratos ativos, com situação normal, no mês calendário: ' || TO_CHAR(QT_CONTRATO_ATIVO) || '|' ||  
+'Quantidade de contratos ativos, com situação normal, no período parametrizado: ' || TO_CHAR(QT_CONTRATO_ANTERIOR) || '|' ||  
+'Parâmetro quantidade de Meses para comparação com o mês calendário anterior (pm_QMesRecuoPJ): ' || COALESCE((':pm_QMesRecuoPJ'),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização utilizado na comparação entre contratos ativos e finalizados (pm_PercCotasPJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercCotasPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE  
+FROM  
+(SELECT C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, NM_CLIE,CD_MES_ANO, QT_CONTRATO_ATIVO,  
+ (SELECT QT_CONTRATO_ATIVO FROM TB_POSICAO_CONTRATO WHERE TO_CHAR(CD_MES_ANO) = TO_CHAR(ADD_MONTHS(TO_DATE(TO_CHAR(T.CD_MES_ANO) || '01', 'YYYY-MM-DD'), (-1 * :pm_QMesRecuoPF)), 'yyyymm') 
+   AND CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE) QT_CONTRATO_ANTERIOR 
+ FROM TB_POSICAO_CONTRATO T  
+ INNER JOIN (SELECT MAX(NM_CLIE) NM_CLIE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT FROM TB_TRANS  
+            WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+            AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+            AND CD_TP_PESSOA = 'J' 
+            AND FL_ANALISADO = 1
+            GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) C ON C.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE 
+ WHERE  T.CD_TP_CONTRATO = 1   
+ AND  T.CD_MES_ANO = :cd_lote  
+) C 
+WHERE QT_CONTRATO_ATIVO > (QT_CONTRATO_ANTERIOR * (:pm_PercCotasPJ/100))  
+  			   
+ 
+ 

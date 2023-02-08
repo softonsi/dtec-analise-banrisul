@@ -1,0 +1,206 @@
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 83 - Utilização de cartão de forma incompatível |' ||    
+'Objetivo: C) Utilização do cartão de forma incompatível com o perfil do cliente, incluindo operações atípicas em outros países. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||    
+'Conclusão: Utilização de cartão de forma incompatível |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Código do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Tipo de Cartão: ' ||   
+CASE T1.CD_TP_CARTAO   
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||   
+'UF e cidade pertencem ao perfil do cartão, mas o valor da transação está acima da média diária dos últimos 12 meses fechados:' ||  
+' de ' || TO_DATE(to_date(SUBSTR(:cd_lote,1,8), 'yyyy/mm/dd')-365, 'DD/MM/YYYY') || ' até ' || TO_DATE(to_date(SUBSTR(:cd_lote,1,8), 'yyyy/mm/dd')-30, 'DD/MM/YYYY')  || '|' ||   
+'Cidade e UF da Operação: ' || COALESCE(T1.NM_CID_OPER, 'Cidade não cadastrada') || ' - ' || COALESCE(T1.SG_UF_AG_OPER, 'UF não cadastrada') || '|' ||    
+'Valor Médio Diário do Cliente: ' || COALESCE(TO_CHAR(T2.VL_MEDIO,'L999G999G999G990D99'), 'Valor não existente') || '|' ||    
+'Parâmetro percentual para flexibilização do valor médio diário do perfil (pm_PercPerfil_PF): ' || COALESCE((SELECT TO_CHAR(:pm_PercPerfil_PF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica valor mínimo para disparo da regra para Pessoa Física (pm_valorMinimo_PF): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimo_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'       				 				 		    
+AS DS_INF_ANLSE     
+FROM TB_TRANS_ANLSE T1,  
+     (SELECT A.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_CARTAO, UPPER(SG_UF_AG_OPER) SG_UF_AG_OPER,  UPPER(REPLACE(NM_CID_OPER,' ', '')) NM_CID_OPER, AVG(VL_OPER) VL_MEDIO  
+      FROM TB_TRANS T 
+      INNER JOIN 
+        (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO, MAX(DT_TRANS) DT_REF FROM TB_TRANS_ANLSE 
+         WHERE CD_TP_CARTAO IN (1, 3) AND SG_UF_AG_OPER IS NOT NULL AND NM_CID_OPER IS NOT NULL AND VL_OPER IS NOT NULL AND CD_CARTAO IS NOT NULL   
+            AND CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote AND CD_TP_PESSOA = 'F' AND CD_TP_CARTAO IN (1, 3) 
+            GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_CARTAO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) A
+        ON T.CD_CARTAO = A.CD_CARTAO AND             
+           T.DT_TRANS >= (TRUNC(DT_REF)-365)  AND
+           T.DT_TRANS <= (TRUNC(DT_REF)-30)               
+        WHERE T.FL_ANALISADO = 1  
+      GROUP BY A.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_CARTAO, UPPER(SG_UF_AG_OPER),  UPPER(REPLACE(NM_CID_OPER,' ', ''))   
+      ) T2    
+WHERE T1.CD_LOTE    = :cd_lote     
+  AND T1.CD_SUBLOTE = :cd_sublote    
+  AND T1.CD_TP_PESSOA = 'F'    
+  AND T1.CD_TP_CARTAO IN (1, 3)    
+  AND T1.CD_CARTAO = T2.CD_CARTAO    
+  AND T1.SG_UF_AG_OPER = T2.SG_UF_AG_OPER    
+  AND T1.NM_CID_OPER = T2.NM_CID_OPER    
+  AND T1.VL_OPER > (T2.VL_MEDIO * (:pm_PercPerfil_PF/100))    
+  AND T1.VL_OPER > (:pm_valorMinimo_PF)    
+UNION    
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 83 - Utilização de cartão de forma incompatível |' ||    
+'Objetivo: C) Utilização do cartão de forma incompatível com o perfil do cliente, incluindo operações atípicas em outros países. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||    
+'Conclusão: Utilização de cartão de forma incompatível |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||   
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Código do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Tipo de Cartão: ' ||   
+CASE T1.CD_TP_CARTAO   
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||   
+'UF e Cidade não pertencem ao perfil do cartão: | ' ||   
+'Cidade e UF da Operação: ' || COALESCE(T1.NM_CID_OPER, 'Cidade não cadastrada') || ' - ' || COALESCE(T1.SG_UF_AG_OPER, 'UF não cadastrada') || '|' ||    
+'Parâmetro que indica valor mínimo para disparo da regra para Pessoa Física (pm_valorMinimo_PF): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimo_PF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'       				 				 		    
+AS DS_INF_ANLSE     
+FROM TB_TRANS_ANLSE T1   
+ WHERE T1.CD_LOTE    = :cd_lote     
+  AND T1.CD_SUBLOTE = :cd_sublote    
+  AND T1.CD_TP_PESSOA = 'F'  
+  AND T1.CD_TP_CARTAO IN (1, 3)   
+  AND T1.SG_UF_AG_OPER IS NOT NULL  
+  AND T1.NM_CID_OPER IS NOT NULL  
+  AND T1.CD_CARTAO IS NOT NULL   
+  AND T1.VL_OPER > (:pm_valorMinimo_PF)    
+  AND NOT EXISTS   
+     (SELECT 1 FROM TB_TRANS T2   
+  	  WHERE T2.CD_TP_CARTAO IN (1, 3)  
+        AND T2.CD_CARTAO = T1.CD_CARTAO    
+        AND T2.SG_UF_AG_OPER = T1.SG_UF_AG_OPER    
+        AND T2.NM_CID_OPER = T1.NM_CID_OPER   
+  	    AND DT_TRANS >= (TRUNC(T1.DT_TRANS) -365)   
+        AND DT_TRANS <= (TRUNC(T1.DT_TRANS) -30)    
+        AND T2.FL_ANALISADO = 1 
+      )   
+UNION    
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 83 - Utilização de cartão de forma incompatível |' ||    
+'Objetivo: C) Utilização do cartão de forma incompatível com o perfil do cliente, incluindo operações atípicas em outros países. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||    
+'Conclusão: Utilização de cartão de forma incompatível |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||    
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||    
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Código do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Tipo de Cartão: ' ||   
+CASE T1.CD_TP_CARTAO   
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||  
+'UF e cidade pertencem ao perfil do cartão, mas o valor da transação está acima da média diária dos últimos 12 meses fechados:' ||  
+' de ' || TO_DATE(to_date(SUBSTR(:cd_lote,1,8), 'yyyy/mm/dd')-365, 'DD/MM/YYYY') || ' até ' || TO_DATE(to_date(SUBSTR(:cd_lote,1,8), 'yyyy/mm/dd')-30, 'DD/MM/YYYY')  || '|' ||   
+'Cidade e UF da Operação: ' || COALESCE(T1.NM_CID_OPER, 'Cidade não cadastrada') || ' - ' || COALESCE(T1.SG_UF_AG_OPER, 'UF não cadastrada') || '|' ||    
+'Valor Médio Diário do Cliente: ' || COALESCE(TO_CHAR(T2.VL_MEDIO,'L999G999G999G990D99'), 'Valor não existente') || '|' ||    
+'Parâmetro percentual para flexibilização do valor médio diário do perfil (pm_PercPerfil_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercPerfil_PJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||     
+'Parâmetro que indica valor mínimo para disparo da regra para Pessoa Jurídica (pm_valorMinimo_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimo_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'       				 				 		    
+AS DS_INF_ANLSE     
+FROM TB_TRANS_ANLSE T1,  
+    (SELECT A.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_CARTAO, UPPER(SG_UF_AG_OPER) SG_UF_AG_OPER,  UPPER(REPLACE(NM_CID_OPER,' ', '')) NM_CID_OPER, AVG(VL_OPER) VL_MEDIO  
+      FROM TB_TRANS T 
+      INNER JOIN 
+        (SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_CARTAO, MAX(DT_TRANS) DT_REF FROM TB_TRANS_ANLSE 
+         WHERE CD_TP_CARTAO IN (1, 3) AND SG_UF_AG_OPER IS NOT NULL AND NM_CID_OPER IS NOT NULL AND VL_OPER IS NOT NULL AND CD_CARTAO IS NOT NULL   
+            AND CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote AND CD_TP_PESSOA = 'J' AND CD_TP_CARTAO IN (1, 3) 
+            GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_CARTAO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE) A
+        ON T.CD_CARTAO = A.CD_CARTAO AND             
+           T.DT_TRANS >= (TRUNC(DT_REF)-365)  AND
+           T.DT_TRANS <= (TRUNC(DT_REF)-30)               
+        WHERE T.FL_ANALISADO = 1  
+      GROUP BY A.DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_CARTAO, UPPER(SG_UF_AG_OPER),  UPPER(REPLACE(NM_CID_OPER,' ', ''))   
+      ) T2    
+WHERE T1.CD_LOTE    = :cd_lote     
+  AND T1.CD_SUBLOTE = :cd_sublote    
+  AND T1.CD_TP_PESSOA = 'J'    
+  AND T1.CD_TP_CARTAO IN (1, 3)    
+  AND T1.CD_CARTAO = T2.CD_CARTAO    
+  AND T1.SG_UF_AG_OPER = T2.SG_UF_AG_OPER    
+  AND T1.NM_CID_OPER = T2.NM_CID_OPER    
+  AND T1.VL_OPER > (T2.VL_MEDIO * (:pm_PercPerfil_PJ/100))    
+  AND T1.VL_OPER > (:pm_valorMinimo_PJ)    
+UNION    
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 83 - Utilização de cartão de forma incompatível |' ||    
+'Objetivo: C) Utilização do cartão de forma incompatível com o perfil do cliente, incluindo operações atípicas em outros países. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||    
+'Conclusão: Utilização de cartão de forma incompatível |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||    
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||    
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Código do Cartão: ' || COALESCE(TO_CHAR(T1.CD_CARTAO), 'Cartão não cadastrado') || '|' ||   
+'Tipo de Cartão: ' ||   
+CASE T1.CD_TP_CARTAO   
+	 WHEN 1 THEN 'Cartão de Crédito'   
+	 WHEN 2 THEN 'Cartão de Débito'   
+	 WHEN 3 THEN 'Cartão Pré Pago'   
+	 ELSE 'Tipo de cartão não cadastrado'   
+END || '|' ||   
+'UF e Cidade não pertencem ao perfil do cartão: | ' ||   
+'Cidade e UF da Operação: ' || COALESCE(T1.NM_CID_OPER, 'Cidade não cadastrada') || ' - ' || COALESCE(T1.SG_UF_AG_OPER, 'UF não cadastrada') || '|' ||      
+'Parâmetro que indica valor mínimo para disparo da regra para Pessoa Jurídica (pm_valorMinimo_PJ): ' || COALESCE((SELECT TO_CHAR(:pm_valorMinimo_PJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'       				 				 		    
+AS DS_INF_ANLSE     
+FROM TB_TRANS_ANLSE T1   
+ WHERE T1.CD_LOTE    = :cd_lote     
+  AND T1.CD_SUBLOTE = :cd_sublote    
+  AND T1.CD_TP_PESSOA = 'J'    
+  AND T1.CD_TP_CARTAO IN (1, 3)   
+  AND T1.SG_UF_AG_OPER IS NOT NULL  
+  AND T1.NM_CID_OPER IS NOT NULL  
+  AND T1.CD_CARTAO IS NOT NULL   
+  AND T1.VL_OPER > (:pm_valorMinimo_PJ)    
+  AND NOT EXISTS   
+     (SELECT 1 FROM TB_TRANS T2   
+  	  WHERE T2.CD_TP_CARTAO IN (1, 3)  
+        AND T2.CD_CARTAO = T1.CD_CARTAO    
+        AND T2.SG_UF_AG_OPER = T1.SG_UF_AG_OPER    
+        AND T2.NM_CID_OPER = T1.NM_CID_OPER   
+  	    AND DT_TRANS >= (TRUNC(T1.DT_TRANS) -365)   
+        AND DT_TRANS <= (TRUNC(T1.DT_TRANS) -30)    
+        AND T2.FL_ANALISADO = 1 
+      )    
+      

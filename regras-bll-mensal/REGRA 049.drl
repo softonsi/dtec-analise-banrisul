@@ -1,0 +1,27 @@
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 49 – Clientes com conta em agência de fronteira |' ||    
+'Objetivo: Verificar se cliente possui conta em agência de fronteira, movimentou de forma expressiva no mês calendário |' ||    
+'Conclusão: Cliente possui conta em agência de fronteira, movimentou de forma expressiva no mês calendário  |' ||    
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Agência de Fronteira: ' || TO_CHAR(T1.CD_AG,'0000') || ' - ' || COALESCE((SELECT NM_AG FROM TB_AGENCIA A WHERE A.CD_AG = T1.CD_AG),'Nome não cadastrado') ||  '|' ||   
+'Conta: ' || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não cadastrada') ||  '|' || 
+'Valor consolidado de Crédito e Débito (sem considerar débito como negativo), por cliente, de todas as transações onde a Agência da Conta seja de fronteira, no mês calendário fechado: ' || TO_CHAR(SUM(VL_OPER), 'L999G999G999G990D99') ||  '|' ||  
+'Parâmetro que indica valor considerado expressivo para o Consolidado de Débito e Crédito (pm_ValorConsolidado): ' || COALESCE((SELECT TO_CHAR(:pm_ValorConsolidado, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado')    
+AS DS_INF_ANLSE     
+FROM TB_TRANS T1    
+WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+AND EXISTS (SELECT 1 FROM TB_AGENCIA C WHERE T1.CD_AG = C.CD_AG AND C.FL_FRONT = 1)  
+AND T1.FL_ANALISADO = 1
+GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_AG, T1.CD_CTA        
+HAVING (SUM(VL_OPER) >= (:pm_ValorConsolidado)) 
+  
+  
+ 

@@ -1,0 +1,27 @@
+# Tempo de espera para checagem de novo sublote
+wait_next_lote_seconds=0
+
+# Quantidade de processos que concorrerão
+qtd_threads=8
+
+# Quantidade de registros para cada página de cálculo do ponto de corte
+qtd_rows_per_page=20000
+
+# Flag para desabilitar o processo DTEC-FLEX que é executado a partir do módulo de análise
+desligar_job_kettle=false
+
+# Flag para desabilitar o processo de penalização de apontamentos sequenciais para os clientes no histórico no processamento do lote mensal
+desligar_apontamento_sequencial=false
+
+# Flag para desabilitar o processo que insere informações de performance na tabela de log de performance
+desligar_log_performance=true
+
+# Nome do servidor onde a instância do módulo de análise está executando (nome gravado na tabela de sublotes no campo "NM_MAQUINA")
+nome_maquina=note
+
+# Local onde se encontraq o JOB do Kettle (CLASSIFICACAO DTEC-FLEX MENSAL)
+kettle_file_ponto_corte=/home/softon/JAVA/workspace_dtec_ld_v3_analise/dtec-ld-v3-analise-banrisul/carga/dtec_oracle/INICIO.kjb
+
+indexes-to-rebuild=BLLS30.IX_CCLIE,BLLS30.IX_TRANS,BLLS30.IX_FUNC_PPE,BLLS30.IX_PROVNMTO,"BLLS30.PkTransacao",BLLS30.IDX_REGRA_68,BLLS30.IDX_TRANS_52,BLLS30.XBAN_TRANS_01,BLLS30.IDX_CC_TRANS_SUREG,BLLS30.IDX_TRANS_DTEC_FLEX,BLLS30.IDX_TRANS_REGRA_024,BLLS30.IDX_TRANS_REGRA_033,BLLS30.IDX_TRANS_REGRA_054,BLLS30.IDX_TRANS_REGRA_085,BLLS30.IDX_TRANS_REGRA_104,BLLS30.IDX_TRANS_REGRA_405,BLLS30.IDX_TRANS_REGRA_083_1,BLLS30.IDX_TRANS_REGRA_M_021,BLLS30.IDX_TRANS_REGRA_M_048,BLLS30.IDX_TRANS_REGRA_M_056,BLLS30.IDX_TRANS_REGRA_M_101,BLLS30.IDX_TRANS_REGRA_M_102,BLLS30.IDX_TRANS_REGRA_M_103,BLLS30.IDX_TRANS_REGRA_M_160,BLLS30.TB_TRANS_COD_TP_DT_IX,BLLS30.IDX_TB_TRANS_BI_DT_TRANS,BLLS30.TB_TRANS_CDIC_CTIC
+
+tablespace-indices=BLL_030_IPRB

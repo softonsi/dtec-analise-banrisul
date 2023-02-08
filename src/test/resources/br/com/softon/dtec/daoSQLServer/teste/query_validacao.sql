@@ -1,0 +1,1 @@
+select cd_regra, count(1) as total from tb_detlh_apontamento where cd_lote = 2014091801 group by cd_regra

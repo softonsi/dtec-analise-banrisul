@@ -1,0 +1,71 @@
+SELECT LAST_DAY(T.DT_FIM) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4011 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE)  || '|' || 
+'Período de consolidação: de ' || TO_CHAR(DT_INIC) || ' até ' || TO_CHAR(DT_FIM) || '|' ||
+'Valor consolidado: ' || TO_CHAR(VL_TOTAL, 'L999G999G999G990D99') || '|' ||
+'Quantidade de transações: ' || TO_CHAR(QT_TOTAL) || '|' ||
+CASE CD_TP_IDENTF_CLIE 
+WHEN 2 THEN 
+COALESCE((':DS-pm_QtdeDiasRecuo' || ' (' || ':NM-pm_QtdeDiasRecuo' || '):' || :pm_QtdeDiasRecuo),'Parâmetro não cadastrado') || '|' || 
+COALESCE((':DS-pm_QtdeSaquesPF' || ' (' || ':NM-pm_QtdeSaquesPF' || '):' || :pm_QtdeSaquesPF),'Parâmetro não cadastrado') || '|' || 
+COALESCE((':DS-pm_ValorRegulatorioPF' || ' (' || ':NM-pm_ValorRegulatorioPF' || '):' || TO_CHAR(:pm_ValorRegulatorioPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' || 
+COALESCE((':DS-pm_ValorTotalSaquesPF' || ' (' || ':NM-pm_ValorTotalSaquesPF' || '):' || TO_CHAR(:pm_ValorTotalSaquesPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' 
+WHEN 3 THEN 
+COALESCE((':DS-pm_QtdeDiasRecuo' || ' (' || ':NM-pm_QtdeDiasRecuo' || '):' || :pm_QtdeDiasRecuo),'Parâmetro não cadastrado') || '|' || 
+COALESCE((':DS-pm_QtdeSaquesPJ' || ' (' || ':NM-pm_QtdeSaquesPJ' || '):' || :pm_QtdeSaquesPJ),'Parâmetro não cadastrado') || '|' || 
+COALESCE((':DS-pm_ValorRegulatorioPJ' || ' (' || ':NM-pm_ValorRegulatorioPJ' || '):' || TO_CHAR(:pm_ValorRegulatorioPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' || 
+COALESCE((':DS-pm_ValorTotalSaquesPJ' || ' (' || ':NM-pm_ValorTotalSaquesPF' || '):' || TO_CHAR(:pm_ValorTotalSaquesPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado') || '|' 
+END 
+AS DS_INF_ANLSE  
+FROM 
+(SELECT A.DT_INIC, A.DT_FIM, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.CD_LOTE, SUM(T.VL_OPER) VL_TOTAL, COUNT(*) QT_TOTAL 
+FROM TB_TRANS T 
+INNER JOIN 
+(SELECT TRUNC(DT_TRANS) DT_FIM, (TRUNC(DT_TRANS) - (:pm_QtdeDiasRecuo)) DT_INIC, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE 
+ FROM TB_TRANS_ANLSE A 
+ WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote 
+   AND CD_TP_OPER = 7 /*saque*/ 
+   AND CD_FORMA_OPER = 7 /*especie*/ 
+   AND ( 
+   (CD_TP_IDENTF_CLIE = 2 AND VL_OPER < (:pm_ValorRegulatorioPF)) 
+   OR 
+   (CD_TP_IDENTF_CLIE = 3 AND VL_OPER < (:pm_ValorRegulatorioPJ)) 
+   ) 
+ GROUP BY TRUNC(DT_TRANS), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE 
+ ) A 
+ ON   TRUNC(T.DT_TRANS) >= A.DT_INIC 
+  AND TRUNC(T.DT_TRANS) <= A.DT_FIM 
+  AND T.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE 
+  AND T.CD_TP_IDENTF_CLIE  = A.CD_TP_IDENTF_CLIE 
+WHERE T.FL_ANALISADO = 1   
+   AND T.CD_TP_OPER = 7 /*saque*/ 
+   AND T.CD_FORMA_OPER = 7 /*especie*/ 
+   AND ( 
+   (T.CD_TP_IDENTF_CLIE = 2 AND VL_OPER < (:pm_ValorRegulatorioPF)) 
+   OR 
+   (T.CD_TP_IDENTF_CLIE = 3 AND VL_OPER < (:pm_ValorRegulatorioPJ)) 
+   ) 
+GROUP BY A.DT_INIC, A.DT_FIM, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE,  A.CD_LOTE ) T 
+WHERE 
+(CD_TP_IDENTF_CLIE = 2 AND 
+ QT_TOTAL >= (:pm_QtdeSaquesPF) AND
+  VL_TOTAL >= (:pm_ValorTotalSaquesPF) 
+  ) 
+OR 
+(CD_TP_IDENTF_CLIE = 3 AND 
+ QT_TOTAL >= (:pm_QtdeSaquesPJ) AND 
+ VL_TOTAL >= (:pm_ValorTotalSaquesPJ)  
+ ) 
+
+
+
+
+  
+

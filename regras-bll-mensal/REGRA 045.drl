@@ -1,0 +1,44 @@
+SELECT C1.CD_DOC_IDENTF_CLIE, C1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 45 - Mesmo endereço comercial por diferentes pessoas jurídicas |' ||   
+'Objetivo: F) Informação de mesmo endereço comercial por diferentes pessoas jurídicas ou organizações, sem justificativa razoável para tal ocorrência. C.C. Bacen n.3.542/2012, Art. 1º, Inciso III |' ||   
+'Conclusão: Informação de mesmo endereço comercial por diferentes pessoas jurídicas ou organizações, sem justificativa razoável para tal ocorrência |' ||   
+'Cliente: ' ||  C1.NM_CLIE || '|' ||   
+CASE C1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE C1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||  
+'Mês/Ano: ' || SUBSTR(C1.CD_MES_ANO, 5, 2)  || '/' || SUBSTR(C1.CD_MES_ANO, 1, 4)  ||  '|' ||    
+'Dados:  Cliente' || '|' ||    
+'Endereço: ' || COALESCE(C1.NM_ENDER_RESID, 'Informação não cadastrada') || '|' ||    
+'Número: ' || COALESCE(TO_CHAR(C1.NU_RESID), 'Informação não cadastrada') || '|' ||    
+'CEP: ' || CASE LENGTH(TO_CHAR(C1.CD_CEP_RESID))   
+                WHEN 7 THEN '0' || SUBSTR(TO_CHAR(C1.CD_CEP_RESID),1,4) || '-' || SUBSTR(TO_CHAR(C1.CD_CEP_RESID),5,3)   
+                WHEN 8 THEN SUBSTR(TO_CHAR(C1.CD_CEP_RESID),1,5) || '-' || SUBSTR(TO_CHAR(C1.CD_CEP_RESID),6,3)   
+                ELSE 'CEP não cadastrado'   
+           END || '|' ||   
+'Quantidade clientes com mesmo endereço comercial: ' || TO_CHAR(COUNT(*)) || '|' ||  
+xmlcast(  xmlagg(xmlelement(outros,   
+'CNPJ-' ||SUBSTR(C2.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 13, 2)     
+|| ':' || C2.NM_CLIE    
+|| '|')    
+order by C2.CD_DOC_IDENTF_CLIE) as clob)   
+AS DS_INF_ANLSE   
+FROM (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA, MAX(NM_CLIE) NM_CLIE, MAX(NM_ENDER_RESID) NM_ENDER_RESID, MAX(CD_CEP_RESID) CD_CEP_RESID, MAX(NU_RESID) NU_RESID 
+      FROM TB_TRANS 
+       WHERE DT_TRANS >=            to_date(to_char(:cd_lote), 'yyyy/mm')  
+         AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)
+		 AND CD_TP_PESSOA = 'J'   
+      AND FL_ANALISADO = 1
+      GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_TP_PESSOA) C1   
+INNER JOIN TB_CAD_CLIE C2 ON   
+	 (    C2.NM_ENDER_RESID IS NOT NULL AND C2.NM_ENDER_RESID = C1.NM_ENDER_RESID 
+      AND C2.CD_CEP_RESID   IS NOT NULL AND C2.CD_CEP_RESID   = C1.CD_CEP_RESID  
+      AND C2.NU_RESID       IS NOT NULL AND C2.NU_RESID       = C1.NU_RESID)             
+  WHERE C2.CD_TP_PESSOA = 'J'   
+  AND C2.CD_DOC_IDENTF_CLIE <> C1.CD_DOC_IDENTF_CLIE     
+GROUP BY C1.CD_MES_ANO, C1.CD_DOC_IDENTF_CLIE, C1.CD_TP_IDENTF_CLIE, C1.NM_CLIE, C1.CD_TP_PESSOA, C1.NM_ENDER_RESID, C1.CD_CEP_RESID, C1.NU_RESID   
+      
+
+          

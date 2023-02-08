@@ -1,0 +1,131 @@
+SELECT C1.CD_DOC_IDENTF_CLIE, C1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 47 - Mesmo endereço residencial ou comercial |' ||     
+'Objetivo: h) Informação de mesmo endereço residencial ou comercial por pessoas naturais, sem demonstração da existência de relação familiar ou comercial. C.C. Bacen n.3.542/2012, Art. 1º, Inciso III |' ||     
+'Conclusão: Informação de mesmo endereço residencial ou comercial por pessoas naturais, sem demonstração da existência de relação familiar ou comercial |' ||     
+'Cliente: ' ||  MAX(C1.NM_CLIE) || '|' ||     
+CASE C1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE C1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||   
+'Lote de cadastro do cliente no sistema DTEC-LD:' || COALESCE(TO_CHAR(MAX(C1.CD_LOTE_INSERT)),'Lote não cadastrado') ||  '|' ||   
+CASE WHEN MAX(C1.DT_ATUALZ_CADSTRL_ANTERIOR) <> MAX(C1.DT_ULTM_ATULZ_CADSTRL) THEN   
+'Data da última atualização cadastral : ' || COALESCE(TO_CHAR(MAX(C1.DT_ULTM_ATULZ_CADSTRL),'DD/MM/YYYY'),'Data não cadastrada') ||  '|' ||  
+'Data da atualização cadastral anterior: ' || COALESCE(TO_CHAR(MAX(C1.DT_ATUALZ_CADSTRL_ANTERIOR),'DD/MM/YYYY'), 'Data não cadastrada')  
+END  
+|| '|' ||     
+'Nome do Pai: ' || COALESCE(max(C1.NM_PAI), 'Informação não cadastrada') || '|' ||      
+'Nome da Mãe: ' || COALESCE(max(C1.NM_MAE), 'Informação não cadastrada') || '|' ||      
+'Nome do Conjugue: ' || COALESCE(max(C1.NM_CONJUGE), 'Informação não cadastrada') || '|' ||      
+'Endereço Residencial: ' || COALESCE(max(C1.NM_ENDER_RESID), 'Informação não cadastrada') || '|' ||       
+'Número Residencial: ' || COALESCE(TO_CHAR(max(C1.NU_RESID)), 'Informação não cadastrada') || '|' ||      
+'CEP: ' || CASE LENGTH(TO_CHAR(MAX(C1.CD_CEP_RESID)))     
+                WHEN 7 THEN '0' || SUBSTR(TO_CHAR(MAX(C1.CD_CEP_RESID)),1,4) || '-' || SUBSTR(TO_CHAR(MAX(C1.CD_CEP_RESID)),5,3)     
+                WHEN 8 THEN SUBSTR(TO_CHAR(MAX(C1.CD_CEP_RESID)),1,5) || '-' || SUBSTR(TO_CHAR(MAX(C1.CD_CEP_RESID)),6,3)     
+                ELSE 'CEP não cadastrado'     
+           END || '|' ||     
+'Análise: Clientes com mesmo endereço residencial' || '|' ||     
+xmlcast(  xmlagg(xmlelement(outros,     
+CASE C2.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'CPF-' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(C2.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C2.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE C2.CD_DOC_IDENTF_CLIE     
+END ||    
+regexp_replace(':Cliente-' || COALESCE(C2.NM_CLIE,'Não cadastrado') ||    
+', Mãe-' || COALESCE(C2.NM_MAE,'Não cadastrado') ||    
+', Pai-' || COALESCE(C2.NM_PAI,'Não cadastrado') ||    
+', Conjuge-' || COALESCE(C2.NM_CONJUGE,'Não cadastrado'),'[^[:print:]]','')     
+|| '|')      
+ORDER BY C2.CD_DOC_IDENTF_CLIE) as clob)    
+|| '|' ||    
+COALESCE((':DS-pm_QtdeEnderResid' || ' (' || ':NM-pm_QtdeEnderResid' || '):' || :pm_QtdeEnderResid),'Parâmetro não cadastrado|' ) || '|'   
+AS DS_INF_ANLSE     
+FROM TB_CAD_CLIE C1     
+INNER JOIN TB_CAD_CLIE C2     
+ON C2.CD_TP_PESSOA = 'F' AND (C2.NM_ENDER_RESID = C1.NM_ENDER_RESID AND C2.CD_CEP_RESID = C1.CD_CEP_RESID AND C2.NU_RESID = C1.NU_RESID)     
+WHERE SUBSTR(TO_CHAR(C1.CD_LOTE),1,6)  = :cd_lote          
+AND C2.CD_DOC_IDENTF_CLIE <> C1.CD_DOC_IDENTF_CLIE    
+AND (C1.DT_ATUALZ_CADSTRL_ANTERIOR IS NOT NULL  
+     AND C1.DT_ULTM_ATULZ_CADSTRL IS NOT NULL  
+     AND C1.DT_ATUALZ_CADSTRL_ANTERIOR <> C1.DT_ULTM_ATULZ_CADSTRL  
+     OR SUBSTR(TO_CHAR(C1.CD_LOTE_INSERT),1,6) = :cd_lote)   
+AND C1.CD_TP_PESSOA = 'F'      
+AND ((C1.NM_ENDER_RESID IS NOT NULL AND C1.CD_CEP_RESID IS NOT NULL AND C1.NU_RESID IS NOT NULL))      
+      /*relação familiar*/          
+AND NOT    
+       ((NVL(C1.NM_MAE,CHR(0)) = NVL(C2.NM_MAE,CHR(0)) AND (C2.NM_MAE IS NOT NULL)) OR    
+        (NVL(C1.NM_PAI,CHR(0)) = NVL(C2.NM_PAI,CHR(0)) AND (C2.NM_PAI IS NOT NULL )) OR    
+        (NVL(C1.NM_CLIE,CHR(0)) = NVL(C2.NM_CONJUGE,CHR(0)) AND (C2.NM_CLIE IS NOT NULL )) OR    
+        (NVL(C1.NM_CONJUGE,CHR(0)) = NVL(C2.NM_CLIE,CHR(0)) AND (C2.NM_CONJUGE IS NOT NULL )) OR            
+        (NVL(C1.NM_MAE,CHR(0)) = NVL(C2.NM_CONJUGE,CHR(0)) AND (C2.NM_MAE IS NOT NULL)) OR    
+        (NVL(C1.NM_PAI,CHR(0)) = NVL(C2.NM_CONJUGE,CHR(0)) AND (C2.NM_PAI IS NOT NULL )) OR    
+        (NVL(C1.NM_MAE,CHR(0)) = NVL(C2.NM_CLIE,CHR(0)) AND (C2.NM_CLIE IS NOT NULL )) OR    
+        (NVL(C1.NM_PAI,CHR(0)) = NVL(C2.NM_CLIE,CHR(0)) AND (C2.NM_CONJUGE IS NOT NULL ))            
+        )    
+GROUP BY C1.CD_DOC_IDENTF_CLIE, C1.CD_TP_IDENTF_CLIE    
+HAVING COUNT(*) > (:pm_QtdeEnderResid)   
+      
+UNION ALL     
+SELECT C1.CD_DOC_IDENTF_CLIE, C1.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 47 - Mesmo endereço residencial ou comercial |' ||     
+'Objetivo: h) Informação de mesmo endereço residencial ou comercial por pessoas naturais, sem demonstração da existência de relação familiar ou comercial. C.C. Bacen n.3.542/2012, Art. 1º, Inciso III |' ||     
+'Conclusão: Informação de mesmo endereço residencial ou comercial por pessoas naturais, sem demonstração da existência de relação familiar ou comercial |' ||     
+'Cliente: ' ||  C1.NM_CLIE || '|' ||     
+CASE C1.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(C1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C1.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE C1.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||     
+'Mês/Ano: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||    
+'Lote de cadastro do cliente no sistema DTEC-LD:' || COALESCE(TO_CHAR((C1.CD_LOTE_INSERT)),'Lote não cadastrado') ||  '|' ||   
+CASE WHEN (C1.DT_ATUALZ_CADSTRL_ANTERIOR) <> (C1.DT_ULTM_ATULZ_CADSTRL) THEN   
+'Data da última atualização cadastral : ' || COALESCE(TO_CHAR((C1.DT_ULTM_ATULZ_CADSTRL),'DD/MM/YYYY'),'Data não cadastrada') ||  '|' ||  
+'Data da atualização cadastral anterior: ' || COALESCE(TO_CHAR((C1.DT_ATUALZ_CADSTRL_ANTERIOR),'DD/MM/YYYY'), 'Data não cadastrada')  
+END  
+|| '|' ||     
+'Endereço Trabalho: ' || COALESCE(C1.NM_ENDER_TRAB, 'Endereço não cadastrado') || '|' ||     
+'Empresa Trabalho: ' || COALESCE(C1.NM_EMP_TRAB, 'Empresa não cadastrada') || '|' ||      
+'Análise: Empresas diferentes com mesmo endereço' || '|' ||     
+'Quantidade de cliente(s) que trabalham em empresas com mesmo endereço:' || TO_CHAR(QT_EMPRESAS) || '|' ||    
+'Cliente(s): Empresa(s) | ' ||      
+EMPRESAS || '|' ||     
+COALESCE((':DS-pm_QtdeEnderTrab' || ' (' || ':NM-pm_QtdeEnderTrab' || '):' || :pm_QtdeEnderTrab),'Parâmetro não cadastrado' ) || '|'   
+AS DS_INF_ANLSE     
+FROM (SELECT S.CD_DOC_IDENTF_CLIE, S.CD_TP_IDENTF_CLIE, S.NM_CLIE, S.NM_ENDER_TRAB, S.NM_EMP_TRAB, S.DT_ATUALZ_CADSTRL_ANTERIOR, S.DT_ULTM_ATULZ_CADSTRL, S.CD_LOTE_INSERT,   
+      xmlcast(  xmlagg(xmlelement(outros,     
+      'CPF-' || S.CD_DOC_IDENTF_OUTRO || ':' || 'Nome da Empresa-' || regexp_replace(S.NM_EMP_OUTRO,'[^[:print:]]','')    
+      || '|') ORDER BY S.CD_DOC_IDENTF_OUTRO) as clob) EMPRESAS, COUNT(*) QT_EMPRESAS    
+      FROM (SELECT  MAX(C.NM_CLIE) NM_CLIE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NM_ENDER_TRAB, C.NM_EMP_TRAB, C.DT_ATUALZ_CADSTRL_ANTERIOR,   
+            C.DT_ULTM_ATULZ_CADSTRL, C.CD_LOTE_INSERT, R.CD_DOC_IDENTF_CLIE CD_DOC_IDENTF_OUTRO, R.CD_TP_IDENTF_CLIE D_TP_IDENTF_OUTRO,   
+            R.NM_EMP_TRAB NM_EMP_OUTRO  
+            FROM (SELECT  X.NM_CLIE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NM_ENDER_TRAB, C.NM_EMP_TRAB, X.DT_ATUALZ_CADSTRL_ANTERIOR, X.DT_ULTM_ATULZ_CADSTRL, X.CD_LOTE_INSERT  
+                  FROM TB_CLIE_RENDA C  
+                  INNER JOIN TB_CAD_CLIE X   
+                  ON C.CD_DOC_IDENTF_CLIE = X.CD_DOC_IDENTF_CLIE   
+                  AND C.CD_TP_IDENTF_CLIE = X.CD_TP_IDENTF_CLIE   
+                  AND C.CD_LOTE = X.CD_LOTE  
+                  WHERE C.NM_EMP_TRAB IS NOT NULL   
+                  AND C.NM_ENDER_TRAB IS NOT NULL  
+                  AND SUBSTR(TO_CHAR(C.CD_LOTE),1,6) = :cd_lote   
+                  AND X.CD_TP_PESSOA = 'F'     
+                  AND ((X.DT_ATUALZ_CADSTRL_ANTERIOR IS NOT NULL   
+                        AND X.DT_ULTM_ATULZ_CADSTRL IS NOT NULL   
+                        AND X.DT_ATUALZ_CADSTRL_ANTERIOR <> X.DT_ULTM_ATULZ_CADSTRL)   
+                       OR   
+                       SUBSTR(TO_CHAR(X.CD_LOTE_INSERT),1,6)  = :cd_lote  
+                      )  
+                 ) C  
+           INNER JOIN TB_CLIE_RENDA R ON R.NM_ENDER_TRAB = C.NM_ENDER_TRAB    
+           WHERE R.NM_EMP_TRAB IS NOT NULL    
+           AND R.NM_EMP_TRAB <> C.NM_EMP_TRAB  
+           GROUP BY C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, C.NM_ENDER_TRAB, C.NM_EMP_TRAB, C.DT_ATUALZ_CADSTRL_ANTERIOR, C.DT_ULTM_ATULZ_CADSTRL, C.CD_LOTE_INSERT, R.CD_DOC_IDENTF_CLIE, R.CD_TP_IDENTF_CLIE, R.NM_EMP_TRAB  
+          ) S  
+GROUP BY S.CD_DOC_IDENTF_CLIE, S.CD_TP_IDENTF_CLIE, S.NM_CLIE, S.NM_ENDER_TRAB, S.NM_EMP_TRAB, S.DT_ATUALZ_CADSTRL_ANTERIOR, S.DT_ULTM_ATULZ_CADSTRL, S.CD_LOTE_INSERT  
+HAVING COUNT(*) > (:pm_QtdeEnderTrab)     
+) C1    
+  
+ 
+    

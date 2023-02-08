@@ -1,0 +1,125 @@
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 80 – Utilização, carga ou recarga de cartão pré-pago em valor incompatível com a capacidade econômica ou perfil do cliente |' ||    
+'Objetivo: A) Utilização, carga ou recarga de cartão pré-pago em valor não compatível com a capacidade econômico-financeira, atividade ou perfil do usuário. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||    
+'Conclusão: Utilização, carga ou recarga de cartão pré-pago em valor não compatível com o perfil do usuário |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Lote: ' || to_char(T1.Cd_lote) || '|' ||  
+'Período de análise: de ' || TO_CHAR(T1.DT_REF - 90) || ' até ' || TO_CHAR((T1.DT_REF),'DD/MM/YYYY')  || '|'  ||     
+'Valor da renda: ' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'renda não informada') || '|'  ||  
+'Quantidade de transações no lote: ' || TO_CHAR(QT_LOTE) || '|'  ||  
+'Valor total das transações no lote: ' || (TO_CHAR(VL_LOTE, 'L999G999G999G990D99')) || '|'  ||  
+'Transações do lote: ' || '|'  ||  TRANS_LOTE  
+|| '|'  ||             
+'Quantidade de transações nos últimos 90 dias: ' || TO_CHAR(QT_90D) || '|'  ||  
+'Valor total das transações nos últimos 90 dias: ' || (TO_CHAR(VL_90D, 'L999G999G999G990D99')) || '|'  ||  
+'Valor médio nos últimos 90 dias: ' || (TO_CHAR(MEDIA_90D, 'L999G999G999G990D99')) || '|'  ||  
+'Parâmetro que indica o valor mínimo para que a regra seja apontada, para Pessoa Física (pm_valorCartaoPrePagoPF): ' || COALESCE((SELECT TO_CHAR(:pm_valorCartaoPrePagoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual de flexibilização do perfil do cliente Pessoa Física (pm_PercPerfilPF): ' || COALESCE((SELECT TO_CHAR(:pm_PercPerfilPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE      
+FROM (SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT,   
+      MAX(T2.VL_90D) VL_90D, MAX(T2.QT_90D) QT_90D, MAX(MEDIA_90D) MEDIA_90D, MAX(T1.DT_TRANS) DT_REF,  
+      SUM(T1.VL_OPER) VL_LOTE, COUNT(T1.CD_TRANSACAO) QT_LOTE,  
+      xmlcast(  xmlagg(xmlelement(outros,   
+      TO_CHAR(T1.DT_TRANS,'DD.MM.YYYY') || '-' || LTRIM(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99'))  || ' / ')     
+      order by T1.DT_TRANS) as clob) TRANS_LOTE    
+      FROM TB_TRANS_ANLSE T1  
+      LEFT JOIN  (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) VL_90D, COUNT(*) QT_90D, AVG(VL_OPER) MEDIA_90D  
+                  FROM TB_TRANS D   
+                  WHERE EXISTS (SELECT 1 FROM VM_CLIE T  
+                                WHERE T.CD_DOC_IDENTF_CLIE = D.CD_DOC_IDENTF_CLIE  
+                                AND T.CD_TP_IDENTF_CLIE = D.CD_TP_IDENTF_CLIE  
+                                AND T.CD_TP_PESSOA = 'F'  
+                                AND D.DT_TRANS < T.DT_FIM  
+                                AND D.DT_TRANS >= (T.DT_FIM - 90))                   
+                  AND (CD_FORMA_OPER = 11 OR CD_TP_OPER IN (25, 26))    
+                  AND FL_ANALISADO = 1  
+                  AND CD_TP_PESSOA = 'F'   
+                  GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE 
+                ) T2  
+      ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE    
+      WHERE T1.CD_LOTE  = :cd_lote        
+      AND T1.CD_SUBLOTE = :cd_sublote   
+      AND (T1.CD_FORMA_OPER = 11 OR T1.CD_TP_OPER IN (25, 26))    
+      AND T1.CD_TP_PESSOA = 'F'   
+      GROUP BY LAST_DAY(TRUNC(T1.DT_TRANS)), T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+      HAVING SUM(VL_OPER) > (:pm_valorCartaoPrePagoPF)  
+      AND (  
+           (SUM(T1.VL_OPER) >  (MAX(MEDIA_90D) * (:pm_PercPerfilPF/100)))  
+            OR   
+           (MAX(T1.VL_RENDA_FAT) IS NOT NULL AND SUM(VL_OPER) > (MAX(T1.VL_RENDA_FAT) * (:pm_PercRenda/100)))    
+           OR    
+           (MAX(T1.VL_RENDA_FAT) IS NULL)    
+          )  
+    ) T1   
+   
+UNION ALL   
+  
+SELECT  T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 80 – Utilização, carga ou recarga de cartão pré-pago em valor incompatível com a capacidade econômica ou perfil do cliente |' ||    
+'Objetivo: A) Utilização, carga ou recarga de cartão pré-pago em valor não compatível com a capacidade econômico-financeira, atividade ou perfil do usuário. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||    
+'Conclusão: Utilização, carga ou recarga de cartão pré-pago em valor não compatível com o perfil do usuário |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Lote: ' || to_char(T1.Cd_lote) || '|' ||  
+'Período de análise: de ' || TO_CHAR(T1.DT_REF - 90) || ' até ' || TO_CHAR((T1.DT_REF),'DD/MM/YYYY')  || '|'  ||     
+'Valor do faturamento: ' || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'renda não informada') || '|'  ||  
+'Quantidade de transações no lote: ' || TO_CHAR(QT_LOTE) || '|'  ||  
+'Valor total das transações no lote: ' || (TO_CHAR(VL_LOTE, 'L999G999G999G990D99')) || '|'  ||  
+'Transações do lote: ' || '|'  ||  TRANS_LOTE  
+|| '|'  ||             
+'Quantidade de transações nos últimos 90 dias: ' || TO_CHAR(QT_90D) || '|'  ||  
+'Valor total das transações nos últimos 90 dias: ' || (TO_CHAR(VL_90D, 'L999G999G999G990D99')) || '|'  ||  
+'Valor médio nos últimos 90 dias: ' || (TO_CHAR(MEDIA_90D, 'L999G999G999G990D99')) || '|'  ||  
+'Parâmetro que indica o valor mínimo para que a regra seja apontada, para Pessoa Jurídica (pm_valorCartaoPrePagoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_valorCartaoPrePagoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro percentual de flexibilização do perfil do cliente Pessoa Jurídica (pm_PercPerfilPJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercPerfilPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização do faturamento do cliente (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE      
+FROM (SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT,   
+      MAX(T2.VL_90D) VL_90D, MAX(T2.QT_90D) QT_90D, MAX(MEDIA_90D) MEDIA_90D, MAX(T1.DT_TRANS) DT_REF,  
+      SUM(T1.VL_OPER) VL_LOTE, COUNT(T1.CD_TRANSACAO) QT_LOTE,  
+      xmlcast(  xmlagg(xmlelement(outros, TO_CHAR(T1.DT_TRANS,'DD.MM.YYYY') || '-' || LTRIM(TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99')) || ' / ')     
+      order by T1.DT_TRANS) as clob) TRANS_LOTE    
+      FROM TB_TRANS_ANLSE T1  
+      LEFT JOIN (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, SUM(VL_OPER) VL_90D, COUNT(*) QT_90D, AVG(VL_OPER) MEDIA_90D  
+                 FROM TB_TRANS D   
+                 WHERE EXISTS (SELECT 1 FROM VM_CLIE T  
+                               WHERE T.CD_DOC_IDENTF_CLIE = D.CD_DOC_IDENTF_CLIE  
+                               AND T.CD_TP_IDENTF_CLIE = D.CD_TP_IDENTF_CLIE  
+                               AND T.CD_TP_PESSOA = 'J'  
+                               AND D.DT_TRANS < T.DT_FIM  
+                               AND D.DT_TRANS >= (T.DT_FIM - 90))                   
+                 AND (CD_FORMA_OPER = 11 OR CD_TP_OPER IN (25, 26))    
+                 AND FL_ANALISADO = 1  
+                 AND CD_TP_PESSOA = 'J'   
+                 GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE 
+                ) T2  
+       ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE    
+       WHERE T1.CD_LOTE  = :cd_lote        
+       AND T1.CD_SUBLOTE = :cd_sublote   
+       AND (T1.CD_FORMA_OPER = 11 OR T1.CD_TP_OPER IN (25, 26))    
+       AND T1.CD_TP_PESSOA = 'J'   
+       GROUP BY LAST_DAY(TRUNC(T1.DT_TRANS)), T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE  
+       HAVING SUM(VL_OPER) > (:pm_valorCartaoPrePagoPJ)  
+       AND (  
+            (SUM(T1.VL_OPER) > (MAX(MEDIA_90D) * (:pm_PercPerfilPJ/100)))  
+             OR   
+            (MAX(T1.VL_RENDA_FAT) IS NOT NULL AND SUM(VL_OPER) > (MAX(T1.VL_RENDA_FAT) * (:pm_PercFaturamento/100)))    
+            OR    
+           (MAX(T1.VL_RENDA_FAT) IS NULL)    
+           )  
+      ) T1  
+   
+ 
+ 

@@ -1,0 +1,49 @@
+/* a) realização ou proposta de operação com pessoas naturais ou jurídicas, inclusive sociedades e */  
+/* instituições financeiras, situadas em Países que Não apliquem ou apliquem insuficientemente as */  
+/* recomendações do Grupo de Ação contra a Lavagem de Dinheiro e o Financiamento do Terrorismo (Gafi), */  
+/* ou que tenham sede em Países ou dependências com tributação favorecida ou regimes fiscais privilegiados*/  
+/* ou em locais onde seja observada a prética contumaz dos crimes previstos na Lei no 9.613, de 3 de março de 1998, */  
+/* Não claramente caracterizadas em sua legalidade e fundamentação econômica; */  
+  
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 120 - Operações relacionadas a países que não apliquem ou apliquem insuficientemente as recomendações do Coaf e Gafi |' ||  
+'Objetivo: A) Realização ou proposta de operação com pessoas naturais ou jurídicas, inclusive sociedades e instituições financeiras, situadas em países que não apliquem ou apliquem insuficientemente as recomendações do Grupo de Ação contra a Lavagem de Dinheiro e o Financiamento do Terrorismo (Gafi), ou que tenham sede em países ou dependências com tributação favorecida ou regimes fiscais privilegiados ou em locais onde seja observada a prática contumaz dos crimes previstos na Lei no 9.613, de 3 de março de 1998, não claramente caracterizadas em sua legalidade e fundamentação econômica. C.C. Bacen n.3.542/2012, Art. 1º, Inciso XI |' ||  
+'Conclusão: Realização ou proposta de operação com pessoas naturais ou jurídicas, inclusive sociedades e instituições financeiras, situadas em países que não apliquem ou apliquem insuficientemente as recomendações do Grupo de Ação contra a Lavagem de Dinheiro e o Financiamento do Terrorismo (Gafi) |' ||  
+'Cliente: ' ||  T.NM_CLIE || '|' ||
+CASE T.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' ||  
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Natureza da Transação: ' ||   
+CASE T.CD_NATUR_OPER  
+	 WHEN 1 THEN 'Crédito'  
+	 WHEN 2 THEN 'Débito'  
+	 WHEN 3 THEN 'Evento'  
+	 ELSE 'Natureza não cadastrada'  
+END || '|' ||  
+'Tipo da Transação: ' || T.CD_TP_OPER || COALESCE((SELECT '-' || NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), ' Tipo não cadastrado') || '|' ||  
+'Forma da Transação: ' || T.CD_FORMA_OPER || COALESCE((SELECT '-' || NM_FORMA_OPER FROM TB_FORMA_OPER WHERE CD_FORMA_OPER = T.CD_FORMA_OPER), ' Forma não cadastrada') || '|' ||  
+'Via da Transação: ' || T.CD_VIA_OPER || COALESCE((SELECT '-' || NM_VIA_OPER FROM TB_VIA_OPER WHERE CD_VIA_OPER = T.CD_VIA_OPER), ' Via não cadastrada') || '|' ||  
+'País Suspeito: ' || T.CD_PAIS_DESTORIG || COALESCE((SELECT '-' || NM_PAIS FROM TB_PAIS WHERE CD_PAIS = T.CD_PAIS_DESTORIG), ' País não cadastrado') || '|' ||  
+'Parâmetro que indica valor mínimo para apontamento da regra (pm_ValorMinimo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T  
+WHERE CD_LOTE    = :cd_lote   
+  AND CD_SUBLOTE = :cd_sublote  
+  AND CD_PAIS_DESTORIG IS NOT NULL   
+  AND VL_OPER IS NOT NULL  
+  AND VL_OPER > (:pm_ValorMinimo)  
+  AND EXISTS  
+    (SELECT 1 FROM TB_PAIS  
+     WHERE CD_PAIS = T.CD_PAIS_DESTORIG  
+	 AND FL_SUSP = 1  
+    )
+    
+    

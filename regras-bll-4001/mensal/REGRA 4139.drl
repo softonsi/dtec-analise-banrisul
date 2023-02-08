@@ -1,0 +1,98 @@
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,         
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4139 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||     
+CASE T.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||       
+CASE FL_CANDIDATO_CNPJ WHEN 1 THEN 'Candidatos políticos PJ:Sim|'  END ||   
+CASE FL_CANDIDATO_CPF  WHEN 1 THEN 'Candidatos políticos PF:Sim|'  END ||   
+CASE FL_CANDIDATO_ADM  WHEN 1 THEN 'Cliente é administrador de CNPJ(s) de Candidato(s): ' || ADM END || '|' || 
+CASE FL_CANDIDATO_CONJUGE WHEN 1 THEN 'Conjuge de político: Sim|' END ||      
+'Valor da Renda/Faturamento: '   || COALESCE(TO_CHAR(VL_RENDA_FAT, 'L999G999G999G990D99'),'Valor não informado')  || '|' ||   
+'Mês calendário:'                || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor consolidado de crédito: ' || TO_CHAR(COALESCE(VL_CREDITO,0), 'L999G999G999G990D99') || '|' ||   
+'Quantidade de crédito: '        || TO_CHAR(COALESCE(QT_CREDITO,0)) || '|' ||   
+'Valor médio de crédito (' || SUBSTR(T.DT_INIC,5,2) || '/' || SUBSTR(T.DT_INIC,1,4) || ',' || SUBSTR(T.DT_FIM,5,2) || '/' || SUBSTR(T.DT_FIM,1,4) || '): ' || TO_CHAR(COALESCE(VL_MEDIO_CREDITO,0), 'L999G999G999G990D99') || '|' ||    
+CASE 
+WHEN FL_CANDIDATO_CNPJ = 1 THEN  
+COALESCE((':DS-pm_ValorMinimoConsCandidatoCNPJ' || ' (' || ':NM-pm_ValorMinimoConsCandidatoCNPJ' || '):' || TO_CHAR(:pm_ValorMinimoConsCandidatoCNPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercCreditoCandidatoCNPJ' || ' (' || ':NM-pm_PercCreditoCandidatoCNPJ' || '):' || TO_CHAR(:pm_PercCreditoCandidatoCNPJ) || '%'),'Parâmetro não cadastrado' ) || '|'    
+WHEN FL_CANDIDATO_CPF = 1 THEN  
+COALESCE((':DS-pm_ValorMinimoConsCandidatoPF' || ' (' || ':NM-pm_ValorMinimoConsCandidatoPF' || '):' || TO_CHAR(:pm_ValorMinimoConsCandidatoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercRendaCandidatoPF' || ' (' || ':NM-pm_PercRendaCandidatoPF' || '):' || TO_CHAR(:pm_PercRendaCandidatoPF) || '%'),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercCreditoCandidatoPF' || ' (' || ':NM-pm_PercCreditoCandidatoPF' || '):' || TO_CHAR(:pm_PercCreditoCandidatoPF) || '%'),'Parâmetro não cadastrado' ) || '|'     
+WHEN FL_CANDIDATO_ADM = 1 THEN  
+COALESCE((':DS-pm_ValorMinimoCandidatoAdm' || ' (' || ':NM-pm_ValorMinimoCandidatoAdm' || '):' || TO_CHAR(:pm_ValorMinimoCandidatoAdm, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercRendaFatCandidatoAdm' || ' (' || ':NM-pm_PercRendaFatCandidatoAdm' || '):' || TO_CHAR(:pm_PercRendaFatCandidatoAdm) || '%'),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercCreditoCandidatoAdm' || ' (' || ':NM-pm_PercCreditoCandidatoAdm' || '):' || TO_CHAR(:pm_PercCreditoCandidatoAdm) || '%'),'Parâmetro não cadastrado' ) || '|'     
+WHEN FL_CANDIDATO_CONJUGE = 1 THEN  
+COALESCE((':DS-pm_ValorMinimoConsConjugePF' || ' (' || ':NM-pm_ValorMinimoConsConjugePF' || '):' || TO_CHAR(:pm_ValorMinimoConsConjugePF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercRendaConjugePF' || ' (' || ':NM-pm_PercRendaConjugePF' || '):' || TO_CHAR(:pm_PercRendaConjugePF) || '%'),'Parâmetro não cadastrado' ) || '|' ||   
+COALESCE((':DS-pm_PercCreditoConjugePF' || ' (' || ':NM-pm_PercCreditoConjugePF' || '):' || TO_CHAR(:pm_PercCreditoConjugePF) || '%'),'Parâmetro não cadastrado' ) || '|'     
+END  
+AS DS_INF_ANLSE     
+FROM (SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, T.NM_CLIE, T.VL_RENDA_FAT, 
+      T.VL_CREDITO, T.QT_CREDITO, T.FL_CANDIDATO_CNPJ, T.FL_CANDIDATO_CPF, T.FL_CANDIDATO_ADM, 
+      T.FL_CANDIDATO_CONJUGE, T.ADM, TO_CHAR(ADD_MONTHS(TO_DATE(T.CD_MES_ANO || '01', 'yy-mm-dd'), -2), 'YYYYMM') DT_INIC, 
+      TO_CHAR(ADD_MONTHS(TO_DATE(T.CD_MES_ANO || '01', 'yy-mm-dd'), -1), 'YYYYMM') DT_FIM, (SUM(P.VL_TOTAL)/2) VL_MEDIO_CREDITO 
+      FROM (SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO, FL_CANDIDATO_CNPJ, FL_CANDIDATO_CPF, FL_CANDIDATO_ADM,FL_CANDIDATO_CONJUGE, 
+            CASE WHEN MAX(FL_CANDIDATO_ADM) = 1 THEN 
+            TO_CHAR(xmlcast(xmlagg(xmlelement(outros, SUBSTR(CD_DOC_IDENTF_ADM, 1, 2) || '.' || SUBSTR(CD_DOC_IDENTF_ADM, 3, 3) || '.' || SUBSTR(CD_DOC_IDENTF_ADM, 6, 3) || '/' || SUBSTR(CD_DOC_IDENTF_ADM, 9, 4) || '-'  || SUBSTR(CD_DOC_IDENTF_ADM, 13, 2) || ', ')  order by CD_DOC_IDENTF_ADM) as clob))     
+            END ADM 
+            FROM (                 
+                 SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, CA.CD_DOC_IDENTF_CLIE CD_DOC_IDENTF_ADM,  T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO,                   
+                  CASE WHEN MAX(LA.DS_CONTEUDO) IS NOT NULL AND LA.CD_LISTA_AUXILIAR = 115 AND T.CD_TP_PESSOA = 'J' THEN 1 ELSE 0 END FL_CANDIDATO_CNPJ, 
+                  CASE WHEN MAX(LA.DS_CONTEUDO) IS NOT NULL AND LA.CD_LISTA_AUXILIAR = 116 AND T.CD_TP_PESSOA = 'F' THEN 1 ELSE 0 END FL_CANDIDATO_CPF, 
+                  CASE WHEN MAX(CAD.DS_CONTEUDO) IS NOT NULL AND MAX(CA.CD_DOC_IDENTF_ADM) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_ADM,  
+                  CASE WHEN MAX(CON.DS_CONTEUDO) IS NOT NULL THEN 1 ELSE 0 END FL_CANDIDATO_CONJUGE                   
+                  FROM (SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, MAX(T.NM_CLIE) NM_CLIE, MAX(T.VL_RENDA_FAT) VL_RENDA_FAT, SUM(T.VL_OPER) VL_CREDITO, COUNT(*) QT_CREDITO 
+                        FROM TB_TRANS T  
+                        WHERE T.DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+                        AND T.DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))          
+                        AND T.FL_ANALISADO = 1   
+                        AND T.CD_NATUR_OPER = 1   
+                        GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, CD_DOC_IDENTF_CONJUGE    
+                       ) T
+                  LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR  LA ON TRIM(LA.DS_CONTEUDO) = T.CD_DOC_IDENTF_CLIE 
+                  LEFT JOIN TB_CADEIA_ADMINISTRADOR     CA ON CA.CD_DOC_IDENTF_ADM = T.CD_DOC_IDENTF_CLIE AND CA.CD_TP_IDENTF_ADM = T.CD_TP_IDENTF_CLIE AND CA.CD_TP_IDENTF_CLIE = 3 /*O cliente é administrador */ 
+                  LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CAD ON CAD.CD_LISTA_AUXILIAR = 115 AND TRIM(CAD.DS_CONTEUDO) = CA.CD_DOC_IDENTF_CLIE   /*CandidatosCNPJ_identificacao*/  
+                  LEFT JOIN TB_CONTEUDO_LISTA_AUXILIAR CON ON CON.CD_LISTA_AUXILIAR = 116 AND T.CD_DOC_IDENTF_CONJUGE IS NOT NULL AND T.CD_TP_PESSOA = 'F' AND TRIM(CON.DS_CONTEUDO) = T.CD_DOC_IDENTF_CONJUGE   /*CandidatosPF_identificacao*/  
+                  GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, CA.CD_DOC_IDENTF_CLIE,  T.NM_CLIE, VL_RENDA_FAT, VL_CREDITO, QT_CREDITO, LA.CD_LISTA_AUXILIAR
+                 ) T 
+            GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, T.NM_CLIE, T.VL_RENDA_FAT, T.VL_CREDITO, T.QT_CREDITO, T.FL_CANDIDATO_CNPJ, T.FL_CANDIDATO_CPF, T.FL_CANDIDATO_ADM, T.FL_CANDIDATO_CONJUGE
+           ) T 
+      INNER JOIN TB_PERFIL_MES_CALENDARIO P  
+      ON  P.CD_VARIAVEL_PRIMEIRA = T.CD_DOC_IDENTF_CLIE 
+      AND P.CD_VARIAVEL_SEGUNDA = T.CD_TP_IDENTF_CLIE 
+      AND P.CD_IDENTF_PERFIL = 105 
+      AND P.CD_VARIAVEL_TERCEIRA = '1' 
+      AND P.CD_ANO_MES >= TO_CHAR(ADD_MONTHS(TO_DATE(T.CD_MES_ANO || '01', 'yy-mm-dd'), -2), 'YYYYMM') 
+      AND P.CD_ANO_MES <= TO_CHAR(ADD_MONTHS(TO_DATE(T.CD_MES_ANO || '01', 'yy-mm-dd'), -1), 'YYYYMM')   
+      GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_TP_PESSOA, T.CD_DOC_IDENTF_CONJUGE, T.NM_CLIE, T.VL_RENDA_FAT, 
+      T.VL_CREDITO, T.QT_CREDITO, T.FL_CANDIDATO_CNPJ, T.FL_CANDIDATO_CPF, T.FL_CANDIDATO_ADM, 
+      T.FL_CANDIDATO_CONJUGE, T.ADM, TO_CHAR(ADD_MONTHS(TO_DATE(T.CD_MES_ANO || '01', 'yy-mm-dd'), -2), 'YYYYMM'), 
+      TO_CHAR(ADD_MONTHS(TO_DATE(T.CD_MES_ANO || '01', 'yy-mm-dd'), -1), 'YYYYMM')
+     ) T 
+WHERE (FL_CANDIDATO_CNPJ = 1  
+       AND VL_CREDITO > (:pm_ValorMinimoConsCandidatoCNPJ)  
+       AND VL_CREDITO > (VL_MEDIO_CREDITO * (:pm_PercCreditoCandidatoCNPJ/100)) 
+      ) 
+OR (FL_CANDIDATO_CPF = 1  
+    AND VL_CREDITO > (:pm_ValorMinimoConsCandidatoPF)  
+    AND ((VL_RENDA_FAT IS NOT NULL AND VL_CREDITO > (VL_RENDA_FAT * (:pm_PercRendaCandidatoPF/100)))  OR VL_RENDA_FAT IS NULL )  
+    AND VL_CREDITO > (VL_MEDIO_CREDITO * (:pm_PercCreditoCandidatoPF/100))      
+   ) 
+OR (FL_CANDIDATO_ADM = 1  
+    AND VL_CREDITO > (:pm_ValorMinimoCandidatoAdm)  
+    AND ((VL_RENDA_FAT IS NOT NULL AND VL_CREDITO > (VL_RENDA_FAT * (:pm_PercRendaFatCandidatoAdm/100)))  OR VL_RENDA_FAT IS NULL )   
+    AND VL_CREDITO > (VL_MEDIO_CREDITO * (:pm_PercCreditoCandidatoAdm/100)) 
+   ) 
+OR (FL_CANDIDATO_CONJUGE = 1  
+    AND VL_CREDITO > (:pm_ValorMinimoConsConjugePF)   
+    AND ((VL_RENDA_FAT IS NOT NULL AND VL_CREDITO > (VL_RENDA_FAT * (:pm_PercRendaConjugePF/100))) OR VL_RENDA_FAT IS NULL )  
+    AND VL_CREDITO > (VL_MEDIO_CREDITO * (:pm_PercCreditoConjugePF/100))   
+   )   
+   

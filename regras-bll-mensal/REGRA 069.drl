@@ -1,0 +1,51 @@
+/* t) existênica de contas em nome de menores ou incapazes, cujos representantes realizem grande número de operações at?picas; e */  
+  
+SELECT  T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 69 - Conta de menor ou incapaz |' ||    
+'Objetivo: t) Existência de contas em nome de menores ou incapazes, cujos representantes realizem grande número de operações atípicas. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Contas em nome de menores ou incapazes, cujos representantes realizem grande número de operações atípicas |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Data de nascimento: ' || COALESCE(TO_CHAR(MAX(T1.DT_NASCTO_FUND),'DD/MM/YYYY'), 'Data não cadastrada') || '|' ||    
+'Idade do cliente (em meses): ' || COALESCE(TO_CHAR(MAX(IDADE)), 'Não foi possivel calcular') || '|' ||    
+xmlcast(  xmlagg(xmlelement(outros,    
+CASE TT.CD_TP_IDENTF_REPRE   
+	WHEN 2 THEN 'Representante: CPF: ' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 1, 3) || '.' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 4, 3) || '.' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 7, 3) || '-' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 10, 2) || ' - Nome: ' || TT.NM_REPRE        
+	WHEN 3 THEN 'Representante: CNPJ: ' ||SUBSTR(TT.CD_DOC_IDENTF_REPRE, 1, 2) || '.' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 3, 3) || '.' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 6, 3) || '/' || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 9, 4) || '-'  || SUBSTR(TT.CD_DOC_IDENTF_REPRE, 13, 2)  || ' - Nome: ' || TT.NM_REPRE        
+	ELSE TT.CD_DOC_IDENTF_REPRE    
+END    
+|| '| ')     
+order by TT.CD_DOC_IDENTF_CLIE) as clob)    
+|| '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(T1.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||     
+'Valor total de créditos no mês calendário: ' || COALESCE(TO_CHAR(MAX(T1.VL_TOTAL), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||     
+'Quantidade de créditos no mês calendário: ' || TO_CHAR(MAX(QTDE)) || '|' ||     
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro que indica valor mínimo para apontamento da regra (pm_ValorMinimo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||    
+'Parâmetro de quantidade de flexibilização da idade em meses do cliente (pm_QtdeMesIdade): ' || COALESCE((':pm_QtdeMesIdade'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE     
+FROM (SELECT MAX(T1.NM_CLIE) NM_CLIE, T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, (TRUNC(MONTHS_BETWEEN(SYSDATE, MAX(T1.DT_NASCTO_FUND)))) IDADE, SUM(VL_OPER) VL_TOTAL, COUNT(*) QTDE, MAX(DT_NASCTO_FUND) DT_NASCTO_FUND, MAX(VL_RENDA_FAT) VL_RENDA_FAT  
+      FROM TB_TRANS T1   
+      WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+      AND T1.FL_ANALISADO = 1       
+      AND T1.CD_TP_PESSOA = 'F'    
+      AND T1.CD_NATUR_OPER = 1 /*credito*/   
+      GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE  
+      HAVING SUM(T1.VL_OPER) > (:pm_ValorMinimo)    
+      AND ((MAX(T1.VL_RENDA_FAT) IS NOT NULL  AND SUM(T1.VL_OPER) > (MAX(T1.VL_RENDA_FAT) * (:pm_PercRenda/100)))    
+           OR    
+           (MAX(T1.VL_RENDA_FAT) IS NULL)    
+          )    
+    ) T1  
+LEFT JOIN TB_TRANSMISSAO_ORDEM TT ON (T1.CD_DOC_IDENTF_CLIE = TT.CD_DOC_IDENTF_CLIE  AND T1.CD_TP_IDENTF_CLIE = TT.CD_TP_IDENTF_CLIE )    
+WHERE (IDADE <= (:pm_QtdeMesIdade)    
+       OR   TT.CD_TP_REPRE IN (2, 3)         
+  	  )    
+GROUP BY T1.NM_CLIE, T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE  

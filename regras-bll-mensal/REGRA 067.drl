@@ -1,0 +1,30 @@
+/*Conta de organizações sem fins lucrativos cujos saldos não tenham fundamentação econômica*/  
+  
+SELECT DISTINCT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 67 - Movimentação de instituição sem fins lucrativos |' ||  
+'Objetivo: r) Existência de conta de depósitos à vista de organizações sem fins lucrativos cujos saldos ou movimentações financeiras não apresentem fundamentação econômica ou legal ou nas quais pareça não haver vinculação entre a atividade declarada da organização e as outras partes envolvidas nas transações. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||  
+'Conclusão: Movimentação de instituição sem fins lucrativos |' ||  
+'Cliente: ' ||  T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||  
+'Mês/Ano de Referência: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||  
+'Ramo de Atividade (Sem Fins Lucrativos): ' || COALESCE((SELECT TO_CHAR(NM_RAMO_ATIVID) FROM TB_RAMO_ATIVID  
+                                                         WHERE T.CD_RAMO_ATIVID = CD_RAMO_ATIVID),'Ramo de Atividade não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_CAD_CLIE T  
+WHERE  EXISTS 
+(SELECT 1 FROM TB_TRANS C 
+WHERE C.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND C.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+  AND C.FL_ANALISADO = 1 
+  AND T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE)      
+  AND T.CD_TP_PESSOA = 'J'  
+  AND EXISTS   
+      (SELECT 1 FROM TB_RAMO_ATIVID   
+       WHERE CD_RAMO_ATIVID = T.CD_RAMO_ATIVID   
+       AND FL_ORGNZ_SLUCRO = 1) 
+       

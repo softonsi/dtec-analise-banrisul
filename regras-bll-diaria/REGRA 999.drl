@@ -1,0 +1,111 @@
+select RS.CD_DOC_IDENTF_CLIE, RS.CD_TP_IDENTF_CLIE, RS.DS_INF_ANLSE || RS.DS_INF_ANLSE || RS.DS_INF_ANLSE as DS_INF_ANLSE from (
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 54 - Conta pouco movimentada que acolheu depósito inusitado |' ||  
+'Objetivo: e) Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||  
+'Conclusão: Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||  
+'Banco Cliente: ' || COALESCE(TO_CHAR(T1.CD_BANCO), 'Banco não cadastrado') || '|' ||  
+'Agência Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG), 'Agência não cadastrada') || '|' ||  
+'Conta Cliente: ' || COALESCE(TO_CHAR(T1.CD_CTA), 'Conta não cadastrada') || '|' ||  
+'Valor da renda/faturamento: ' || LTRIM(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99')) || '|'  ||   
+'Período de consolidação do crédito: de ' || TO_CHAR((T1.DT_FIM - 30),'DD/MM/YYYY') || ' até ' || TO_CHAR((T1.DT_FIM),'DD/MM/YYYY') ||  '|' || 
+'Valor total de crédito nos últimos 30 dias: ' || LTRIM(TO_CHAR(T1.VL_TOTAL_30D, 'L999G999G999G990D99')) || '|'  ||   
+'Quantidade de transações nos últimos 3 meses: ' || TO_CHAR(QT_TOTAL_3M) || '|'  ||  
+ 
+CASE CD_TP_PESSOA WHEN 'F' THEN 
+'Parâmetro de comparação, que indica um valor significativo de movimentação de crédito nos últimos 30 dias para Pessoa Física (pm_ValorMinimoConsPF): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, 'L999G999G999G990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_ValorMinimoConsPF' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro de quantidade de transações, em 90 dias, considerada inexpressiva, indicando conta pouco movimentada (pm_QtdeTransacoesPF): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, '999999990') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_QtdeTransacoesPF' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização de renda (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, '999999990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_PercRenda' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|'  
+ELSE 
+'Parâmetro de comparação, que indica um valor significativo de movimentação de crédito nos últimos 30 dias para Pessoa Jurídica (pm_ValorMinimoConsPJ): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, 'L999G999G999G990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_ValorMinimoConsPJ' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro de quantidade de transações, em 90 dias, considerada inexpressiva, indicando conta pouco movimentada (pm_QtdeTransacoesPJ): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, '999999990') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_QtdeTransacoesPJ' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização de renda (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, '999999990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_PercFaturamento' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|'  
+END 
+ 
+AS DS_INF_ANLSE  
+FROM 
+(SELECT T.NM_CLIE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_BANCO, T.CD_AG, T.CD_CTA, MAX(T.CD_TP_PESSOA) CD_TP_PESSOA, MAX(T.VL_RENDA_FAT) VL_RENDA_FAT, 
+ NVL(SUM(T.QT_TOTAL_3M),0) QT_TOTAL_3M, SUM(T.VL_TOTAL_30D) VL_TOTAL_30D, MAX(DT_FIM) DT_FIM 
+ FROM ( 
+ SELECT DT_TRANS, C.DT_FIM, C.NM_CLIE, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, T2.CD_BANCO, T2.CD_AG, T2.CD_CTA, MAX(C.CD_TP_PESSOA) CD_TP_PESSOA, MAX(C.VL_RENDA_FAT) VL_RENDA_FAT, 
+ CASE WHEN DT_TRANS <= TO_DATE(LAST_DAY(ADD_MONTHS(C.DT_FIM,-1))) AND T2.DT_TRANS >= TO_DATE(ADD_MONTHS(LAST_DAY(ADD_MONTHS(C.DT_FIM,-3)) + 1, -1),'DD/MM/YY')      
+          THEN COUNT(*) END QT_TOTAL_3M,           
+ CASE WHEN DT_TRANS <= C.DT_FIM AND T2.DT_TRANS >= (C.DT_FIM - 30)      
+          THEN SUM(VL_OPER) END VL_TOTAL_30D 
+ FROM TB_TRANS T2  
+ INNER JOIN VM_CLIE C ON T2.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T2.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE 
+ WHERE T2.CD_NATUR_OPER = 1  
+  AND T2.FL_ANALISADO = 1  
+  AND T2.DT_TRANS <= C.DT_FIM  
+  AND T2.DT_TRANS >= TO_DATE(ADD_MONTHS(LAST_DAY(ADD_MONTHS(C.DT_FIM,-3)) + 1, -1),'DD/MM/YY')      
+  AND T2.CD_BANCO IS NOT NULL  
+  AND T2.CD_AG IS NOT NULL  
+  AND T2.CD_CTA IS NOT NULL  
+ GROUP BY C.NM_CLIE, T2.CD_DOC_IDENTF_CLIE, T2.CD_TP_IDENTF_CLIE, T2.CD_BANCO, T2.CD_AG, T2.CD_CTA, DT_TRANS, DT_FIM 
+ ) T 
+ GROUP BY T.NM_CLIE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_BANCO, T.CD_AG, T.CD_CTA 
+ ) T1 
+WHERE  
+   (CD_TP_PESSOA = 'F' AND 
+   T1.VL_TOTAL_30D > (SELECT VL_PARAM FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_ValorMinimoConsPF') AND 
+   (((T1.VL_RENDA_FAT IS NOT NULL AND VL_TOTAL_30D > (T1.VL_RENDA_FAT * (SELECT VL_PARAM/100 FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_PercRenda'))) 
+    OR T1.VL_RENDA_FAT IS NULL ) 
+    AND QT_TOTAL_3M < (SELECT VL_PARAM FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_QtdeTransacoesPF') 
+    )) 
+    OR  
+  (CD_TP_PESSOA = 'J' AND 
+   T1.VL_TOTAL_30D > (SELECT VL_PARAM FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_ValorMinimoConsPJ') AND 
+   (((T1.VL_RENDA_FAT IS NOT NULL AND VL_TOTAL_30D > (T1.VL_RENDA_FAT * (SELECT VL_PARAM/100 FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_PercFaturamento'))) 
+    OR T1.VL_RENDA_FAT IS NULL ) 
+    AND QT_TOTAL_3M < (SELECT VL_PARAM FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3 AND NM_CAMPO_PARAM = 'pm_QtdeTransacoesPJ') 
+   ))  
+UNION ALL 
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 54 - Conta pouco movimentada que acolheu depósito inusitado |' ||  
+'Objetivo: e) Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||  
+'Conclusão: Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||  
+'Data do crédito: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor do crédito: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Tipo de operação: ' || COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T1.CD_TP_OPER),TO_CHAR(CD_TP_OPER) || ' nome não cadastrado') || '|' ||  
+'Forma da operação: ' || COALESCE((SELECT NM_FORMA_OPER FROM TB_FORMA_OPER WHERE CD_FORMA_OPER = T1.CD_FORMA_OPER),TO_CHAR(CD_FORMA_OPER) || ' nome não cadastrado') || '|' ||  
+'Banco Cliente: ' || COALESCE(TO_CHAR(T1.CD_BANCO), 'Banco não cadastrado') || '|' ||  
+'Agência Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG), 'Agência não cadastrada') || '|' ||  
+'Conta Cliente: ' || COALESCE(TO_CHAR(T1.CD_CTA), 'Conta não cadastrada') || '|' ||  
+'Período de consolidação da média: de ' || TO_CHAR(ADD_MONTHS(LAST_DAY(ADD_MONTHS(M.DT_FIM,-3)) + 1, -1),'DD/MM/YYYY') ||  
+' até ' || TO_CHAR(LAST_DAY(ADD_MONTHS(M.DT_FIM,-1)),'DD/MM/YYYY') ||  '|' || 
+'Valor médio de crédito nos últimos 3 meses:' || TO_CHAR(M.VL_MEDIA_3M, 'L999G999G999G990D99') || '|'  ||  
+'Quantidade de transações de crédito nos últimos 3 meses:' || TO_CHAR(M.QT) || '|'  ||  
+CASE CD_TP_PESSOA WHEN 'F' THEN 
+'Parâmetro de comparação, que indica um valor significativo de movimentação para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, 'L999G999G999G990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_ValorMinimoPF' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização do Valor da Média do Consolidado para Pesso Física (pm_PercCredito_PF): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, '999999990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_PercCredito_PF' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|'  
+ELSE 
+'Parâmetro de comparação, que indica um valor significativo de movimentação para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, 'L999G999G999G990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_ValorMinimoPJ' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização de faturamento (pm_PercCredito_PJ): ' || COALESCE((SELECT TO_CHAR(VL_PARAM, '999999990D99') FROM TB_REGRA_PARAMETRO WHERE NM_CAMPO_PARAM = 'pm_PercCredito_PJ' AND CD_REGRA = 54 AND CD_VERSAO_SISTEMA = 3),'Parâmetro não cadastrado') || '|'   
+END 
+AS DS_INF_ANLSE  
+FROM TB_TRANS_ANLSE T1  
+INNER JOIN 
+ (SELECT C.NM_CLIE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, T.CD_BANCO, T.CD_AG, T.CD_CTA, SUM(T.VL_OPER)/3 VL_MEDIA_3M, COUNT(*) QT, MAX(DT_FIM) DT_FIM 
+  FROM TB_TRANS T 
+  INNER JOIN VM_CLIE C ON T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE 
+  WHERE T.CD_NATUR_OPER = 1  
+    AND T.FL_ANALISADO = 1  
+	AND T.DT_TRANS <= TO_DATE(LAST_DAY(ADD_MONTHS(C.DT_FIM,-1)))  
+	AND T.DT_TRANS >= TO_DATE(ADD_MONTHS(LAST_DAY(ADD_MONTHS(C.DT_FIM,-3)) + 1, -1),'DD/MM/YY')  
+    GROUP BY C.NM_CLIE, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, T.CD_BANCO, T.CD_AG, T.CD_CTA) M 
+       ON T1.CD_DOC_IDENTF_CLIE = M.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = M.CD_TP_IDENTF_CLIE AND  
+          T1.CD_BANCO = M.CD_BANCO AND T1.CD_AG = M.CD_AG AND T1.CD_CTA = M.CD_CTA        
+) RS JOIN TB_APONTAMENTO ON (1 = 1) JOIN tb_param_global ON (1 = 1) AND ROWNUM <= 10000

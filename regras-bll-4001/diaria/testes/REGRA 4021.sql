@@ -1,0 +1,128 @@
+/*DIARIO*/
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE)  || '|' || 
+'Data da transação:' || TO_CHAR(T.DT_TRANS) || '|' ||
+'Valor da transação: ' || COALESCE(TO_CHAR(T.VL_OPER, 'L999G999G999G990D99'),'NULO') || '|' ||
+'Tipo de operação: '   || COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER O WHERE O.CD_TP_OPER = T.CD_TP_OPER), TO_CHAR(T.CD_TP_OPER)) || '|' ||
+'Valor da Renda: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'),'NULO') || '|' ||
+'Valor médio consolidado do cliente, das transações com cartão pré-pago em moeda estrangeira, baseado nos últimos 6 meses, desconsiderando o mês calendário: ' || COALESCE(TO_CHAR(T.VL_MED_CARTAO_PPAGO, 'L999G999G999G990D99'),'NULO') || '|' ||
+'Valor médio consolidado da ocupação, das transações com cartão pré-pago em moeda estrangeira, baseado nos últimos 6 meses, desconsiderando o mês calendário: |' || ocupacoes || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_ValorMinimoPF'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_PercRenda, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_PercRenda'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_PercPerfilPF, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_PercPerfilPF'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_PercOcupacao, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_PercOcupacao'),'Parâmetro não cadastrado|' ) || '|' 
+AS DS_INF_ANLSE  
+FROM
+(SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,
+ VL_MED_CARTAO_PPAGO
+ ,LISTAGG( COALESCE((SELECT NM_OCUP FROM TB_OCUP O WHERE O.CD_OCUP = T.CD_OCUP), TO_CHAR(T.CD_OCUP)) || ':' 
+ || 'Valor médio da ocupação ' || COALESCE(TO_CHAR(VL_MED_OCUP, 'L999G999G999G990D99'),'NULO')  , '| ') 
+ WITHIN GROUP (ORDER BY T.CD_OCUP) ocupacoes
+FROM 
+(SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,  VL_MED_CARTAO_PPAGO, T.CD_OCUP, VL_MED_OCUP
+FROM 
+(SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,
+(SUM(M2.VL_TOTAL)/SUM(M2.QT_TOTAL)) VL_MED_CARTAO_PPAGO, C.CD_OCUP, (SUM(M3.VL_TOTAL)/SUM(M3.QT_TOTAL)) VL_MED_OCUP
+FROM
+TB_TRANS_ANLSE T
+LEFT JOIN TB_CLIE_RENDA C ON T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE
+LEFT JOIN TB_PERFIL_MES_CALENDARIO M2 ON M2.CD_VARIAVEL_PRIMEIRA = T.CD_DOC_IDENTF_CLIE AND M2.CD_VARIAVEL_SEGUNDA = T.CD_TP_IDENTF_CLIE AND M2.CD_IDENTF_PERFIL = 102 AND M2.CD_ANO_MES <> TO_CHAR(T.DT_TRANS, 'YYYYMM')/*perfil do cliente*/
+LEFT JOIN 
+
+(Select TO_CHAR(T.DT_TRANS, 'YYYYMM') cd_ano_mes, c.cd_ocup, sum(vl_oper) vl_total, count(*) qt_total 
+from tb_trans t 
+inner join tb_clie_renda c on T.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE
+WHERE exists (select 1 from tb_trans_anlse a where a.CD_LOTE = :cd_lote AND a.CD_SUBLOTE = :cd_sublote and trunc(t.dt_trans) >= (a.dt_trans - 180) and CD_TP_OPER IN (25,26,3,7) AND CD_FORMA_OPER = 8)
+  AND T.CD_TP_PESSOA = 'F' 
+  AND T.CD_TP_OPER in (
+     25, /*Emissão de cartão pré-pago*/
+     26, /*Recarga de cartão pré-pago*/
+      3, /*Compra*/
+      7) /*Saque*/
+  AND T.CD_FORMA_OPER = 8 /*Moeda estrangeira*/ 
+  group by TO_CHAR(T.DT_TRANS, 'YYYYMM'), c.cd_ocup) M3
+
+ON M3.CD_OCUP = C.CD_OCUP AND M3.CD_ANO_MES <> TO_CHAR(T.DT_TRANS, 'YYYYMM') /*perfil da ocupação*/
+WHERE T.CD_LOTE = :cd_lote AND T.CD_SUBLOTE = :cd_sublote
+  AND T.CD_TP_PESSOA = 'F' 
+  AND T.CD_TP_OPER in (
+     25, /*Emissão de cartão pré-pago*/
+     26, /*Recarga de cartão pré-pago*/
+      3, /*Compra*/
+      7) /*Saque*/
+  AND T.CD_FORMA_OPER = 8 /*Moeda estrangeira*/ 
+  AND T.VL_OPER >= (:pm_ValorMinimoPF)  
+GROUP BY T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT, C.CD_OCUP    
+) T
+WHERE  (
+    (T.VL_RENDA_FAT IS NOT NULL AND T.VL_OPER >= (T.VL_RENDA_FAT * (:pm_PercRenda/100)))
+    OR       
+    (VL_MED_CARTAO_PPAGO IS NOT NULL AND T.VL_OPER >= (VL_MED_CARTAO_PPAGO * (:pm_PercPerfilPF/100)))      
+    OR       
+    (VL_MED_OCUP IS NOT NULL AND T.VL_OPER >= (VL_MED_OCUP * (:pm_PercOcupacao/100)))     
+    )
+GROUP BY T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,  VL_MED_CARTAO_PPAGO, T.CD_OCUP, VL_MED_OCUP     
+ ) T      
+GROUP BY T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT, VL_MED_CARTAO_PPAGO        
+) T
+union
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE)  || '|' || 
+'Data da transação:' || TO_CHAR(T.DT_TRANS) || '|' ||
+'Valor da transação: ' || COALESCE(TO_CHAR(T.VL_OPER, 'L999G999G999G990D99'),'NULO') || '|' ||
+'Tipo de operação: '   || COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER O WHERE O.CD_TP_OPER = T.CD_TP_OPER), TO_CHAR(T.CD_TP_OPER)) || '|' ||
+'Ramo de atividade: '  || COALESCE(COALESCE((SELECT NM_RAMO_ATIVID FROM TB_RAMO_ATIVID R WHERE R.CD_RAMO_ATIVID = T.CD_RAMO_ATIVID), TO_CHAR(CD_RAMO_ATIVID)),'NULO') || '|' ||
+'Valor da Renda: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'),'NULO') || '|' ||
+'Valor médio consolidado do cliente, das transações com cartão pré-pago em moeda estrangeira, baseado nos últimos 6 meses, desconsiderando o mês calendário: ' || COALESCE(TO_CHAR(T.VL_MED_CARTAO_PPAGO, 'L999G999G999G990D99'),'NULO') || '|' ||
+'Valor médio consolidado do ramo de atividade, das transações com cartão pré-pago em moeda estrangeira, baseado nos últimos 6 meses, desconsiderando o mês calendário: ' || COALESCE(TO_CHAR(VL_MED_RAMO, 'L999G999G999G990D99'),'NULO') || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_ValorMinimoPJ'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_PercFaturamento, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_PercFaturamento'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_PercPerfilPJ, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_PercPerfilPJ'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_PercRamoAtividade, 'L999G999G999G990D99') FROM DUAL)  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4021 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_PercRamoAtividade'),'Parâmetro não cadastrado|' ) || '|' 
+AS DS_INF_ANLSE  
+FROM
+(SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,  VL_MED_CARTAO_PPAGO, T.CD_RAMO_ATIVID, VL_MED_RAMO
+FROM 
+(SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,
+(SUM(M2.VL_TOTAL)/SUM(M2.QT_TOTAL)) VL_MED_CARTAO_PPAGO, T.CD_RAMO_ATIVID, (SUM(M3.VL_TOTAL)/SUM(M3.QT_TOTAL)) VL_MED_RAMO
+FROM
+TB_TRANS_ANLSE T
+LEFT JOIN TB_PERFIL_MES_CALENDARIO M2 ON M2.CD_VARIAVEL_PRIMEIRA = T.CD_DOC_IDENTF_CLIE AND M2.CD_VARIAVEL_SEGUNDA = T.CD_TP_IDENTF_CLIE AND M2.CD_IDENTF_PERFIL = 102 AND M2.CD_ANO_MES <> TO_CHAR(T.DT_TRANS, 'YYYYMM')/*perfil do cliente*/
+LEFT JOIN TB_PERFIL_MES_CALENDARIO M3 ON M3.CD_VARIAVEL_PRIMEIRA = T.CD_RAMO_ATIVID AND M3.CD_IDENTF_PERFIL = 103 AND M3.CD_ANO_MES <> TO_CHAR(T.DT_TRANS, 'YYYYMM') /*perfil da RAMO*/
+WHERE T.CD_LOTE = :cd_lote AND T.CD_SUBLOTE = :cd_sublote
+  AND T.CD_TP_PESSOA = 'J' 
+  AND T.CD_TP_OPER in (
+     25, /*Emissão de cartão pré-pago*/
+     26, /*Recarga de cartão pré-pago*/
+      3, /*Compra*/
+      7) /*Saque*/
+  AND T.CD_FORMA_OPER = 8 /*Moeda estrangeira*/ 
+  AND T.VL_OPER >= (:pm_ValorMinimoPJ)  
+GROUP BY T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT, T.CD_RAMO_ATIVID    
+) T
+WHERE  (
+    (T.VL_RENDA_FAT IS NOT NULL AND T.VL_OPER >= (T.VL_RENDA_FAT * (:pm_PercFaturamento/100)))
+    OR       
+    (VL_MED_CARTAO_PPAGO IS NOT NULL AND T.VL_OPER >= (VL_MED_CARTAO_PPAGO * (:pm_PercPerfilPJ/100)))      
+    OR       
+    (VL_MED_RAMO IS NOT NULL AND T.VL_OPER >= (VL_MED_RAMO * (:pm_PercRamoAtividade/100)))     
+    )
+GROUP BY T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.DT_TRANS, T.VL_OPER, T.CD_TP_OPER, T.CD_TP_PESSOA, T.CD_FORMA_OPER, T.VL_RENDA_FAT,  VL_MED_CARTAO_PPAGO, T.CD_RAMO_ATIVID, VL_MED_RAMO     
+ ) T      
+

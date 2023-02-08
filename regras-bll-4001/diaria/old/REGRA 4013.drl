@@ -1,0 +1,59 @@
+SELECT LAST_DAY(T.DT_TRANS) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,    
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4013 AND CD_VERSAO_SISTEMA = 4) ||
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE)  || '|' || 
+'Período de consolidação de : '  || (DT_TRANS - (select vl_param from tb_regra_parametro where cd_regra = 4013 and cd_versao_SISTEMA = 4 and nm_campo_param = 'pm_QtdeDiasRecuo')) || ' até ' || TO_CHAR(dt_trans) || '|' || 
+'Quantidade de agencias distintas: ' || TO_CHAR(qt_ag_distintas) || '|' || 
+'Agências: |' || '|' || agencias || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || TO_CHAR(VL_PARAM) FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4013 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_QtdeDiasRecuo'),'Parâmetro não cadastrado|' ) || '|' ||
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || TO_CHAR(VL_PARAM) FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4013 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_QtdeDistintaAgOperacao'),'Parâmetro não cadastrado|' ) || '|' 
+AS DS_INF_ANLSE  
+FROM
+(
+    SELECT  A.CD_LOTE, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.DT_TRANS, COUNT(*) QT_AG_DISTINTAS, 
+    LISTAGG( 'Cod.Agência ' || TO_CHAR(CD_AG_OPER) || ':' || 'quantidade transações ' || to_char(qt_ag) || ', valor total ' || to_char(vl_ag) , '| ') 
+        WITHIN GROUP (ORDER BY CD_AG_OPER) agencias
+    FROM (
+        /* 2) agrupado por agencia - cria tabela com join por range de data, agrupando registos conforme a regra - tabela 2 do join */
+        SELECT  A.CD_LOTE, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.DT_TRANS, T.CD_AG_OPER, COUNT(*) QT_AG, SUM(VL_OPER) VL_AG 
+        FROM TB_TRANS T
+        INNER JOIN
+        /* 1) inicio da regra - monta lista inicial de transações conforme especificacao da regra - tabela 1 do join */
+        (
+            SELECT trunc(DT_TRANS) dt_trans, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE
+            FROM TB_TRANS_ANLSE 
+            WHERE CD_LOTE = :cd_lote AND CD_SUBLOTE = :cd_sublote
+                AND CD_NATUR_OPER = 1 /*credito*/
+                AND CD_TP_OPER    = 4 /*deposito*/
+                AND CD_VIA_OPER   = 1 /*atm*/
+                AND CD_FORMA_OPER in (7, 2) /*especie, cheque*/
+                AND CD_AG_OPER IS NOT NULL
+            group by trunc(DT_TRANS), CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE
+         ) A 
+         /* join por range de data para recuo entre tb_tran_anlse e tb_trans */
+        ON  trunc(T.DT_TRANS) >= A.DT_TRANS - (select vl_param from tb_regra_parametro where cd_regra = 4013 and cd_versao_SISTEMA = 4 and nm_campo_param = 'pm_QtdeDiasRecuo')
+        AND trunc(T.DT_TRANS) <= (A.DT_TRANS) 
+        AND T.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_CLIE
+        AND T.CD_TP_IDENTF_CLIE  = A.CD_TP_IDENTF_CLIE
+
+         /* inicio da regra */
+        WHERE T.FL_ANALISADO = 1 
+            AND CD_NATUR_OPER = 1 /*credito*/
+            AND CD_TP_OPER    = 4 /*deposito*/
+            AND CD_VIA_OPER   = 1 /*atm*/  
+            AND CD_FORMA_OPER in (7, 2) /*especie, cheque*/
+            AND CD_AG_OPER IS NOT NULL
+        GROUP BY A.CD_LOTE, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.DT_TRANS, T.CD_AG_OPER 
+        /* agrupado por agencia*/
+
+    ) A
+    GROUP BY A.CD_LOTE, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.NM_CLIE, A.DT_TRANS
+    HAVING COUNT(*) >= (select vl_param from tb_regra_parametro where cd_regra = 4013 and cd_versao_SISTEMA = 4 and nm_campo_param = 'pm_QtdeDistintaAgOperacao')
+) T
+

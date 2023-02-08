@@ -1,0 +1,1 @@
+select cd_doc_identf_clie from tb_apontamento where cd_doc_identf_clie = '36898457691';

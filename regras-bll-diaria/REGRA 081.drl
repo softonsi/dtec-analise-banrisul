@@ -1,0 +1,95 @@
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO,T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 81 – Utilização, carga ou recarga de voucher em valor incompatível com a capacidade econômica ou perfil do cliente |' ||  
+'Objetivo: A) Utilização, carga ou recarga de voucher em valor não compatível com a capacidade econômico-financeira, atividade ou perfil do usuário. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||  
+'Conclusão: Utilização, carga ou recarga de voucher em valor não compatível com o perfil do usuário |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' ||
+CASE T1.CD_TP_IDENTF_CLIE 
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T1.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||  
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Valor Renda: ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Valor médio de transações com voucher do cliente: ' || COALESCE(TO_CHAR(VL_MEDIA, 'L999G999G999G990D99') , 'Valor não existente') || '|' ||  
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica o valor mínimo para que a regra seja apontada, para Pessoa Física (pm_valorVoucherPF): ' || COALESCE((SELECT TO_CHAR(:pm_valorVoucherPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização do perfil do cliente Pessoa Física (pm_PercPerfilPF): ' || COALESCE((SELECT TO_CHAR(:pm_PercPerfilPF, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T1 
+INNER JOIN 
+  (SELECT C.DT_APONTAMENTO, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, AVG(T2.VL_OPER) * (:pm_PercPerfilPF/100) VL_MEDIA 
+   FROM TB_TRANS T2  
+   INNER JOIN VM_CLIE C ON T2.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T2.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE  
+   WHERE C.CD_TP_PESSOA = 'F' 
+     AND (T2.CD_FORMA_OPER = 15 OR T2.CD_TP_OPER IN (64, 65))   
+     AND T2.FL_ANALISADO = 1 
+	 AND T2.DT_TRANS < C.DT_FIM  
+	 AND T2.DT_TRANS >= (C.DT_FIM - 90) 
+     GROUP BY C.DT_APONTAMENTO, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE) T 
+  ON LAST_DAY(TRUNC(T1.DT_TRANS)) = T.DT_APONTAMENTO AND T1.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE  
+WHERE (T1.CD_FORMA_OPER = 15  
+       OR  
+       T1.CD_TP_OPER IN (64, 65))  
+  AND T1.VL_OPER > (:pm_valorVoucherPF) 
+  AND (((T1.VL_RENDA_FAT IS NOT NULL AND  
+         T1.VL_OPER > (T1.VL_RENDA_FAT * (:pm_PercRenda/100)))  
+        OR  
+        (T1.VL_RENDA_FAT IS NULL))  
+       OR  
+       (T1.VL_OPER > VL_MEDIA 
+	   )  
+      ) 
+UNION  ALL 
+SELECT LAST_DAY(TRUNC(T1.DT_TRANS)) DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,   
+'Análise: Regra 81 – Utilização, carga ou recarga de voucher em valor incompatível com a capacidade econômica ou perfil do cliente |' ||  
+'Objetivo: A) Utilização, carga ou recarga de voucher em valor não compatível com a capacidade econômico-financeira, atividade ou perfil do usuário. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso VI |' ||  
+'Conclusão: Utilização, carga ou recarga de voucher em valor não compatível com o perfil do usuário |' ||  
+'Cliente: ' ||  T1.NM_CLIE || '|' || 
+CASE T1.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2) 
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)  
+	ELSE T1.CD_DOC_IDENTF_CLIE 
+END 
+|| '|' || 
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' || 
+'Data da Transação: ' || TO_CHAR(T1.DT_TRANS,'DD/MM/YYYY') || '|' ||  
+'Valor da Transação: ' || TO_CHAR(T1.VL_OPER, 'L999G999G999G990D99') || '|'  ||  
+'Agência do Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),'Agência não informada') || '|'  ||   
+'Conta do Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),'Conta não informada') || '|'  ||  
+'Valor Faturamento: ' || COALESCE(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Valor médio de transações com voucher do cliente: ' || COALESCE(TO_CHAR(VL_MEDIA, 'L999G999G999G990D99') , 'Valor não existente') || '|' ||  
+'Parâmetro percentual de flexibilização do faturamento do cliente (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica o valor mínimo para que a regra seja apontada, para Pessoa Jurídica (pm_valorVoucherPJ): ' || COALESCE((SELECT TO_CHAR(:pm_valorVoucherPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Parâmetro percentual de flexibilização do perfil do cliente Pessoa Jurídica (pm_PercPerfilPJ): ' || COALESCE((SELECT TO_CHAR(:pm_PercPerfilPJ, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  
+AS DS_INF_ANLSE   
+FROM TB_TRANS_ANLSE T1  
+INNER JOIN 
+  (SELECT C.DT_APONTAMENTO, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE, AVG(T2.VL_OPER) * (:pm_PercPerfilPJ/100) VL_MEDIA 
+   FROM TB_TRANS T2   
+   INNER JOIN VM_CLIE C ON T2.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T2.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE  
+   WHERE C.CD_TP_PESSOA = 'J' 
+     AND (T2.CD_FORMA_OPER = 15 OR T2.CD_TP_OPER IN (64, 65))   
+     AND T2.FL_ANALISADO = 1 
+	 AND T2.DT_TRANS < C.DT_FIM  
+	 AND T2.DT_TRANS >= (C.DT_FIM - 90) 
+     GROUP BY C.DT_APONTAMENTO, C.CD_DOC_IDENTF_CLIE, C.CD_TP_IDENTF_CLIE) T 
+  ON LAST_DAY(TRUNC(T1.DT_TRANS)) = T.DT_APONTAMENTO AND T1.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T.CD_TP_IDENTF_CLIE  
+WHERE  T1.CD_TP_PESSOA = 'J'  
+  AND (T1.CD_FORMA_OPER = 15   
+       OR  
+       T1.CD_TP_OPER IN (64, 65)) 
+  AND T1.VL_OPER > (:pm_valorVoucherPJ) 
+  AND (((T1.VL_RENDA_FAT IS NOT NULL AND  
+         T1.VL_OPER > (T1.VL_RENDA_FAT * (:pm_PercFaturamento/100)))  
+        OR  
+        (T1.VL_RENDA_FAT IS NULL))  
+       OR  
+       (T1.VL_OPER > VL_MEDIA 
+	   )  
+      ) 
+      

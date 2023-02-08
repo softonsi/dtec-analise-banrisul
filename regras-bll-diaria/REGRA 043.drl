@@ -1,0 +1,168 @@
+/* d) Cadastramento de várias contas em uma mesma data, ou em curto período, com elementos em comum, tais como titulares, */
+/* procuradores, sócios, endereço, número de telefone, etc.*/        
+
+/*nova - SHEILA 20/03/2020 */
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,            
+'Análise: Regra 43 - Cadastro de várias contas em uma mesma data |' ||           
+'Objetivo: d) Cadastramento de várias contas em uma mesma data, ou em curto período, com elementos em comum, tais como titulares, procuradores, sócios, endereço, número de telefone, etc. C.C. Bacen n.3.542/2012, Art. 1º, Inciso II |' ||           
+'Conclusão: Cadastramento de várias contas em uma mesma data, ou em curto período, com elementos em comum, tais como titulares, procuradores, sócios, endereço, número de telefone, etc. |' ||           
+'Cliente: ' ||  T1.NM_CLIE || '|' ||         
+CASE T1.CD_TP_IDENTF_CLIE          
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)          
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)           
+	ELSE T1.CD_DOC_IDENTF_CLIE          
+END          
+|| '|' ||      
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||   
+'Agência(s) e conta(s) nova(s): ' || xmlcast(  xmlagg(xmlelement(contas, LTRIM(TO_CHAR(C.CD_AG,'0000')) || '-' || LTRIM(TO_CHAR(C.CD_CTA,'0000000000')) || '|') order by C.CD_AG) as clob) || '|' || 
+'Data de referência da abertura da Conta: ' || TO_CHAR(MAX(c.DT_ABERT_CTA),'DD/MM/YYYY') || '|' ||        
+'Período de avaliação: De ' || TO_CHAR((MAX(c.DT_ABERT_CTA) - (:pm_QtdeDiasPF)),'DD/MM/YYYY') || ' até ' || TO_CHAR(MAX(c.DT_ABERT_CTA),'DD/MM/YYYY') || '|' ||          
+'Nome do Pai: ' || COALESCE(MAX(T1.NM_PAI), 'Não cadastrada') || '|' ||            
+'Nome da Mãe: ' || COALESCE(MAX(T1.NM_MAE), 'Não cadastrada') || '|' ||            
+'Nome do Conjugue: ' || COALESCE(MAX(T1.NM_CONJUGE), 'Não cadastrada') || '|' ||            
+'Endereço Residencial: ' || COALESCE(MAX(T1.NM_ENDER_RESID), 'Não cadastrado')  || '|' ||       
+'Número: ' || COALESCE(TO_CHAR(MAX(T1.NU_RESID)) , 'Não cadastrado ') || '|' ||       
+'CEP Residencial: ' || COALESCE(TO_CHAR(max(T1.CD_CEP_RESID)),'Não informado') || '|' ||      
+'Telefone: (' || COALESCE(TO_CHAR(MAX(T1.NU_DDD_TELEFONE)), 'Não informado') || ') ' || COALESCE(TO_CHAR(MAX(T1.CD_FONE_CLIE)), '- Não informado') || '|' ||            
+'Quantidade de contas abertas em curto período de tempo (Segue abaixo a relação dessas contas): ' || TO_CHAR(count(*))  || '|' ||       
+xmlcast(  xmlagg(xmlelement(outros,        
+CASE C.CD_TP_IDENTF_CLIE        
+	WHEN 2 THEN 'CPF-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)        
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)         
+	ELSE C.CD_DOC_IDENTF_CLIE        
+END ||       
+':' || CAD.NM_CLIE ||       
+', Agência-' || TO_CHAR(C.CD_AG,'0000') ||       
+', Conta-' || TO_CHAR(C.CD_CTA,'0000000000') ||       
+', Data Abertura-' || TO_CHAR(C.DT_ABERT_CTA,'DD/MM/YYYY') ||       
+', Nome Mãe-' || COALESCE(CAD.NM_MAE, 'não informado') ||       
+', Nome Pai-' || COALESCE(CAD.NM_PAI, 'não informado') ||       
+', Nome Conjuge-' || COALESCE(CAD.NM_CONJUGE, 'não informado') ||       
+', Endereço-' || COALESCE(CAD.NM_ENDER_RESID, 'não informado') || ',' || COALESCE(TO_CHAR(CAD.NU_RESID), 'não informado') ||       
+', CEP-' || COALESCE(TO_CHAR(CAD.CD_CEP_RESID), 'não informado') ||       
+', Telefone-(' || COALESCE(TO_CHAR(CAD.NU_DDD_TELEFONE), 'não informado') || ') ' || COALESCE(TO_CHAR(CAD.CD_FONE_CLIE), 'não informado')        
+|| '|')         
+order by C.CD_DOC_IDENTF_CLIE) as clob)         
+|| '|' ||       
+'Parâmetro que indica um período curto, em dias, para Pessoa Física (pm_QtdeDiasPF): ' || COALESCE((':pm_QtdeDiasPF'),'Parâmetro não cadastrado') || '|' ||           
+'Parâmetro de comparação para a quantidade de contas, tratadas pela regra. Para Pessoa Física (pm_QtdeContaPF): ' || COALESCE((':pm_QtdeContaPF'),'Parâmetro não cadastrado') || '|'           
+ AS DS_INF_ANLSE            
+FROM VM_CLIE T1           
+INNER JOIN TB_CTA C ON T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE AND C.FL_CTA_NOVA = 1         
+AND C.DT_ABERT_CTA BETWEEN (T1.DT_FIM - (:pm_QtdeDiasPF)) AND T1.DT_FIM   
+INNER JOIN TB_CAD_CLIE CAD ON C.CD_DOC_IDENTF_CLIE = CAD.CD_DOC_IDENTF_CLIE AND C.CD_TP_IDENTF_CLIE = CAD.CD_TP_IDENTF_CLIE             
+WHERE T1.CD_TP_PESSOA = 'F'         
+  AND CAD.CD_TP_PESSOA = 'F'       
+  AND C.FL_CTA_NOVA = 1                       
+  AND C.DT_ABERT_CTA IS NOT NULL          
+  AND (          
+    (T1.NM_CONJUGE IS NOT NULL     AND CAD.NM_CONJUGE IS NOT NULL     AND UPPER(T1.NM_CONJUGE) = UPPER(CAD.NM_CONJUGE))   OR           
+    (T1.NM_MAE IS NOT NULL         AND CAD.NM_MAE IS NOT NULL         AND     
+     UPPER(T1.NM_MAE) NOT IN ('NAO INFORMADO', 'NÃO INFORMADO', 'NAO DECLARADO', 'NÃO DECLARADO', 'NAO CONSTA', 'NÃO CONSTA', 'NADA CONSTA',     
+                              'MAE DESCONHECIDA', 'MÃE DESCONHECIDA', 'NAO INFORMOU', 'NÃO INFORMOU', 'NAO INFORMADA', 'NÃO INFORMADA',     
+                              'NAO IDENTIFICADO', 'NÃO IDENTIFICADO', 'PAI DESCONHECIDO', 'NO INFORMADO', 'SEM REGISTRO', 'NAO REGISTRADO',    
+                              'NÃO REGISTRADO', 'NAO CONHECIDO')      AND UPPER(T1.NM_MAE) = UPPER(CAD.NM_MAE))  OR           
+    (T1.NM_PAI IS NOT NULL         AND CAD.NM_PAI IS NOT NULL         AND      
+     UPPER(T1.NM_PAI) NOT IN ('NAO INFORMADO', 'NÃO INFORMADO', 'NAO DECLARADO', 'NÃO DECLARADO', 'NAO CONSTA', 'NÃO CONSTA', 'NADA CONSTA',     
+                              'MAE DESCONHECIDA', 'MÃE DESCONHECIDA', 'NAO INFORMOU', 'NÃO INFORMOU', 'NAO INFORMADA', 'NÃO INFORMADA',     
+                              'NAO IDENTIFICADO', 'NÃO IDENTIFICADO', 'PAI DESCONHECIDO', 'NO INFORMADO', 'SEM REGISTRO', 'NAO REGISTRADO',    
+                              'NÃO REGISTRADO', 'NAO CONHECIDO')      AND UPPER(T1.NM_PAI) = UPPER(CAD.NM_PAI))  OR           
+    (T1.NM_MAE IS NOT NULL         AND CAD.NM_MAE IS NOT NULL         AND UPPER(T1.NM_MAE) = UPPER(CAD.NM_CONJUGE)) OR           
+    (T1.NM_PAI IS NOT NULL         AND CAD.NM_PAI IS NOT NULL         AND UPPER(T1.NM_PAI) = UPPER(CAD.NM_CONJUGE)) OR           
+    (T1.NM_CLIE IS NOT NULL        AND CAD.NM_CLIE IS NOT NULL        AND UPPER(T1.NM_CLIE) = UPPER(CAD.NM_PAI))  OR           
+    (T1.NM_CLIE IS NOT NULL        AND CAD.NM_CLIE IS NOT NULL        AND UPPER(T1.NM_CLIE) = UPPER(CAD.NM_MAE))  OR           
+    (T1.NM_ENDER_RESID IS NOT NULL AND CAD.NM_ENDER_RESID IS NOT NULL AND UPPER(T1.NM_ENDER_RESID) = UPPER(CAD.NM_ENDER_RESID)) OR           
+    ((T1.CD_CEP_RESID  IS NOT NULL AND CAD.CD_CEP_RESID IS NOT NULL   AND T1.CD_CEP_RESID = CAD.CD_CEP_RESID)           
+      AND (T1.NU_RESID IS NOT NULL AND CAD.NU_RESID IS NOT NULL AND T1.NU_RESID = CAD.NU_RESID)) OR           
+    (T1.NU_DDD_TELEFONE IS NOT NULL AND T1.CD_FONE_CLIE IS NOT NULL AND   
+     CAD.NU_DDD_TELEFONE IS NOT NULL AND CAD.CD_FONE_CLIE IS NOT NULL AND   
+     TO_CHAR(T1.NU_DDD_TELEFONE || T1.CD_FONE_CLIE) = TO_CHAR(CAD.NU_DDD_TELEFONE ||CAD.CD_FONE_CLIE))           
+   )                 
+GROUP BY T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, T1.CD_LOTE        
+HAVING COUNT(*) >= (:pm_QtdeContaPF)           
+    
+UNION ALL       
+       
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,            
+'Análise: Regra 43 - Cadastro de várias contas em uma mesma data |' ||           
+'Objetivo: d) Cadastramento de várias contas em uma mesma data, ou em curto período, com elementos em comum, tais como titulares, procuradores, sócios, endereço, número de telefone, etc. C.C. Bacen n.3.542/2012, Art. 1º, Inciso II |' ||           
+'Conclusão: Cadastramento de várias contas em uma mesma data, ou em curto período, com elementos em comum, tais como titulares, procuradores, sócios, endereço, número de telefone, etc.|' ||           
+'Cliente: ' ||  T1.NM_CLIE || '|' ||         
+CASE T1.CD_TP_IDENTF_CLIE          
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)          
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)           
+	ELSE T1.CD_DOC_IDENTF_CLIE          
+END   || '|' ||   
+'Lote: ' || TO_CHAR(T1.CD_LOTE) || '|' ||  
+'Agência(s) e conta(s) nova(s): ' || xmlcast(  xmlagg(xmlelement(contas, LTRIM(TO_CHAR(C.CD_AG,'0000')) || '-' || LTRIM(TO_CHAR(C.CD_CTA,'0000000000')) || '|') order by C.CD_AG) as clob) || '|' || 
+'Data de referencia da abertura da Conta nova: ' || TO_CHAR(MAX(c.DT_ABERT_CTA),'DD/MM/YYYY') || '|' ||           
+'Período de avaliação: De ' || TO_CHAR((MAX(c.DT_ABERT_CTA) - (:pm_QtdeDiasPJ)),'DD/MM/YYYY') || ' até ' || TO_CHAR(MAX(c.DT_ABERT_CTA),'DD/MM/YYYY') || '|' ||          
+'Endereço: ' || COALESCE(MAX(T1.NM_ENDER_RESID), 'Não cadastrado')  || '|' ||       
+'Número: ' || COALESCE( TO_CHAR(MAX(T1.NU_RESID)) , 'Não cadastrado ') || '|' ||       
+'CEP: ' || COALESCE(TO_CHAR(MAX(T1.CD_CEP_RESID)),'Não informado') || '|' ||          
+'Telefone: (' || COALESCE(TO_CHAR(MAX(T1.NU_DDD_TELEFONE)), 'Não informado') || ') ' || COALESCE(TO_CHAR(MAX(T1.CD_FONE_CLIE)), ' - Não informado') || '|' ||      
+'Observação: Seguem todas as relações do cliente (quando existir). A avaliação do apontamento não está explicita, deve-se levar em consideração as informações abaixo.' || '|' ||              
+'Quantidade de contas abertas em curto período de tempo (Segue abaixo a relação dessas contas): ' || TO_CHAR(COUNT(*))  || '|' ||       
+xmlcast(  xmlagg(xmlelement(outros,        
+CASE C.CD_TP_IDENTF_CLIE        
+	WHEN 2 THEN 'CPF-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 10, 2)        
+	WHEN 3 THEN 'CNPJ-' ||SUBSTR(C.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(C.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(C.CD_DOC_IDENTF_CLIE, 13, 2)         
+	ELSE C.CD_DOC_IDENTF_CLIE        
+END ||       
+':' || CAD.NM_CLIE ||       
+', Agência-' || TO_CHAR(C.CD_AG,'0000') ||       
+', Conta-' || TO_CHAR(C.CD_CTA,'0000000000') ||       
+', Data Abertura-' || TO_CHAR(C.DT_ABERT_CTA,'DD/MM/YYYY') ||       
+', Endereço-' || COALESCE(CAD.NM_ENDER_RESID, 'não informado') || ',' || COALESCE(TO_CHAR(CAD.NU_RESID), 'número não informado') ||       
+', CEP-' || COALESCE(TO_CHAR(CAD.CD_CEP_RESID), 'não informado') ||       
+', Telefone-(' || COALESCE(TO_CHAR(CAD.NU_DDD_TELEFONE), 'não informado') || ') ' || COALESCE(TO_CHAR(CAD.CD_FONE_CLIE), 'não informado')        
+|| '|')         
+order by C.CD_DOC_IDENTF_CLIE) as clob)         
+|| '|' ||            
+(select xmlcast(  xmlagg(xmlelement(outros,        
+CASE TO1.CD_TP_IDENTF_REPRE   
+	WHEN 2 THEN 'Representante: CPF: ' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 1, 3) || '.' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 4, 3) || '.' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 7, 3) || '-' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 10, 2) || ' - Nome: ' || TO1.NM_REPRE        
+	WHEN 3 THEN 'Representante: CNPJ: ' ||SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 1, 2) || '.' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 3, 3) || '.' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 6, 3) || '/' || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 9, 4) || '-'  || SUBSTR(TO1.CD_DOC_IDENTF_REPRE, 13, 2)  || ' - Nome: ' || TO1.NM_REPRE        
+	ELSE TO1.CD_DOC_IDENTF_REPRE    
+END    
+|| '| ')     
+order by CD_DOC_IDENTF_REPRE) as clob)         
+FROM TB_TRANSMISSAO_ORDEM TO1 WHERE TO1.CD_DOC_IDENTF_CLIE = T1.CD_DOC_IDENTF_CLIE)      
+|| '|' ||           
+(SELECT xmlcast(  xmlagg(xmlelement(cadeia, 'Cadeia Societária - Galho:' || NM_ARVORE_SIMPLES || '|')  order by T1.CD_DOC_IDENTF_CLIE) as clob)         
+ FROM TB_BNEFC_FINAL_SOCTRIA B WHERE B.NM_ARVORE_SIMPLES like '%' || SUBSTR(T1.CD_DOC_IDENTF_CLIE,1,8) || '%')       
+|| '|' ||       
+'Parâmetro que indica um período curto, em dias, para Pessoa Jurídica (pm_QtdeDiasPJ): ' || COALESCE((':pm_QtdeDiasPJ'),'Parâmetro não cadastrado') || '|' ||           
+'Parâmetro de comparação para a quantidade de contas, tratadas pela regra. Para Pessoa Jurídica (pm_QtdeContaPJ): ' || COALESCE((':pm_QtdeContaPJ'),'Parâmetro não cadastrado') || '|'           
+ AS DS_INF_ANLSE            
+
+FROM VM_CLIE T1           
+INNER JOIN TB_CTA C ON T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = C.CD_TP_IDENTF_CLIE AND C.FL_CTA_NOVA = 1       
+  and    C.DT_ABERT_CTA BETWEEN (TRUNC(T1.DT_FIM) - (:pm_QtdeDiasPJ)) AND TRUNC(T1.DT_FIM)               
+      
+INNER JOIN TB_CAD_CLIE CAD ON C.CD_DOC_IDENTF_CLIE = CAD.CD_DOC_IDENTF_CLIE AND C.CD_TP_IDENTF_CLIE = CAD.CD_TP_IDENTF_CLIE         
+WHERE T1.CD_TP_PESSOA = 'J'         
+  AND CAD.CD_TP_PESSOA = 'J'       
+  AND C.FL_CTA_NOVA = 1              
+  AND C.DT_ABERT_CTA IS NOT NULL          
+  AND (       
+  ((T1.NM_ENDER_RESID IS NOT NULL AND CAD.NM_ENDER_RESID IS NOT NULL AND UPPER(T1.NM_ENDER_RESID)= UPPER(CAD.NM_ENDER_RESID)) OR           
+    ((T1.CD_CEP_RESID  IS NOT NULL AND CAD.CD_CEP_RESID IS NOT NULL   AND T1.CD_CEP_RESID = CAD.CD_CEP_RESID)           
+      AND (T1.NU_RESID IS NOT NULL AND CAD.NU_RESID IS NOT NULL AND T1.NU_RESID = CAD.NU_RESID)) OR           
+    (T1.CD_FONE_CLIE IS NOT NULL AND T1.NU_DDD_TELEFONE IS NOT NULL AND  
+     CAD.CD_FONE_CLIE IS NOT NULL AND CAD.NU_DDD_TELEFONE IS NOT NULL AND  
+     TO_CHAR(T1.NU_DDD_TELEFONE || T1.CD_FONE_CLIE) = TO_CHAR(CAD.NU_DDD_TELEFONE ||CAD.CD_FONE_CLIE)) )         
+           
+   OR EXISTS (SELECT 1 FROM TB_BNEFC_FINAL_SOCTRIA A        
+              WHERE A.NM_ARVORE_SIMPLES like '%' || T1.CD_RADICAL_IDENTF_CLIE || '%'        
+               AND A.NM_ARVORE_SIMPLES like '%' || SUBSTR(C.CD_DOC_IDENTF_CLIE,1,9) || '%'       
+               )            
+   OR (EXISTS (SELECT 1 FROM TB_TRANSMISSAO_ORDEM TO1          
+        WHERE T1.REPRESENTANTES LIKE '%' || TO1.CD_DOC_IDENTF_REPRE  || '%'      
+          AND TO1.CD_DOC_IDENTF_CLIE  = C.CD_DOC_IDENTF_CLIE         
+          AND TO1.CD_TP_IDENTF_CLIE   = C.CD_TP_IDENTF_CLIE         
+            ))        
+    )          
+GROUP BY T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, T1.CD_LOTE         
+HAVING COUNT(*) >= (:pm_QtdeContaPJ)    
+

@@ -1,0 +1,66 @@
+/*k) recebimento de recursos com imediata compra de instrumentos para a realizacao de pagamentos ou de transferencia a terceiros, sem justificativa */    
+    
+SELECT T1.DT_APONTAMENTO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 60 - Recebimento e imediata transferência ou pagamento a terceiros |' ||    
+'Objetivo: k) Recebimento de recursos com imediata compra de instrumentos para a realização de pagamentos ou de transferências a terceiros, sem justificativa. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Recebimento de recursos com imediata compra de instrumentos para a realização de pagamentos ou de transferências a terceiros, sem justificativa |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||  
+CASE T1.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Lote: ' || to_char(T1.Cd_lote) || '|' || 
+'Período de análise: de ' || TO_CHAR(MAX(T1.DT_REF) - (:pm_QtdeDias),'DD/MM/YYYY')  
+|| ' até ' || TO_CHAR(MAX(T1.DT_REF),'DD/MM/YYYY')  || '|'  ||    
+ 
+'Quantidade de transações de crédito: ' || TO_CHAR(COUNT(T2.CD_TRANSACAO)) || '|'  || 
+'Valor total das transações de crédito: ' || (TO_CHAR(SUM(T2.VL_OPER), 'L999G999G999G990D99')) || '|'  || 
+'Créditos: Detalhes ' || '|'  ||     
+ xmlcast(  xmlagg(xmlelement(outros,  
+ TO_CHAR(T2.DT_TRANS,'DD/MM/YYYY') || ': Valor-' || LTRIM(TO_CHAR(T2.VL_OPER, 'L999G999G999G990D99')) || ', '  ||   
+         COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T2.CD_TP_OPER), 'Tipo não cadastrado')    
+|| '|')    
+order by T2.DT_TRANS) as clob) 
+|| '|'  ||  
+                    
+'Quantidade de transações de débito no lote: ' || MAX(qt_debito) || '|'  || 
+'Valor total das transações de débito no lote: ' || (TO_CHAR(MAX(VL_DEBITO), 'L999G999G999G990D99')) || '|'  || 
+'Débitos: Detalhes (lote) ' || '|'  ||  
+TO_CHAR(DBMS_LOB.SUBSTR((T1.DEBITOS), 4000)) || '|' ||    
+'Parâmetro que indica pequeno espaço de tempo, em dias (pm_QtdeDias): ' || COALESCE((':pm_QtdeDias'),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE     
+FROM ( 
+ 
+SELECT T.DT_APONTAMENTO, T.CD_LOTE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, SUM(T.VL_DEBITO) VL_DEBITO, SUM(T.QT_DEBITO) QT_DEBITO, MAX(T.DT_REF) DT_REF, 
+xmlcast(  xmlagg(xmlelement(outros,  
+CASE T.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'Dest-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'Dest-' ||SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_DESTORIG   
+END  
+|| ':' || LTRIM(TO_CHAR(T.VL_DEBITO, 'L999G999G999G990D99')) || ', Qtde.Trans- ' ||  TO_CHAR(T.QT_DEBITO) 
+|| '|')    
+order by T.CD_DOC_IDENTF_DESTORIG) as clob) DEBITOS   
+FROM 
+(SELECT LAST_DAY(TRUNC(DT_TRANS)) DT_APONTAMENTO, CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, SUM(VL_OPER) VL_DEBITO, COUNT(*) QT_DEBITO, MAX(DT_TRANS) DT_REF, CD_DOC_IDENTF_DESTORIG, CD_TP_IDENTF_DESTORIG 
+FROM TB_TRANS_ANLSE    
+ WHERE CD_LOTE   = :cd_lote       
+  AND CD_SUBLOTE = :cd_sublote    
+  AND CD_NATUR_OPER = 2    
+  AND CD_DOC_IDENTF_DESTORIG IS NOT NULL  
+  AND CD_DOC_IDENTF_CLIE <> CD_DOC_IDENTF_DESTORIG    
+  GROUP BY LAST_DAY(TRUNC(DT_TRANS)), CD_LOTE, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_DOC_IDENTF_DESTORIG, CD_TP_IDENTF_DESTORIG) T 
+  GROUP BY T.DT_APONTAMENTO, T.CD_LOTE, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE   
+  ) T1   
+   
+INNER JOIN TB_TRANS T2 ON T1.CD_DOC_IDENTF_CLIE = T2.CD_DOC_IDENTF_CLIE AND T1.CD_TP_IDENTF_CLIE = T2.CD_TP_IDENTF_CLIE   
+ 
+WHERE T2.FL_ANALISADO = 1      
+  AND T2.CD_NATUR_OPER  = 1     
+  AND T2.DT_TRANS <= T1.DT_REF    
+  AND EXTRACT (DAY FROM (T1.DT_REF - T2.DT_TRANS))     
+  <= (:pm_QtdeDias)     
+GROUP BY T1.DT_APONTAMENTO, T1.CD_LOTE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, TO_CHAR(DBMS_LOB.SUBSTR((T1.DEBITOS), 4000)) 
+ 

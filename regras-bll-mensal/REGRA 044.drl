@@ -1,0 +1,80 @@
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,          
+'Análise: Regra 44 – Pessoa Jurídica com estrutura societária sem transparência |' ||       
+'Objetivo: Pessoa Jurídica com estrutura societária sem transparência quanto aos beneficiários/proprietários, como offshores, PIC, Trusts, clubes ou fundos de investimento, pessoas jurídicas com sócios com tais características ou cujo beneficiário final não pode ser identificado ou cuja identificação seja difícil ou onerosa |' ||        
+'Conclusão: Pessoa Jurídica com estrutura societária sem transparência |' ||        
+'Cliente: ' || MAX(T.NM_CLIE) || '|' ||       
+CASE T.CD_TP_IDENTF_CLIE       
+	 WHEN 2 THEN 'CPF: ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)        
+	 WHEN 3 THEN 'CNPJ: ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)         
+	 ELSE T.CD_DOC_IDENTF_CLIE        
+END       
+|| '|' ||        
+'Tipo de Pessoa: ' ||          
+CASE T.CD_TP_IDENTF_CLIE        
+	 WHEN 2 THEN 'Física (CPF)'        
+	 WHEN 3 THEN 'Jurídica (CNPJ)'        
+	 ELSE 'Tipo de pessoa não cadastrada'        
+END || '|' ||       
+'Lote: ' || :cd_lote || '|' ||       
+'Forma de constituição do cliente: ' || TO_CHAR(T.CD_FORMA_CONSTTCAO) || ' - ' || COALESCE((SELECT F.NM_FORMA_CONSTTCAO FROM TB_FORMA_CONSTTCAO F WHERE F.CD_FORMA_CONSTTCAO = T.CD_FORMA_CONSTTCAO), 'Não cadastrada') || '|' ||   
+'CNPJ/CPF: Percentual de participação de todos o(s) sócio(s) imediato(s) |'  ||    
+(SELECT xmlcast(  xmlagg(xmlelement(cadeia, (S.CD_DOC_IDENTF_SOCIO || ':' || COALESCE(TO_CHAR(S.PC_PARTC_SOCIO, '999999990D99'), 'Não informado')) || '|')  order by s.CD_DOC_IDENTF_SOCIO) as clob)    
+ FROM TB_CADEIA_SOCTRIA S WHERE S.CD_DOC_IDENTF_SOCIEDD = T.CD_DOC_IDENTF_CLIE AND S.CD_TP_IDENTF_SOCIEDD  = T.CD_TP_IDENTF_CLIE    
+ AND S.PC_PARTC_SOCIO > (:pm_percParticipacao)) || '||' || 
+'Beneficiário(s) final(is) PJ : CPF/CNPJ- '  || xmlcast(  xmlagg(xmlelement(cadeia, (CD_DOC_IDENTF_FINAL) || ', ')  order by CD_DOC_IDENTF_FINAL) as clob) || '||' ||    
+'Cadeia societária com beneficiário(s) final(is) PJ: |' || xmlcast(  xmlagg(xmlelement(cadeia, 'Galho(s): ' || (NM_ARVORE_SIMPLES) || '|')  order by t.CD_DOC_IDENTF_CLIE) as clob)  || '||' ||      
+'Parâmetro que indica percentual de participação expressiva do sócio imediato (pm_percParticipacao): ' || (SELECT TO_CHAR(:pm_percParticipacao, '999999990D99') FROM DUAL) || '|'  ||  
+'Parâmetro de valor mínimo para, pelo menos, umas das transações do mês avaliado (pm_ValorMinimo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'       
+ as  DS_INF_ANLSE      
+FROM (SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, T1.CD_RADICAL_IDENTF_CLIE, T1.CD_FORMA_CONSTTCAO  
+      FROM TB_TRANS T1   
+      WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+      AND T1.FL_ANALISADO = 1  
+      AND T1.CD_TP_PESSOA = 'J'    
+      AND T1.VL_OPER > (:pm_ValorMinimo)   
+      AND T1.CD_FORMA_CONSTTCAO IS NOT NULL   
+      AND EXISTS (SELECT 1 FROM TB_FORMA_CONSTTCAO F WHERE F.CD_FORMA_CONSTTCAO = T1.CD_FORMA_CONSTTCAO AND F.FL_BNEFC_FINAL = 1) ) T, TB_BNEFC_FINAL_SOCTRIA B  
+WHERE EXISTS (SELECT 1 FROM TB_CADEIA_SOCTRIA C   
+              WHERE C.CD_DOC_IDENTF_SOCIEDD = T.CD_DOC_IDENTF_CLIE  
+              AND C.CD_TP_IDENTF_SOCIEDD  = T.CD_TP_IDENTF_CLIE   
+              AND C.PC_PARTC_SOCIO > (:pm_percParticipacao) 
+              AND B.NM_ARVORE_SIMPLES like '%' || LTRIM(RTRIM(T.CD_RADICAL_IDENTF_CLIE)) || '%'           
+              AND B.NM_ARVORE_SIMPLES like '%' || LTRIM(RTRIM(C.CD_RADICAL_IDENTF_SOCIO)) || '%'  /*socio imediato para pegar o ramo especifico da arvore*/   
+              AND B.CD_TP_IDENTF_FINAL = 3)   
+  GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_FORMA_CONSTTCAO  
+UNION ALL    
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, TO_CLOB (   
+'Análise: Regra 44 – Pessoa Jurídica com estrutura societária sem transparência |'  ||       
+'Objetivo: Pessoa Jurídica com estrutura societária sem transparência quanto aos beneficiários/proprietários, como offshores, PIC, Trusts, clubes ou fundos de investimento, pessoas jurídicas com sócios com tais características ou cujo beneficiário final não pode ser identificado ou cuja identificação seja difícil ou onerosa |' ||        
+'Conclusão: Pessoa Jurídica com estrutura societária sem transparência |' ||        
+'Cliente: ' || (T.NM_CLIE) || '|' ||       
+CASE T.CD_TP_IDENTF_CLIE       
+	 WHEN 2 THEN 'CPF: ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)        
+	 WHEN 3 THEN 'CNPJ: ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)         
+	 ELSE T.CD_DOC_IDENTF_CLIE        
+END       
+|| '|' ||        
+'Tipo de Pessoa: ' ||         
+CASE T.CD_TP_IDENTF_CLIE        
+	 WHEN 2 THEN 'Física (CPF)'        
+	 WHEN 3 THEN 'Jurídica (CNPJ)'        
+	 ELSE 'Tipo de pessoa não cadastrada'        
+END || '|' ||       
+'Lote: ' || :cd_lote || '|' ||      
+'Forma de constituição do cliente: ' || TO_CHAR(T.CD_FORMA_CONSTTCAO) || ' - ' || COALESCE((SELECT F.NM_FORMA_CONSTTCAO FROM TB_FORMA_CONSTTCAO F WHERE F.CD_FORMA_CONSTTCAO = T.CD_FORMA_CONSTTCAO), 'Não cadastrada') || '|' ||   
+'Parâmetro de valor mínimo para, pelo menos, umas das transações do mês avaliado (pm_ValorMinimo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'  ||  
+'Análise: A forma de constituição do CNPJ permite a identificação do(s) seu(s) beneficiário(s) final(is), mas o cliente CNPJ não possui uma cadeia societária.' || '|'     
+) as  DS_INF_ANLSE       
+FROM (SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.NM_CLIE, T1.CD_RADICAL_IDENTF_CLIE, T1.CD_FORMA_CONSTTCAO  
+      FROM TB_TRANS T1   
+      WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)      
+      AND T1.FL_ANALISADO = 1
+      AND T1.CD_TP_PESSOA = 'J'    
+      AND T1.VL_OPER > (:pm_ValorMinimo)   
+      AND T1.CD_FORMA_CONSTTCAO IS NOT NULL   
+      AND EXISTS (SELECT 1 FROM TB_FORMA_CONSTTCAO F WHERE F.CD_FORMA_CONSTTCAO = T1.CD_FORMA_CONSTTCAO AND F.FL_BNEFC_FINAL = 1) ) T   
+WHERE    
+   NOT EXISTS (SELECT 1 FROM TB_CADEIA_SOCTRIA C WHERE C.CD_RADICAL_IDENTF_SOCIEDD = T.CD_RADICAL_IDENTF_CLIE)   
+   

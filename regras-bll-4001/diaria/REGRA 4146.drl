@@ -1,0 +1,82 @@
+/* BANRISUL - DIÁRIA */ 
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4146 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' ||   
+'Tipo da Transação: ' || COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), 'Descrição não cadastrada') || '|' || 
+'Forma da Transação: Moeda Estrangeira|' || 
+'Modalidade da Conta: CCME (Contas Correntes em Moeda Estrangeira)|' || 
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||     
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|' ||  
+'Valor da Renda:' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Não identificado') || '|' || 
+CASE T.CD_TP_IDENTF_DESTORIG  
+     WHEN 2 THEN 'Documento do Destino/Origem envolvido (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2) 
+     WHEN 3 THEN 'Documento do Destino/Origem envolvido (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_DESTORIG 
+END 
+ || '|' || 
+COALESCE((':DS-pm_PercRenda' || ' (' || ':NM-pm_PercRenda' || '):' || :pm_PercRenda || '%'),'Parâmetro não cadastrado' ) || '|' || 
+COALESCE((':DS-pm_ValorMinimoPF' || ' (' || ':NM-pm_ValorMinimoPF' || '):' || TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' 
+AS DS_INF_ANLSE 
+FROM TB_TRANS_ANLSE T   
+WHERE T.CD_LOTE = :cd_lote 
+AND T.CD_SUBLOTE = :cd_sublote
+AND T.CD_TP_PESSOA = 'F' 
+AND T.CD_FORMA_OPER = 8 /* MOEDA ESTRANGEIRA */ 
+--AND T.CD_MODALIDADE_CTA = 1 /* CCME */ 
+AND T.CD_DOC_IDENTF_DESTORIG IS NOT NULL  /* Transação envolvendo terceiros */   
+AND T.VL_OPER IS NOT NULL 
+AND T.VL_OPER >= (:pm_ValorMinimoPF)
+AND ((T.VL_RENDA_FAT IS NOT NULL AND
+      T.VL_OPER >= (T.VL_RENDA_FAT * (:pm_PercRenda/100))
+	 )
+	 OR
+	 T.VL_RENDA_FAT IS NULL
+	)
+UNION ALL 
+SELECT LAST_DAY(TRUNC(T.DT_TRANS)) DT_APONTAMENTO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,   
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4146 AND CD_VERSAO_SISTEMA = 4) ||  
+'Cliente: ' ||  COALESCE(T.NM_CLIE, 'Nome não informado') || '|' || 
+CASE T.CD_TP_IDENTF_CLIE  
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)  
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)   
+	ELSE T.CD_DOC_IDENTF_CLIE  
+END  
+|| '|' ||    
+'Lote: ' || TO_CHAR(T.CD_LOTE) || '|' || 
+'Tipo da Transação: ' || COALESCE((SELECT NM_TP_OPER FROM TB_TP_OPER WHERE CD_TP_OPER = T.CD_TP_OPER), 'Descrição não cadastrada') || '|' || 
+'Forma da Transação: Moeda Estrangeira|' || 
+'Modalidade da Conta: CCME (Contas Correntes em Moeda Estrangeira)|' || 
+'Data da Transação: ' || TO_CHAR(T.DT_TRANS,'DD/MM/YYYY') || '|' ||     
+'Valor da Transação: ' || TO_CHAR(T.VL_OPER, 'L999G999G999G990D99') || '|' ||  
+'Valor do Faturamento:' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Não identificado') || '|' || 
+CASE T.CD_TP_IDENTF_DESTORIG  
+     WHEN 2 THEN 'Documento do Destino/Origem envolvido (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2) 
+     WHEN 3 THEN 'Documento do Destino/Origem envolvido (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_DESTORIG 
+END 
+ || '|' || 
+COALESCE((':DS-pm_PercFaturamento' || ' (' || ':NM-pm_PercFaturamento' || '):' || :pm_PercFaturamento || '%'),'Parâmetro não cadastrado' ) || '|' || 
+COALESCE((':DS-pm_ValorMinimoPJ' || ' (' || ':NM-pm_ValorMinimoPJ' || '):' || TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado' ) || '|' 
+AS DS_INF_ANLSE 
+FROM TB_TRANS_ANLSE T   
+WHERE T.CD_LOTE = :cd_lote 
+AND T.CD_SUBLOTE = :cd_sublote
+AND T.CD_TP_PESSOA = 'J' 
+AND T.CD_FORMA_OPER = 8 /* MOEDA ESTRANGEIRA */ 
+--AND T.CD_MODALIDADE_CTA = 1 /* CCME */ 
+AND T.CD_DOC_IDENTF_DESTORIG IS NOT NULL  /* Transação envolvendo terceiros  */ 
+AND T.VL_OPER IS NOT NULL 
+AND T.VL_OPER >= (:pm_ValorMinimoPJ)
+AND ((T.VL_RENDA_FAT IS NOT NULL AND
+      T.VL_OPER >= (T.VL_RENDA_FAT * (:pm_PercFaturamento/100))
+	 )
+	 OR
+	 T.VL_RENDA_FAT IS NULL
+	)

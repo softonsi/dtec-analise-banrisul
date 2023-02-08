@@ -1,0 +1,160 @@
+/* -COM PERFIL- */ 
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,        
+'Análise: Regra 54 - Conta pouco movimentada que acolheu depósito inusitado |' ||       
+'Objetivo: e) Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||       
+'Conclusão: Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado |' ||       
+'Cliente: ' ||  T1.NM_CLIE || '|' ||      
+CASE T1.CD_TP_IDENTF_CLIE      	 
+WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      	  
+WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       	  
+ELSE T1.CD_DOC_IDENTF_CLIE      
+END      || '|' ||        
+'Análise: Conta com ' || TO_CHAR(T1.QT_TOTAL_3M) || ' movimentação(ões), nos 3 meses anteriores ao mês calendário, que recebeu o valor total de crédito de ' || LTRIM(TO_CHAR(T1.VL_TOTAL_30D, 'L999G999G999G990D99')) || ', no mês calendário, considerado expressivo em relação a Renda/Faturamento.' || '|'  ||     
+'Banco Cliente: '   || COALESCE(TO_CHAR(T1.CD_BANCO,'000'), 'Não cadastrado') || '|' ||       
+'Agência Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'), 'Não cadastrada') || '|' ||       
+'Conta Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'), 'Não cadastrada') || '|' ||      
+'Valor da Renda/Faturamento: ' || COALESCE(LTRIM(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99')), 'Renda/Faturamento não cadastrado') || '|'  ||      
+'Mês/Ano Calendário: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||      
+'Período de consolidação (3 meses anteriores ao mês  calendário): De ' ||  SUBSTR(TO_CHAR(CD_ANO_MES_INIC),5,2) || '/' || SUBSTR(TO_CHAR(CD_ANO_MES_INIC),1,4) || ' até ' || SUBSTR(TO_CHAR(CD_ANO_MES_FIM),5,2) || '/' || SUBSTR(TO_CHAR(CD_ANO_MES_FIM) ,1,4) ||  '|' ||    
+'Valor total de crédito no mês calendário: ' || LTRIM(TO_CHAR(T1.VL_TOTAL_30D, 'L999G999G999G990D99')) || '|'  ||        
+'Valor médio mensal de créditos nos 3 meses anteriores ao mês calendário: ' || LTRIM(TO_CHAR(T1.VL_TOTAL_3M/3, 'L999G999G999G990D99')) || '|'  ||        
+'Quantidade de transações nos 3 meses anteriores ao mês calendário: ' || TO_CHAR(T1.QT_TOTAL_3M) || '|' ||      
+CASE CD_TP_PESSOA WHEN 'F' THEN     COALESCE((':DS-pm_ValorMinimoConsPF' || ' (' || ':NM-pm_ValorMinimoConsPF' || '):' || TO_CHAR(:pm_ValorMinimoConsPF,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_QtdeTransacoesPF' || ' (' || ':NM-pm_QtdeTransacoesPF' || '):' || :pm_QtdeTransacoesPF),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_PercRenda' || ' (' || ':NM-pm_PercRenda' || '):' || TO_CHAR(:pm_PercRenda, '999999990D99')),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_ValorMinimoPF' || ' (' || ':NM-pm_ValorMinimoPF' || '):' || TO_CHAR(:pm_ValorMinimoPF,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_PercCredito_PF' || ' (' || ':NM-pm_PercCredito_PF' || '):' || TO_CHAR(:pm_PercCredito_PF, '999999990D99')),'Parâmetro não cadastrado|' ) || '|'    
+ELSE     
+COALESCE((':DS-pm_ValorMinimoConsPJ' || ' (' || ':NM-pm_ValorMinimoConsPJ' || '):' || TO_CHAR(:pm_ValorMinimoConsPJ,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_QtdeTransacoesPJ' || ' (' || ':NM-pm_QtdeTransacoesPJ' || '):' || :pm_QtdeTransacoesPJ),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_PercFaturamento' || ' (' || ':NM-pm_PercFaturamento' || '):' || TO_CHAR(:pm_PercFaturamento, '999999990D99')),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_ValorMinimoPJ' || ' (' || ':NM-pm_ValorMinimoPJ' || '):' ||  TO_CHAR(:pm_ValorMinimoPJ,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_PercCredito_PJ' || ' (' || ':NM-pm_PercCredito_PJ' || '):' || TO_CHAR(:pm_PercCredito_PJ,  '999999990D99')),'Parâmetro não cadastrado|' )     
+END        
+AS DS_INF_ANLSE    
+FROM (SELECT T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_BANCO, T1.CD_AG, T1.CD_CTA, T1.CD_TP_PESSOA, T1.VL_RENDA_FAT, T1.CD_ANO_MES_INIC, T1.CD_ANO_MES_FIM, T1.CD_ANO_MES1 CD_ANO_MES, 
+      SUM(T1.QT_TOTAL_3M) QT_TOTAL_3M, SUM(T1.VL_TOTAL_3M) VL_TOTAL_3M, SUM(T1.QT_TOTAL_30D) QT_TOTAL_30D, SUM(T1.VL_TOTAL_30D) VL_TOTAL_30D   
+      FROM  
+     (SELECT D.NM_CLIE, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE, D.CD_BANCO, D.CD_AG, D.CD_CTA, D.CD_TP_PESSOA, D.VL_RENDA_FAT, D.CD_ANO_MES_INIC, D.CD_ANO_MES_FIM, D.CD_ANO_MES CD_ANO_MES1, T.CD_ANO_MES CD_ANO_MES2, 
+      CASE WHEN T.CD_ANO_MES >= D.CD_ANO_MES_INIC AND T.CD_ANO_MES <= D.CD_ANO_MES_FIM THEN SUM(T.QT_TOTAL) END QT_TOTAL_3M, 
+      CASE WHEN T.CD_ANO_MES >= D.CD_ANO_MES_INIC AND T.CD_ANO_MES <= D.CD_ANO_MES_FIM THEN SUM(T.VL_TOTAL) END VL_TOTAL_3M, 
+      CASE WHEN T.CD_ANO_MES = D.CD_ANO_MES THEN SUM(T.QT_TOTAL) END QT_TOTAL_30D, 
+      CASE WHEN T.CD_ANO_MES = D.CD_ANO_MES THEN SUM(T.VL_TOTAL) END VL_TOTAL_30D 
+      FROM TB_PERFIL_MES_CALENDARIO T 
+      INNER JOIN (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_BANCO, CD_AG, CD_CTA, MAX(NM_CLIE) NM_CLIE, MAX(CD_TP_PESSOA) CD_TP_PESSOA, MAX(VL_RENDA_FAT) VL_RENDA_FAT, 
+                  to_char(TRUNC(MAX(DT_TRANS)),'yyyymm') CD_ANO_MES,  
+                  to_char((LAST_DAY(ADD_MONTHS(MAX(DT_TRANS), - 4)) +1), 'yyyymm') CD_ANO_MES_INIC, 
+                  to_char(LAST_DAY(ADD_MONTHS(MAX(DT_TRANS), - 1)), 'yyyymm') CD_ANO_MES_FIM 
+                  FROM TB_TRANS                                                          
+                  WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+                  AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+                  AND FL_ANALISADO = 1 
+                  AND CD_BANCO IS NOT NULL                                         
+                  AND CD_AG IS NOT NULL                                        
+                  AND CD_CTA  IS NOT NULL         
+                  GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, CD_BANCO, CD_AG, CD_CTA                                                         
+                 ) D                                        
+      ON T.CD_IDENTF_PERFIL = 10   
+      AND T.CD_VARIAVEL_PRIMEIRA = D.CD_BANCO  
+      AND T.CD_VARIAVEL_SEGUNDA = D.CD_AG  
+      AND T.CD_VARIAVEL_TERCEIRA = D.CD_CTA   
+      AND T.CD_ANO_MES >= D.CD_ANO_MES_INIC  
+      AND T.CD_ANO_MES <= D.CD_ANO_MES 
+      GROUP BY D.NM_CLIE, D.CD_DOC_IDENTF_CLIE, D.CD_TP_IDENTF_CLIE, D.CD_BANCO, D.CD_AG, D.CD_CTA, D.CD_TP_PESSOA, D.VL_RENDA_FAT, D.CD_ANO_MES_INIC, D.CD_ANO_MES_FIM, D.CD_ANO_MES, T.CD_ANO_MES    
+     ) T1 
+     GROUP BY T1.NM_CLIE, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_BANCO, T1.CD_AG, T1.CD_CTA, T1.CD_TP_PESSOA, T1.VL_RENDA_FAT, T1.CD_ANO_MES_INIC, T1.CD_ANO_MES_FIM, T1.CD_ANO_MES1 
+     ) T1 
+WHERE (VL_TOTAL_30D IS NOT NULL AND QT_TOTAL_3M IS NOT NULL) 
+  AND ((T1.CD_TP_PESSOA = 'F'  
+        AND T1.VL_TOTAL_30D > (:pm_ValorMinimoConsPF)                                       
+        AND ((T1.VL_RENDA_FAT IS NOT NULL AND (T1.VL_TOTAL_30D > (T1.VL_RENDA_FAT * (:pm_PercRenda/100)))) OR T1.VL_RENDA_FAT IS NULL)                                      
+        AND QT_TOTAL_3M < (:pm_QtdeTransacoesPF) 
+        )                                                                            
+        OR                                      
+       (T1.CD_TP_PESSOA = 'J'  
+        AND T1.VL_TOTAL_30D > (:pm_ValorMinimoConsPJ)  
+        AND ((T1.VL_RENDA_FAT IS NOT NULL AND T1.VL_TOTAL_30D > (T1.VL_RENDA_FAT * (:pm_PercFaturamento/100))) OR T1.VL_RENDA_FAT IS NULL)  
+        AND  QT_TOTAL_3M < (:pm_QtdeTransacoesPJ) 
+         )                                                                         
+    )   
+UNION ALL  
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,        
+'Análise: Regra 54 - Conta pouco movimentada que acolheu depósito inusitado |' ||       
+'Objetivo: e) Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||       
+'Conclusão: Movimentação de quantia significativa por meio de conta até então pouco movimentada ou de conta que acolha depósito inusitado |' ||       
+'Cliente: ' ||  T1.NM_CLIE || '|' ||      
+CASE T1.CD_TP_IDENTF_CLIE      	 
+WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)      	  
+WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)       	  
+ELSE T1.CD_DOC_IDENTF_CLIE      
+END      || '|' ||       
+'Análise: Conta que recebeu ' || TO_CHAR(T1.QT_TRANS) || ' crédito(s) inusitado(s), em relação a média dos últimos 3 meses anteriores ao mês calendário, de ' || LTRIM(TO_CHAR(T1.VL_TOTAL_3M/3, 'L999G999G999G990D99'))  || '.'    || '|'  ||    
+'Banco Cliente: '   || COALESCE(TO_CHAR(T1.CD_BANCO,'000'), 'Não cadastrado') || '|' ||       
+'Agência Cliente: ' || COALESCE(TO_CHAR(T1.CD_AG,'0000'),   'Não cadastrada') || '|' ||       
+'Conta Cliente: '   || COALESCE(TO_CHAR(T1.CD_CTA,'0000000000'),   'Não cadastrada') || '|' ||      
+'Valor da Renda/Faturamento: ' || COALESCE(LTRIM(TO_CHAR(T1.VL_RENDA_FAT, 'L999G999G999G990D99')), 'Não cadastrado') || '|'  ||      
+'Mês/Ano Calendário: ' || SUBSTR(:cd_lote,5,2) || '/' || SUBSTR(:cd_lote,1,4) ||  '|' ||      
+'Período de consolidação (3 meses anteriores ao mês  calendário): De ' ||  SUBSTR(TO_CHAR(CD_ANO_MES_INIC),5,2) || '/' || SUBSTR(TO_CHAR(CD_ANO_MES_INIC),1,4) || ' até ' || SUBSTR(TO_CHAR(CD_ANO_MES_FIM),5,2) || '/' || SUBSTR(TO_CHAR(CD_ANO_MES_FIM) ,1,4) ||  '|' ||    
+'Valor total de crédito no mês calendário: ' || LTRIM(TO_CHAR(T1.VL_TOTAL_30D, 'L999G999G999G990D99')) || '|'  ||        
+'Valor médio mensal de créditos nos 3 meses anteriores ao mês calendário: ' || LTRIM(TO_CHAR(T1.VL_TOTAL_3M/3, 'L999G999G999G990D99')) || '|'  ||        
+'Quantidade de créditos inusitados, no mês calendário: ' || TO_CHAR(T1.QT_TRANS) || '|'  ||   
+'Valores dos créditos inusitados, no mês calendário: ' || TO_CHAR(T1.VALORES) || '|'  ||   
+CASE CD_TP_PESSOA WHEN 'F' THEN     COALESCE((':DS-pm_ValorMinimoConsPF' || ' (' || ':NM-pm_ValorMinimoConsPF' || '):' || TO_CHAR(:pm_ValorMinimoConsPF,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_QtdeTransacoesPF' || ' (' || ':NM-pm_QtdeTransacoesPF' || '):' || :pm_QtdeTransacoesPF),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_PercRenda' || ' (' || ':NM-pm_PercRenda' || '):' || TO_CHAR(:pm_PercRenda, '999999990D99')),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_ValorMinimoPF' || ' (' || ':NM-pm_ValorMinimoPF' || '):' || TO_CHAR(:pm_ValorMinimoPF,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_PercCredito_PF' || ' (' || ':NM-pm_PercCredito_PF' || '):' || TO_CHAR(:pm_PercCredito_PF, '999999990D99')),'Parâmetro não cadastrado|' ) || '|'    
+ELSE     
+COALESCE((':DS-pm_ValorMinimoConsPJ' || ' (' || ':NM-pm_ValorMinimoConsPJ' || '):' || TO_CHAR(:pm_ValorMinimoConsPJ,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_QtdeTransacoesPJ' || ' (' || ':NM-pm_QtdeTransacoesPJ' || '):' || :pm_QtdeTransacoesPJ),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_PercFaturamento' || ' (' || ':NM-pm_PercFaturamento' || '):' || TO_CHAR(:pm_PercFaturamento, '999999990D99')),'Parâmetro não cadastrado|' ) || '|'  ||   
+COALESCE((':DS-pm_ValorMinimoPJ' || ' (' || ':NM-pm_ValorMinimoPJ' || '):' ||  TO_CHAR(:pm_ValorMinimoPJ,'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'  ||    
+COALESCE((':DS-pm_PercCredito_PJ' || ' (' || ':NM-pm_PercCredito_PJ' || '):' || TO_CHAR(:pm_PercCredito_PJ,  '999999990D99')),'Parâmetro não cadastrado|' )     
+END     
+AS DS_INF_ANLSE   
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_BANCO, T.CD_AG, T.CD_CTA, T.CD_TP_PESSOA, MAX(NM_CLIE) NM_CLIE, MAX(VL_RENDA_FAT) VL_RENDA_FAT, 
+      C.CD_ANO_MES_INIC, C.CD_ANO_MES_FIM, C.CD_ANO_MES, C.QT_TOTAL_3M, C.VL_TOTAL_3M, C.QT_TOTAL_30D, C.VL_TOTAL_30D , COUNT(*) QT_TRANS, 
+      xmlcast(xmlagg(xmlelement(outros,  LTRIM(TO_CHAR(VL_OPER, 'L999G999G999G990D99'))  || '/ ')  order by VL_OPER) as clob) VALORES     
+      FROM TB_TRANS T 
+      INNER JOIN (SELECT CD_BANCO, CD_AG, CD_CTA, CD_ANO_MES_INIC, CD_ANO_MES_FIM, CD_ANO_MES2 CD_ANO_MES, SUM(QT_TOTAL_3M) QT_TOTAL_3M, SUM(VL_TOTAL_3M) VL_TOTAL_3M, SUM(QT_TOTAL_30D) QT_TOTAL_30D, SUM(VL_TOTAL_30D) VL_TOTAL_30D 
+                  FROM (SELECT T.CD_ANO_MES CD_ANO_MES1, T.CD_VARIAVEL_PRIMEIRA CD_BANCO, T.CD_VARIAVEL_SEGUNDA CD_AG, T.CD_VARIAVEL_TERCEIRA CD_CTA, D.CD_ANO_MES_INIC, D.CD_ANO_MES_FIM, D.CD_ANO_MES CD_ANO_MES2, 
+                        CASE WHEN T.CD_ANO_MES >= D.CD_ANO_MES_INIC AND T.CD_ANO_MES <= D.CD_ANO_MES_FIM THEN SUM(T.QT_TOTAL) END QT_TOTAL_3M, 
+                        CASE WHEN T.CD_ANO_MES >= D.CD_ANO_MES_INIC AND T.CD_ANO_MES <= D.CD_ANO_MES_FIM THEN SUM(T.VL_TOTAL) END VL_TOTAL_3M, 
+                        CASE WHEN T.CD_ANO_MES = D.CD_ANO_MES THEN SUM(T.QT_TOTAL) END QT_TOTAL_30D, 
+                        CASE WHEN T.CD_ANO_MES = D.CD_ANO_MES THEN SUM(T.VL_TOTAL) END VL_TOTAL_30D 
+                        FROM TB_PERFIL_MES_CALENDARIO T 
+                        INNER JOIN (SELECT to_char(ADD_MONTHS(last_day(to_date(to_char(:cd_lote) || '01', 'yyyy/mm/dd')), - 3), 'YYYYMM') CD_ANO_MES_INIC,  
+                                    to_char(ADD_MONTHS(last_day(to_date(to_char(:cd_lote) || '01', 'yyyy/mm/dd')), - 1), 'YYYYMM') CD_ANO_MES_FIM, 
+                                    :cd_lote CD_ANO_MES 
+                                    FROM DUAL) D 
+                        ON T.CD_ANO_MES >= D.CD_ANO_MES_INIC   
+                        AND T.CD_ANO_MES <= D.CD_ANO_MES   
+                        AND T.CD_IDENTF_PERFIL = 10 
+                        GROUP BY T.CD_ANO_MES, T.CD_VARIAVEL_PRIMEIRA , T.CD_VARIAVEL_SEGUNDA , T.CD_VARIAVEL_TERCEIRA , D.CD_ANO_MES_INIC, D.CD_ANO_MES_FIM, D.CD_ANO_MES 
+                       ) E 
+                  GROUP BY CD_BANCO, CD_AG, CD_CTA, CD_ANO_MES_INIC, CD_ANO_MES_FIM, CD_ANO_MES2  
+                 ) C 
+      ON T.CD_BANCO = C.CD_BANCO  
+      AND T.CD_AG = C.CD_AG  
+      AND T.CD_CTA = C.CD_CTA 
+      WHERE T.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1) 
+      AND T.FL_ANALISADO = 1  
+      AND T.CD_NATUR_OPER = 1  
+      AND C.VL_TOTAL_30D IS NOT NULL  
+      AND ((T.CD_TP_PESSOA = 'F'  
+            AND C.VL_TOTAL_30D > (:pm_ValorMinimoConsPF)  
+            AND T.VL_OPER > (:pm_ValorMinimoPF)  
+            AND T.VL_OPER > ((C.VL_TOTAL_3M/3) * (:pm_PercCredito_PF/100)) 
+           ) 
+           OR 
+           (T.CD_TP_PESSOA = 'J'   
+            AND C.VL_TOTAL_30D > (:pm_ValorMinimoConsPJ)  
+            AND T.VL_OPER > (:pm_ValorMinimoPJ)  
+            AND T.VL_OPER > ((C.VL_TOTAL_3M/3) * (:pm_PercCredito_PJ/100))                        
+           ) 
+          ) 
+      GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.CD_BANCO, T.CD_AG, T.CD_CTA, T.CD_TP_PESSOA, C.CD_ANO_MES_INIC, C.CD_ANO_MES_FIM,  
+      C.CD_ANO_MES, C.QT_TOTAL_3M, C.VL_TOTAL_3M, C.QT_TOTAL_30D, C.VL_TOTAL_30D  
+     ) T1 
+      

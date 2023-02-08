@@ -1,0 +1,33 @@
+/* Recursos pertencentes ou controlados por pessoas envolvidas com o terrorismo*/   
+   
+SELECT DISTINCT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 112 - Recursos de pessoa relacionada ao terrorismo |' ||    
+'Objetivo: C) Existência de recursos pertencentes ou controlados, direta ou indiretamente, por pessoas que reconhecidamente tenham cometido ou intentado cometer atos terroristas, ou deles participado ou facilitado o seu cometimento. C.C. Bacen n.3.542/2012, Art. 1º, Inciso X |' ||    
+'Conclusão: Recursos de pessoa relacionada ao terrorismo |' ||    
+'Cliente: ' ||  T.NM_CLIE || '|' ||  
+CASE T.CD_TP_IDENTF_CLIE   
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)   
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)    
+	ELSE T.CD_DOC_IDENTF_CLIE   
+END   
+|| '|' ||   
+'Mês/Ano de Referência: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) || '|'     
+AS DS_INF_ANLSE     
+FROM (SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_MES_ANO FROM TB_TRANS T    
+      WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+         AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)    
+      AND T.FL_ANALISADO = 1    
+      GROUP BY T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_MES_ANO) T
+WHERE EXISTS (SELECT 1 FROM TB_NOTICIA_CLIE N  
+              WHERE N.CD_DOC_IDENTF_CLIE = T.CD_DOC_IDENTF_CLIE  
+              AND N.CD_TP_IDENTF_CLIE  = T.CD_TP_IDENTF_CLIE  
+              AND (UPPER(N.NM_TP_SUSP) <> 'GOVERNO' AND UPPER(N.NM_TP_SUSP) <> 'SOCIOAMBIENTAL' AND UPPER(N.NM_TP_SUSP) <> 'LISTAS DIVERSAS')  
+              AND N.NM_FONTE_NOTICIA LIKE '%LISTA - %'  
+             )      
+AND NOT EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR CLA 
+                WHERE CLA.DS_CONTEUDO LIKE '%' || T.CD_DOC_IDENTF_CLIE || '%' 
+                AND CLA.CD_LISTA_AUXILIAR = 100   
+               ) 
+                                 
+                                 
+                                          

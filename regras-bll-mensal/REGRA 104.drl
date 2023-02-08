@@ -1,0 +1,41 @@
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE,      
+'Análise: Regra 104 - Movimentação atípica por pessoa relacionada à licitação |' ||     
+'Objetivo: D) Movimentações atípicas de recursos por pessoa natural ou jurídica relacionados à licitação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VIII |' ||     
+'Conclusão: Movimentações atípicas de recursos por pessoa natural ou jurídica relacionados à licitação |' ||     
+'Cliente: ' ||  T.NM_CLIE || '|' ||   
+CASE T.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||     
+'Mês/Ano: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||      
+'Análise: Cliente pertence à Lista Auxiliar de Licitação |' ||   
+'Valor Faturamento: ' || COALESCE(TO_CHAR(T.VL_RENDA_FAT, 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||     
+'Valor Consolidado de Crédito: ' || TO_CHAR(T.VL_TOTAL, 'L999G999G999G990D99') || '|'  ||     
+'Quantidade de créditos no período: ' || TO_CHAR(T.QT_TOTAL) || '|' ||  
+'Parâmetro que indica valor mínimo do consolidado para apontamento da regra para Pessoa Jurídica (pm_ValorMinimo): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimo, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro percentual de flexibilização do faturamento do cliente (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'    
+AS DS_INF_ANLSE      
+FROM (SELECT T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, MAX(T1.NM_CLIE) NM_CLIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT,  
+      SUM(T1.VL_OPER) VL_TOTAL, COUNT(*) QT_TOTAL     
+      FROM TB_TRANS T1 
+      WHERE DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+        AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)       
+        AND T1.CD_TP_PESSOA = 'J'   
+        AND T1.FL_ANALISADO = 1  
+        AND T1.CD_NATUR_OPER = 1 
+        GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE
+      ) T
+WHERE T.VL_TOTAL > (:pm_ValorMinimo)   
+AND ((T.VL_RENDA_FAT IS NOT NULL AND     
+      T.VL_TOTAL > (T.VL_RENDA_FAT * (:pm_PercFaturamento/100)))     
+       OR     
+      (T.VL_RENDA_FAT IS NULL)     
+    )      
+AND EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR L   
+            WHERE L.CD_LISTA_AUXILIAR = 103     
+              AND L.DS_CONTEUDO LIKE '%' || T.CD_DOC_IDENTF_CLIE || '%'  
+             )   
+             
+             

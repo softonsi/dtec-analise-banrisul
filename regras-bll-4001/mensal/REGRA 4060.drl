@@ -1,0 +1,36 @@
+/*MENSAL*/ 
+SELECT T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, 
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4060 AND CD_VERSAO_SISTEMA = 4) || 
+'Cliente: ' || T.NM_CLIE || '|' || 
+CASE T.CD_TP_IDENTF_CLIE 
+     WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' + SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2) 
+     WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2) 
+     ELSE T.CD_DOC_IDENTF_CLIE 
+END 
+ || '|' ||  
+'Mês calendário: ' || TO_CHAR(CD_MES_ANO,'YYYY-MM') || '|' || 
+'Valor consolidado de crédito no mesmo POS: ' || TO_CHAR( VL_MES, 'L999G999G999G990D99') || '|' || 
+'Quantidade de créditos no mesmo POS: ' || TO_CHAR( QT_MES) || '|' || 
+'Valor médio de crédito no mesmo POS nos últimos 6 meses: ' || TO_CHAR( VL_MEDIO, 'L999G999G999G990D99') || '|' || 
+'terminal de pagamento (Point of Sale - POS): ' || TO_CHAR( NU_POS) || '|' || 
+COALESCE((SELECT DS_CAMPO_PARAM || ' (' || NM_CAMPO_PARAM || '):' || (SELECT TO_CHAR(:pm_percMediaCreditoPOS) FROM DUAL) || '%'  FROM TB_REGRA_PARAMETRO WHERE CD_REGRA = 4059 AND CD_VERSAO_SISTEMA = 4 AND NM_CAMPO_PARAM = 'pm_percMediaCreditoPOS'),'Parâmetro não cadastrado|' ) || '|'  
+AS DS_INF_ANLSE   
+FROM 
+ 
+(SELECT T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.VL_RENDA_FAT, NU_POS, VL_MES, QT_MES, 
+ SUM(M.VL_TOTAL)/6 VL_MEDIO, SUM(M.QT_TOTAL)/6 QT_MEDIO 
+FROM  
+(SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, VL_RENDA_FAT, NU_POS, SUM(VL_OPER) VL_MES, COUNT(*) QT_MES 
+ FROM TB_TRANS 
+ WHERE CD_TP_PESSOA = 'J' 
+   AND CD_NATUR_OPER = 1  /*credito-engloba doação*/ 
+   AND CD_VIA_OPER = 4 /*POS*/  
+   AND DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+   AND DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+ GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_LOTE, VL_RENDA_FAT, NU_POS 
+ ) T 
+ INNER JOIN TB_PERFIL_MES_CALENDARIO M ON M.CD_IDENTF_PERFIL = 104 AND T.CD_DOC_IDENTF_CLIE = M.CD_VARIAVEL_PRIMEIRA  AND T.CD_TP_IDENTF_CLIE  = M.CD_VARIAVEL_SEGUNDA AND T.NU_POS = M.CD_VARIAVEL_TERCEIRA AND M.CD_ANO_MES <> T.CD_MES_ANO 
+  
+GROUP BY T.CD_MES_ANO, T.CD_DOC_IDENTF_CLIE, T.CD_TP_IDENTF_CLIE, T.NM_CLIE, T.CD_LOTE, T.VL_RENDA_FAT, T.NU_POS,VL_MES, QT_MES 
+) T 
+WHERE VL_MES >= ( VL_MEDIO * (:pm_percMediaCreditoPOS/100)) 

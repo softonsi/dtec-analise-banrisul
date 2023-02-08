@@ -1,0 +1,60 @@
+    
+SELECT T.CD_DOC_IDENTF_CLIE,T.CD_TP_IDENTF_CLIE,       
+(SELECT 'Análise: Regra ' || TO_CHAR(CD_REGRA) || ' - ' || NM_REGRA || '| Objetivo: ' || DS_REGRA || '|' FROM TB_REGRA WHERE CD_REGRA = 4140 AND CD_VERSAO_SISTEMA = 4) ||   
+'Cliente: ' ||  coalesce(T.NM_CLIE, 'Nome não informado') || '|' ||     
+CASE T.CD_TP_IDENTF_CLIE      
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 10, 2)      
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_CLIE, 13, 2)       
+	ELSE T.CD_DOC_IDENTF_CLIE      
+END      
+|| '|' ||          
+'Mês calendário: ' || SUBSTR(T.CD_MES_ANO,5,2) || '/' || SUBSTR(T.CD_MES_ANO,1,4) ||  '|' ||  
+CASE T.CD_TP_IDENTF_DESTORIG      
+	WHEN 2 THEN 'Pessoa que recebeu a transferência da conta do candidato (CPF): ' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 10, 2)      
+	WHEN 3 THEN 'Pessoa que recebeu a transferência da conta do candidato (CNPJ): ' ||SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T.CD_DOC_IDENTF_DESTORIG, 13, 2)       
+	ELSE T.CD_DOC_IDENTF_DESTORIG      
+END      
+|| '|' ||   
+CASE T.CD_TP_IDENTF_DESTORIG      
+	WHEN 2 THEN  'Ocupação, da pessoa destino, não relacionada a contas de campanha: ' || TO_CHAR(OCUP)    
+	WHEN 3 THEN  'Ramo de atividade, da pessoa destino, não relacionada a contas de campanha: ' || (SELECT NM_RAMO_ATIVID FROM TB_RAMO_ATIVID R WHERE R.CD_RAMO_ATIVID = T.CD_ATIVID_DESTORIG )   
+	ELSE T.CD_ATIVID_DESTORIG      
+END      
+|| '|' ||   
+'Valor consolidado: ' || TO_CHAR(VL_TOTAL, 'L999G999G999G990D99') || '|' ||   
+'Quantidade de transações: ' || TO_CHAR(QT_TOTAL) || '|' ||   
+  
+COALESCE((':DS-pm_ValorMinimoCandidatoCNPJ_PJ' || ' (' || ':NM-pm_ValorMinimoCandidatoCNPJ_PJ' || '):' || TO_CHAR(:pm_ValorMinimoCandidatoCNPJ_PJ, 'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|' ||   
+COALESCE((':DS-pm_ValorMinimoCandidatoCNPJ_PF' || ' (' || ':NM-pm_ValorMinimoCandidatoCNPJ_PF' || '):' || TO_CHAR(:pm_ValorMinimoCandidatoCNPJ_PF, 'L999G999G999G990D99')),'Parâmetro não cadastrado|' ) || '|'   
+AS DS_INF_ANLSE     
+FROM (SELECT CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_DOC_IDENTF_DESTORIG, CD_TP_IDENTF_DESTORIG, CD_ATIVID_DESTORIG, VL_TOTAL, QT_TOTAL,   
+      CASE WHEN MAX(CD_OCUP_DESTORIG) IS NOT NULL THEN 
+      xmlcast(xmlagg(xmlelement(outros, COALESCE((SELECT NM_OCUP FROM TB_OCUP P WHERE P.CD_OCUP = T.CD_OCUP_DESTORIG), TO_CHAR(T.CD_OCUP_DESTORIG)) || ', ')  order by T.CD_OCUP_DESTORIG) as clob)    
+      END OCUP  
+      FROM (SELECT A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, MAX(A.NM_CLIE) NM_CLIE, A.CD_DOC_IDENTF_DESTORIG, A.CD_TP_IDENTF_DESTORIG, C.CD_RAMO_ATIVID CD_ATIVID_DESTORIG, CR.CD_OCUP CD_OCUP_DESTORIG, SUM(A.VL_OPER) VL_TOTAL, COUNT(*) QT_TOTAL   
+            FROM TB_TRANS A   
+            INNER JOIN TB_CAD_CLIE C ON C.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_DESTORIG AND C.CD_TP_IDENTF_CLIE = A.CD_TP_IDENTF_DESTORIG  
+            LEFT JOIN TB_CLIE_RENDA CR ON CR.CD_DOC_IDENTF_CLIE = A.CD_DOC_IDENTF_DESTORIG AND CR.CD_TP_IDENTF_CLIE = A.CD_TP_IDENTF_DESTORIG  
+            WHERE DT_TRANS >= TO_DATE(:cd_lote || '01','YYYYMMDD') 
+            AND DT_TRANS <=  LAST_DAY(TO_DATE(:cd_lote || '01','YYYYMMDD'))    
+            AND CD_NATUR_OPER = 2     
+            AND FL_ANALISADO = 1   
+            AND CD_DOC_IDENTF_DESTORIG IS NOT NULL   
+            AND EXISTS (SELECT 1 FROM TB_CONTEUDO_LISTA_AUXILIAR  PI   
+                        WHERE PI.CD_LISTA_AUXILIAR = 115 /*Lista Identificação Candidatos CNPJ*/  
+                        AND TRIM(PI.DS_CONTEUDO) = A.CD_DOC_IDENTF_CLIE   
+                       )      
+            GROUP BY A.CD_MES_ANO, A.CD_DOC_IDENTF_CLIE, A.CD_TP_IDENTF_CLIE, A.CD_DOC_IDENTF_DESTORIG, A.CD_TP_IDENTF_DESTORIG, C.CD_RAMO_ATIVID, CR.CD_OCUP  
+           ) T  
+    WHERE ((CD_TP_IDENTF_DESTORIG = 3 AND   
+            EXISTS (SELECT 1 FROM TB_RAMO_ATIVID R WHERE R.CD_RAMO_ATIVID = T.CD_ATIVID_DESTORIG AND R.FL_RELACAO_CTA_CAMPANHA = 1) AND   
+            VL_TOTAL >= (:pm_ValorMinimoCandidatoCNPJ_PJ) 
+           )      
+           OR  
+           (CD_TP_IDENTF_DESTORIG = 2 AND   
+            EXISTS (SELECT 1 FROM TB_OCUP O WHERE O.CD_OCUP = T.CD_OCUP_DESTORIG AND O.FL_RELACAO_CTA_CAMPANHA = 1) AND   
+            VL_TOTAL >= (:pm_ValorMinimoCandidatoCNPJ_PF) 
+           )  
+          )      
+    GROUP BY CD_MES_ANO, CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_DOC_IDENTF_DESTORIG, CD_TP_IDENTF_DESTORIG, CD_ATIVID_DESTORIG, VL_TOTAL, QT_TOTAL  
+) T  

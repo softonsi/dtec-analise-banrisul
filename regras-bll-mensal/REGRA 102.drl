@@ -1,0 +1,110 @@
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 102 - Movimentação atípica por pessoas relacionadas a patrocínio, propaganda, etc |' ||   
+'Objetivo: B) Movimentações atípicas de recursos por pessoa natural ou jurídica relacionados a patrocínio, propaganda, marketing, consultorias, assessorias e capacitação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VIII |' ||   
+'Conclusão: Movimentações atípicas de recursos por pessoa natural ou jurídica relacionados a patrocínio, propaganda, marketing, consultorias, assessorias e capacitação |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Patrocínio: Sim |' ||   
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(T1.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Valor total de crédito: ' || COALESCE(TO_CHAR(SUM(T1.VL_OPER), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Quantidade total de crédito: ' || TO_CHAR(SUM(QTDE)) || '|' ||   
+'Origens dos créditos: CPF/CNPJ' || '|' || 
+xmlcast(  xmlagg(xmlelement(outros,   
+CASE T1.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'CPF: ' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'CNPJ: ' ||SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_DESTORIG   
+END   
+|| '| ')    
+order by CD_DOC_IDENTF_DESTORIG) as clob)   
+|| '|' || 
+'Parâmetro percentual de flexibilização da renda do cliente (pm_PercRenda): ' || COALESCE((SELECT TO_CHAR(:pm_PercRenda, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica valor mínimo para apontamento da regra para Pessoa Física (pm_ValorMinimoPF): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPF, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE 
+FROM ( 
+SELECT MAX(T1.NM_CLIE) NM_CLIE, T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT, CD_DOC_IDENTF_DESTORIG,CD_TP_IDENTF_DESTORIG, SUM(VL_OPER) VL_OPER, COUNT(*) QTDE 
+FROM TB_TRANS T1   
+WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+  AND T1.FL_ANALISADO = 1  
+  AND T1.CD_TP_PESSOA = 'F'   
+  AND T1.FL_PATROCINIO = 1 
+  AND T1.CD_NATUR_OPER = 1   
+  AND EXISTS   
+      (SELECT 1 FROM TB_CAD_CLIE C   
+     	WHERE C.CD_DOC_IDENTF_CLIE = T1.CD_DOC_IDENTF_DESTORIG   
+       	  AND C.CD_TP_IDENTF_CLIE  = T1.CD_TP_IDENTF_DESTORIG   
+       	  AND EXISTS (SELECT 1 FROM TB_FORMA_CONSTTCAO WHERE CD_FORMA_CONSTTCAO = C.CD_FORMA_CONSTTCAO AND FL_SETOR_PUBLICO = 1)   
+     	)   
+GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_DOC_IDENTF_DESTORIG, T1.CD_TP_IDENTF_DESTORIG 
+) T1 
+GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE  
+HAVING (SUM(T1.VL_OPER) > (:pm_ValorMinimoPF))   
+   AND   
+   (MAX(T1.VL_RENDA_FAT) IS NOT NULL AND SUM(T1.VL_OPER) > (MAX(T1.VL_RENDA_FAT) * (:pm_PercRenda/100))   
+    OR   
+    MAX(T1.VL_RENDA_FAT) IS NULL   
+    )   
+       
+UNION ALL   
+ 
+ 
+SELECT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,    
+'Análise: Regra 102 - Movimentação atípica por pessoas relacionadas a patrocínio, propaganda, etc |' ||   
+'Objetivo: B) Movimentações atípicas de recursos por pessoa natural ou jurídica relacionados a patrocínio, propaganda, marketing, consultorias, assessorias e capacitação. C.C. Bacen n.3.542/2012, Art. 1º, Inciso VIII |' ||   
+'Conclusão: Movimentações atípicas de recursos por pessoa natural ou jurídica relacionados a patrocínio, propaganda, marketing, consultorias, assessorias e capacitação |' ||   
+'Cliente: ' ||  MAX(T1.NM_CLIE) || '|' ||   
+CASE T1.CD_TP_IDENTF_CLIE    
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)    
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)     
+	ELSE T1.CD_DOC_IDENTF_CLIE    
+END    
+|| '|' ||    
+'Patrocínio: Sim |' ||   
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||   
+'Valor Renda: ' || COALESCE(TO_CHAR(MAX(T1.VL_RENDA_FAT), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Valor total de crédito: ' || COALESCE(TO_CHAR(SUM(T1.VL_OPER), 'L999G999G999G990D99'), 'Valor não cadastrado') || '|' ||   
+'Quantidade total de crédito: ' || TO_CHAR(SUM(QTDE)) || '|' ||   
+'Origens dos créditos: CPF/CNPJ' || '|' || 
+xmlcast(  xmlagg(xmlelement(outros,   
+CASE T1.CD_TP_IDENTF_DESTORIG   
+	WHEN 2 THEN 'CPF: ' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 10, 2)   
+	WHEN 3 THEN 'CNPJ: ' ||SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_DESTORIG, 13, 2)    
+	ELSE T1.CD_DOC_IDENTF_DESTORIG   
+END   
+|| '| ')    
+order by CD_DOC_IDENTF_DESTORIG) as clob)   
+|| '|' || 
+'Parâmetro percentual de flexibilização do faturamento do cliente (pm_PercFaturamento): ' || COALESCE((SELECT TO_CHAR(:pm_PercFaturamento, '999999990D99') FROM DUAL),'Parâmetro não cadastrado') || '|' ||   
+'Parâmetro que indica valor mínimo para apontamento da regra para Pessoa Jurídica (pm_ValorMinimoPJ): ' || COALESCE((SELECT TO_CHAR(:pm_ValorMinimoPJ, 'L999G999G999G990D99') FROM DUAL),'Parâmetro não cadastrado') || '|'   
+AS DS_INF_ANLSE 
+FROM ( 
+SELECT MAX(T1.NM_CLIE) NM_CLIE, T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, MAX(T1.VL_RENDA_FAT) VL_RENDA_FAT, CD_DOC_IDENTF_DESTORIG,CD_TP_IDENTF_DESTORIG, SUM(VL_OPER) VL_OPER, COUNT(*) QTDE 
+FROM TB_TRANS T1   
+WHERE T1.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+  AND T1.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)   
+  AND T1.FL_ANALISADO = 1  
+  AND T1.CD_TP_PESSOA = 'J'   
+  AND T1.FL_PATROCINIO = 1 
+  AND T1.CD_NATUR_OPER = 1   
+  AND EXISTS   
+      (SELECT 1 FROM TB_CAD_CLIE C   
+     	WHERE C.CD_DOC_IDENTF_CLIE = T1.CD_DOC_IDENTF_DESTORIG   
+       	  AND C.CD_TP_IDENTF_CLIE  = T1.CD_TP_IDENTF_DESTORIG   
+       	  AND EXISTS (SELECT 1 FROM TB_FORMA_CONSTTCAO WHERE CD_FORMA_CONSTTCAO = C.CD_FORMA_CONSTTCAO AND FL_SETOR_PUBLICO = 1)   
+     	)   
+GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE, T1.CD_DOC_IDENTF_DESTORIG, T1.CD_TP_IDENTF_DESTORIG 
+) T1 
+GROUP BY T1.CD_MES_ANO, T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE  
+HAVING (SUM(T1.VL_OPER) > (:pm_ValorMinimoPJ))   
+   AND   
+   (MAX(T1.VL_RENDA_FAT) IS NOT NULL AND SUM(T1.VL_OPER) > (MAX(T1.VL_RENDA_FAT) * (:pm_PercFaturamento/100))   
+    OR   
+    MAX(T1.VL_RENDA_FAT) IS NULL   
+    )      

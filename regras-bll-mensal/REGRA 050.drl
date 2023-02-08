@@ -1,0 +1,124 @@
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 50 - Operação incompatível com a capacidade econômica do cliente |' ||    
+'Objetivo: a) Movimentação de recursos incompatível com o patrimônio, a atividade econômica ou a ocupação profissional e a capacidade financeira do cliente. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Movimentação de recurso incompatível com o patrimônio, a atividade econômica ou a ocupação profissional e a capacidade financeira do cliente |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||    
+CASE T1.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T1.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||     
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||     
+'Valor Consolidado > pm_ValorMinimo_PF: ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ' ||   
+COALESCE((SELECT LTRIM(TO_CHAR(:pm_ValorMinimo_PF, 'L999G999G999G990D99')) FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+'Ocupação: ' || COALESCE((SELECT LISTAGG(O.NM_OCUP, ', ') WITHIN GROUP (ORDER BY O.NM_OCUP desc)    
+                          FROM TB_OCUP O, TB_CLIE_RENDA C     
+                          WHERE T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE     
+                          AND T1.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE     
+                          AND C.CD_OCUP            = O.CD_OCUP), 'Não cadastrada') || '|' ||  
+CASE COALESCE((SELECT LISTAGG(TO_CHAR(M.VL_MED_CREDITO, 'L999G999G999G990D99'), ' OU ') WITHIN GROUP (ORDER BY M.CD_OCUP desc)     
+               FROM TB_MED_OCUP M, TB_CLIE_RENDA C      
+               WHERE T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE      
+               AND T1.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE      
+               AND C.CD_OCUP            = M.CD_OCUP), '0')  
+WHEN '0' THEN 'Valor Consolidado > Valor Médio de Crédito da Ocupação * (pm_PercOcupacao/100): ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > Valor não cadastrado '  
+ELSE 'Valor Consolidado > Valor Médio de Crédito da Ocupação * (pm_PercOcupacao/100): ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > (' ||  
+     (SELECT LISTAGG(LTRIM(TO_CHAR(M.VL_MED_CREDITO, 'L999G999G999G990D99')), ' OU ') WITHIN GROUP (ORDER BY M.CD_OCUP desc)     
+      FROM TB_MED_OCUP M, TB_CLIE_RENDA C      
+      WHERE T1.CD_DOC_IDENTF_CLIE = C.CD_DOC_IDENTF_CLIE      
+      AND T1.CD_TP_IDENTF_CLIE  = C.CD_TP_IDENTF_CLIE      
+      AND C.CD_OCUP            = M.CD_OCUP) || ') * ' ||  
+      (SELECT LTRIM(TO_CHAR(:pm_PercOcupacao/100, '999999990D99')) FROM DUAL) 
+END  
+|| '|' ||  
+CASE COALESCE(TO_CHAR(T1.VL_MEDIA_RENDA_FAT,'L999G999G999G990D99'),'0')  
+WHEN '0' THEN 'Valor Consolidado > Valor Médio de Renda * (pm_PercRendaFat/100): ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > Valor não cadastrado |'  
+ELSE 'Valor Consolidado > Valor Médio de Renda * (pm_PercRendaFat/100) : ' ||  TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ' ||  
+     LTRIM(TO_CHAR(T1.VL_MEDIA_RENDA_FAT, 'L999G999G999G990D99')) || ' * ' || COALESCE((SELECT LTRIM(TO_CHAR(:pm_PercRendaFat/100, '999999990D99')) FROM DUAL),'Parâmetro não cadastrado') || ' |'   
+END  
+||   
+CASE COALESCE(TO_CHAR(T1.VL_MEDIA_PATRIM, 'L999G999G999G990D99'), '0')  
+WHEN '0' THEN 'Valor Consolidado > Valor Médio de Patrimônio * (pm_PercPatrimonio/100): ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > Valor não cadastrado |'  
+ELSE 'Valor Consolidado > Valor Médio de Patrimônio * (pm_PercPatrimonio/100) : ' ||  TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ('  || 
+     LTRIM(TO_CHAR(T1.VL_MEDIA_PATRIM, 'L999G999G999G990D99')) || ' * ' || COALESCE((SELECT LTRIM(TO_CHAR(:pm_PercPatrimonio/100, '999999990D99')) FROM DUAL),'Parâmetro não cadastrado') || ') |'   
+END   
+AS DS_INF_ANLSE     
+FROM (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO, SUM(T2.VL_OPER) VL_TOTAL, AVG(T2.VL_RENDA_FAT) VL_MEDIA_RENDA_FAT,     
+      AVG(T2.VL_PATRIM) VL_MEDIA_PATRIM FROM TB_TRANS T2    
+      WHERE T2.CD_NATUR_OPER = 1    
+      AND T2.CD_TP_PESSOA = 'F'    
+      AND T2.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T2.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)  
+      AND T2.FL_ANALISADO = 1   
+      GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_MES_ANO) T1    
+WHERE T1.VL_TOTAL IS NOT NULL      
+  AND T1.VL_TOTAL > (:pm_ValorMinimo_PF)    
+  AND (EXISTS (SELECT 1 FROM TB_CLIE_RENDA C, TB_MED_OCUP M    
+               WHERE C.CD_DOC_IDENTF_CLIE = T1.CD_DOC_IDENTF_CLIE    
+               AND C.CD_TP_IDENTF_CLIE = T1.CD_TP_IDENTF_CLIE    
+               AND C.CD_OCUP = M.CD_OCUP  
+               AND T1.VL_TOTAL > (M.VL_MED_CREDITO * (:pm_PercOcupacao/100))    
+              )    
+       OR    
+  	   (T1.VL_MEDIA_RENDA_FAT IS NOT NULL AND     
+  	    T1.VL_TOTAL > (T1.VL_MEDIA_RENDA_FAT * (:pm_PercRendaFat/100)))     
+       OR    
+       T1.VL_MEDIA_RENDA_FAT IS NULL    
+       OR    
+       (T1.VL_MEDIA_PATRIM IS NOT NULL AND     
+        T1.VL_TOTAL > (T1.VL_MEDIA_PATRIM * (:pm_PercPatrimonio/100))    
+       )    
+      )    
+UNION ALL      
+SELECT DISTINCT T1.CD_DOC_IDENTF_CLIE, T1.CD_TP_IDENTF_CLIE,     
+'Análise: Regra 50 - Operação incompatível com a capacidade econômica do cliente |' ||    
+'Objetivo: a) Movimentação de recursos incompatível com o patrimônio, a atividade econômica ou a ocupação profissional e a capacidade financeira do cliente. C.C. Bacen n. 3.542/2012, Art. 1º, Inciso IV |' ||    
+'Conclusão: Movimentação de recurso incompatível com o patrimônio, a atividade econômica ou a ocupação profissional e a capacidade financeira do cliente |' ||    
+'Cliente: ' ||  T1.NM_CLIE || '|' ||    
+CASE T1.CD_TP_IDENTF_CLIE     
+	WHEN 2 THEN 'Tipo de Pessoa Física (CPF): ' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 4, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 7, 3) || '-' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 10, 2)     
+	WHEN 3 THEN 'Tipo de Pessoa Jurídica (CNPJ): ' ||SUBSTR(T1.CD_DOC_IDENTF_CLIE, 1, 2) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 3, 3) || '.' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 6, 3) || '/' || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 9, 4) || '-'  || SUBSTR(T1.CD_DOC_IDENTF_CLIE, 13, 2)      
+	ELSE T1.CD_DOC_IDENTF_CLIE     
+END     
+|| '|' ||    
+'Mês/Ano: ' || SUBSTR(T1.CD_MES_ANO,5,2) || '/' || SUBSTR(T1.CD_MES_ANO,1,4) ||  '|' ||    
+'Ramo de Atividade: ' || COALESCE((SELECT TO_CHAR(NM_RAMO_ATIVID) FROM TB_RAMO_ATIVID    
+                                   WHERE T1.CD_RAMO_ATIVID = CD_RAMO_ATIVID),'Ramo de Atividade não cadastrado') || '|' ||    
+'Valor Consolidado > pm_ValorMinimo_PJ: ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ' ||   
+COALESCE((SELECT LTRIM(TO_CHAR(:pm_ValorMinimo_PJ, 'L999G999G999G990D99')) FROM DUAL),'Parâmetro não cadastrado') || '|' ||  
+CASE COALESCE((SELECT TO_CHAR(M.VL_MED_CREDITO, 'L999G999G999G990D99') FROM TB_MED_RAMO_ATIVID M    
+               WHERE T1.CD_RAMO_ATIVID = M.CD_RAMO_ATIVID),'0') 
+WHEN '0' THEN 'Valor Consolidado > Valor Médio de Crédito do Ramo de Atividade * (pm_PercRamoAtividade/100): ' ||   
+TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ' || 'Valor não cadastrado'  
+ELSE 'Valor Consolidado > Valor Médio de Crédito do Ramo de Atividade * (pm_PercRamoAtividade/100): ' ||  
+TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ' || (SELECT LTRIM(TO_CHAR(M.VL_MED_CREDITO, 'L999G999G999G990D99')) FROM TB_MED_RAMO_ATIVID M    
+                                                     WHERE T1.CD_RAMO_ATIVID = M.CD_RAMO_ATIVID) || ' * ' ||  
+                                                     COALESCE((SELECT LTRIM(TO_CHAR(:pm_PercRamoAtividade/100, '999999990D99')) FROM DUAL),'Parâmetro não cadastrado')  
+END                              
+|| '|' ||  
+CASE COALESCE(TO_CHAR(T1.VL_MEDIA_RENDA_FAT,'L999G999G999G990D99'),'0')  
+WHEN '0' THEN 'Valor Consolidado > Valor Médio de Faturamento * (pm_PercRendaFat/100): ' || TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > Valor não cadastrado |'  
+ELSE 'Valor Consolidado > Valor Médio de Faturamento * (pm_PercRendaFat/100) : ' ||  TO_CHAR(T1.VL_TOTAL, 'L999G999G999G990D99') || ' > ' ||  
+     LTRIM(TO_CHAR(T1.VL_MEDIA_RENDA_FAT, 'L999G999G999G990D99')) || ' * ' || COALESCE((SELECT LTRIM(TO_CHAR(:pm_PercRendaFat/100, '999999990D99')) FROM DUAL),'Parâmetro não cadastrado') || ' |'   
+END  
+AS DS_INF_ANLSE     
+FROM (SELECT CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_RAMO_ATIVID, T2.CD_MES_ANO, SUM(T2.VL_OPER) VL_TOTAL, AVG(T2.VL_RENDA_FAT) VL_MEDIA_RENDA_FAT FROM TB_TRANS T2    
+      WHERE T2.CD_NATUR_OPER = 1    
+      AND T2.CD_TP_PESSOA = 'J'    
+      AND T2.DT_TRANS >=  to_date(to_char(:cd_lote), 'yyyy/mm')  
+      AND T2.DT_TRANS < add_months((to_date(to_char(:cd_lote), 'yyyy/mm')), 1)     
+      AND T2.FL_ANALISADO = 1
+      GROUP BY CD_DOC_IDENTF_CLIE, CD_TP_IDENTF_CLIE, NM_CLIE, CD_RAMO_ATIVID, CD_MES_ANO) T1    
+WHERE T1.VL_TOTAL IS NOT NULL     
+  AND T1.VL_TOTAL > (:pm_ValorMinimo_PJ)    
+  AND ((T1.VL_TOTAL > ((SELECT VL_MED_CREDITO FROM TB_MED_RAMO_ATIVID    
+	                    WHERE CD_RAMO_ATIVID = T1.CD_RAMO_ATIVID) *     
+                       (:pm_PercRamoAtividade/100)))    
+       OR    
+  	   (T1.VL_MEDIA_RENDA_FAT IS NOT NULL AND     
+  	    T1.VL_TOTAL > (T1.VL_MEDIA_RENDA_FAT * (:pm_PercRendaFat/100)))     
+       OR    
+       T1.VL_MEDIA_RENDA_FAT IS NULL    
+      ) 
+      
